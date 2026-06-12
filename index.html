@@ -6,32 +6,67 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color:#1a1a1a}
+
+/* ===== LOGIN ===== */
+#login-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;background:#0a0f0a}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(45,90,45,0.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(200,168,75,0.15) 0%,transparent 50%),radial-gradient(ellipse at 60% 80%,rgba(26,46,26,0.8) 0%,transparent 60%),linear-gradient(135deg,#0a0f0a 0%,#0f1a0f 40%,#1a2e1a 100%)}
+.login-rings{position:absolute;inset:0;pointer-events:none}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(200,168,75,0.08);animation:ringPulse 4s ease-in-out infinite}
+.ring:nth-child(1){width:300px;height:300px;top:-80px;right:-80px;animation-delay:0s}
+.ring:nth-child(2){width:500px;height:500px;top:-180px;right:-180px;animation-delay:0.8s}
+.ring:nth-child(3){width:200px;height:200px;bottom:-60px;left:-60px;animation-delay:1.6s}
+.ring:nth-child(4){width:400px;height:400px;bottom:-160px;left:-160px;animation-delay:2.4s}
+@keyframes ringPulse{0%,100%{opacity:0.4;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
+.login-particles{position:absolute;inset:0;pointer-events:none}
+.particle{position:absolute;width:3px;height:3px;border-radius:50%;background:#c8a84b;opacity:0;animation:float 6s ease-in-out infinite}
+@keyframes float{0%{opacity:0;transform:translateY(0) scale(0)}20%{opacity:0.6}80%{opacity:0.3}100%{opacity:0;transform:translateY(-120px) scale(1.5)}}
+
+.login-card{position:relative;z-index:2;width:100%;max-width:420px;background:linear-gradient(145deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%);border:1px solid rgba(200,168,75,0.25);border-radius:28px;padding:44px 36px 36px;box-shadow:0 40px 100px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.03),inset 0 1px 0 rgba(200,168,75,0.15);backdrop-filter:blur(30px)}
+.login-badge{display:flex;justify-content:center;margin-bottom:24px}
+.login-badge-inner{width:80px;height:80px;background:linear-gradient(135deg,#c8a84b 0%,#e8c86b 50%,#c8a84b 100%);border-radius:22px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#1a2e1a;letter-spacing:0.5px;box-shadow:0 12px 40px rgba(200,168,75,0.5),0 0 0 1px rgba(255,255,255,0.1);animation:badgeGlow 3s ease-in-out infinite}
+@keyframes badgeGlow{0%,100%{box-shadow:0 12px 40px rgba(200,168,75,0.5),0 0 0 1px rgba(255,255,255,0.1)}50%{box-shadow:0 12px 60px rgba(200,168,75,0.7),0 0 30px rgba(200,168,75,0.2),0 0 0 1px rgba(255,255,255,0.15)}}
+.login-eyebrow{text-align:center;font-size:10px;font-weight:700;color:#c8a84b;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:8px;opacity:0.8}
+.login-title{text-align:center;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.3px;line-height:1.2;margin-bottom:6px}
+.login-divider{display:flex;align-items:center;gap:10px;margin:16px 0 24px}
+.login-divider-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent)}
+.login-divider-text{font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:1px;white-space:nowrap}
+.login-field{margin-bottom:16px}
+.login-field-label{font-size:10px;font-weight:700;color:rgba(200,168,75,0.7);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:block}
+.login-field-wrap{position:relative}
+.login-field-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;opacity:0.5}
+.login-field input{width:100%;padding:13px 14px 13px 42px;border-radius:14px;border:1.5px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);font-size:14px;color:#fff;outline:none;font-family:'Segoe UI',sans-serif;transition:all 0.25s;letter-spacing:0.3px}
+.login-field input::placeholder{color:rgba(255,255,255,0.2)}
+.login-field input:focus{border-color:rgba(200,168,75,0.6);background:rgba(200,168,75,0.05);box-shadow:0 0 0 4px rgba(200,168,75,0.08)}
+.login-submit{width:100%;padding:15px;border-radius:14px;border:none;background:linear-gradient(135deg,#c8a84b 0%,#e8c86b 50%,#b8983b 100%);color:#1a2e1a;font-size:15px;font-weight:800;cursor:pointer;margin-top:8px;transition:all 0.25s;letter-spacing:0.5px;box-shadow:0 8px 30px rgba(200,168,75,0.4);position:relative;overflow:hidden}
+.login-submit::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);opacity:0;transition:opacity 0.25s}
+.login-submit:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(200,168,75,0.5)}
+.login-submit:hover::before{opacity:1}
+.login-submit:active{transform:translateY(0)}
+.login-error-box{margin-top:14px;padding:10px 14px;border-radius:10px;background:rgba(184,59,26,0.15);border:1px solid rgba(184,59,26,0.3);font-size:12px;color:#ff8a75;text-align:center;display:none;font-weight:500}
+.login-footer-text{text-align:center;font-size:10px;color:rgba(255,255,255,0.15);margin-top:28px;letter-spacing:0.5px;line-height:1.6}
+
+/* ===== APP ===== */
 .header{background:linear-gradient(135deg,#0f1a0f 0%,#1a2e1a 60%,#243324 100%);padding:18px 24px 20px;position:relative;overflow:hidden}
-.header::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(200,168,75,0.07)}
+.header::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(200,168,75,0.07);pointer-events:none}
 .logo-row{display:flex;align-items:center;gap:14px}
 .logo-hex{width:46px;height:46px;background:linear-gradient(135deg,#c8a84b,#e8c86b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#1a2e1a;flex-shrink:0;letter-spacing:0.5px}
 .brand-name{font-size:17px;font-weight:700;color:#fff}
 .brand-sub{font-size:11px;color:#8aaa8a;margin-top:2px}
-
-/* Tab bar */
+.logout-btn{margin-left:auto;background:rgba(200,168,75,0.1);border:1.5px solid rgba(200,168,75,0.25);color:#c8a84b;font-size:11px;font-weight:600;padding:6px 14px;border-radius:20px;cursor:pointer;transition:all 0.2s;white-space:nowrap;position:relative;z-index:10}
+.logout-btn:hover{background:rgba(200,168,75,0.2);border-color:#c8a84b}
 .tab-bar{background:#1a2e1a;display:flex;padding:0 16px}
 .tab-btn{padding:12px 20px;font-size:13px;font-weight:600;color:#6a8a6a;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s}
 .tab-btn.active{color:#c8a84b;border-bottom-color:#c8a84b}
 .tab-btn:hover{color:#8aaa8a}
-
 .page{background:#f4f3ee;padding:0 0 60px;min-height:calc(100vh - 120px)}
 .container{max-width:680px;margin:0 auto;padding:0 16px}
 .top-space{height:20px}
-
-/* Cards */
 .card{background:#fff;border-radius:16px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
 .card-head{padding:14px 20px 12px;border-bottom:1px solid #f0efe9;display:flex;align-items:center;gap:12px}
 .step-badge{width:28px;height:28px;border-radius:8px;background:#1a2e1a;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#c8a84b;flex-shrink:0}
 .card-head-title{font-size:14px;font-weight:700;color:#1a1a1a}
 .card-head-sub{font-size:11px;color:#999;margin-top:1px}
 .card-body{padding:16px 20px 20px}
-
-/* Form */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .form-grid.single{grid-template-columns:1fr}
 .form-group{display:flex;flex-direction:column;gap:5px}
@@ -39,8 +74,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
 .form-group input,.form-group textarea{padding:10px 12px;border-radius:8px;border:1.5px solid #e0dfd9;font-size:13px;color:#1a1a1a;outline:none;font-family:'Segoe UI',sans-serif;background:#fafaf7}
 .form-group input:focus,.form-group textarea:focus{border-color:#2d5a2d;background:#fff}
 .form-group textarea{resize:vertical;min-height:70px}
-
-/* Door selection */
 .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .cat-card{border:2px solid #e8e7e1;border-radius:12px;padding:16px;cursor:pointer;transition:all 0.2s;text-align:center;background:#fafaf7}
 .cat-card:hover{border-color:#2d5a2d;background:#f0f6f0}
@@ -83,8 +116,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
 .lam-thick-btn.active{border-color:#2d5a2d;background:#2d5a2d;color:#fff}
 .add-btn{width:100%;margin-top:14px;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#2d5a2d,#1a3a1a);color:#c8a84b;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s}
 .add-btn:hover{background:linear-gradient(135deg,#3a6e3a,#243324)}
-
-/* Quote list */
 .quote-wrap{background:#fff;border-radius:16px;overflow:hidden;margin-bottom:8px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
 .quote-header{background:#1a2e1a;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .quote-header-title{font-size:13px;font-weight:700;color:#c8a84b;text-transform:uppercase;letter-spacing:0.8px}
@@ -113,8 +144,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
 .q-act-btn.danger{border-color:rgba(184,59,26,0.3);color:#e8a090}
 .q-act-btn.save-btn{background:rgba(45,90,45,0.3);border-color:rgba(45,90,45,0.6);color:#8aaa8a}
 .q-act-btn.save-btn:hover{background:rgba(45,90,45,0.5);color:#c8a84b}
-
-/* Projects tab */
 .proj-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .proj-title{font-size:16px;font-weight:700;color:#1a1a1a}
 .proj-count{font-size:12px;color:#999}
@@ -135,8 +164,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
 .reset-zone-sub{font-size:11px;color:#999;margin-bottom:12px}
 .reset-btn-red{width:100%;padding:11px;border-radius:8px;border:1.5px solid #b83b1a;background:transparent;color:#b83b1a;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s}
 .reset-btn-red:hover{background:#fdf0ed}
-
-/* Modal */
 .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
 .modal{background:#fff;border-radius:16px;padding:26px 22px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
 .modal-title{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px}
@@ -157,32 +184,53 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
 .rate-input:focus{border-color:#2d5a2d}
 .rate-unit{font-size:11px;color:#999;width:50px}
 .hidden{display:none}
-.fade-in{animation:fadeIn 0.25s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.success-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2e1a;color:#c8a84b;padding:12px 24px;border-radius:30px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.3);transition:opacity 0.4s}
+.success-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2e1a;color:#c8a84b;padding:12px 24px;border-radius:30px;font-size:13px;font-weight:600;z-index:9998;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+/* session timer bar */
+.session-bar{background:#0f1a0f;padding:4px 16px;display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:10px;color:#4a6a4a}
+.session-timer{color:#c8a84b;font-weight:700;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
 
-<!-- Login Screen -->
-<div class="login-overlay" id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">GWPL</div>
-    <div class="login-title">Geetanjali Woodcraft</div>
-    <div class="login-sub">Door Rate Calculator &nbsp;·&nbsp; Authorized Access Only</div>
-    <div class="login-group">
-      <label class="login-label">User ID</label>
-      <input class="login-input" type="text" id="login-user" placeholder="Enter User ID" onkeydown="if(event.key==='Enter')doLogin()">
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-rings">
+    <div class="ring"></div><div class="ring"></div>
+    <div class="ring"></div><div class="ring"></div>
+  </div>
+  <div class="login-particles" id="particles"></div>
+  <div class="login-card">
+    <div class="login-badge"><div class="login-badge-inner">GWPL</div></div>
+    <div class="login-eyebrow">Geetanjali Woodcraft Pvt. Ltd.</div>
+    <div class="login-title">Door Rate Calculator</div>
+    <div class="login-divider">
+      <div class="login-divider-line"></div>
+      <div class="login-divider-text">AUTHORIZED ACCESS ONLY</div>
+      <div class="login-divider-line"></div>
     </div>
-    <div class="login-group">
-      <label class="login-label">Password</label>
-      <input class="login-input" type="password" id="login-pass" placeholder="Enter Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-field">
+      <label class="login-field-label">User ID</label>
+      <div class="login-field-wrap">
+        <span class="login-field-icon">👤</span>
+        <input type="text" id="login-user" placeholder="Enter your User ID" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+      </div>
     </div>
-    <button class="login-btn" onclick="doLogin()">Login →</button>
-    <div class="login-error" id="login-error"></div>
-    <div class="login-footer">© Geetanjali Woodcraft Pvt. Ltd.</div>
+    <div class="login-field">
+      <label class="login-field-label">Password</label>
+      <div class="login-field-wrap">
+        <span class="login-field-icon">🔑</span>
+        <input type="password" id="login-pass" placeholder="Enter your Password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+    </div>
+    <button class="login-submit" onclick="doLogin()">Login to Continue →</button>
+    <div class="login-error-box" id="login-error">❌ Incorrect User ID or Password. Please try again.</div>
+    <div class="login-footer-text">© 2025 Geetanjali Woodcraft Pvt. Ltd.<br>All rights reserved · Unauthorized access is prohibited</div>
   </div>
 </div>
+
+<!-- MAIN APP -->
+<div id="main-app" style="display:none">
 
 <!-- Toast -->
 <div class="success-toast hidden" id="toast"></div>
@@ -246,11 +294,18 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
 <div class="header">
   <div class="logo-row">
     <div class="logo-hex">GWPL</div>
-    <div>
+    <div style="flex:1">
       <div class="brand-name">Geetanjali Woodcraft</div>
       <div class="brand-sub">PRIVATE LIMITED</div>
     </div>
+    <button class="logout-btn" onclick="doLogout()">⏻ Logout</button>
   </div>
+</div>
+
+<!-- Session timer bar -->
+<div class="session-bar">
+  <span>Session expires in</span>
+  <span class="session-timer" id="session-timer">10:00</span>
 </div>
 
 <div class="tab-bar">
@@ -261,8 +316,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
 <div class="page">
 <div class="container">
 <div class="top-space"></div>
-
-<!-- CALCULATOR TAB -->
 <div id="calc-tab">
 
 <!-- Step 1: Client Details -->
@@ -304,7 +357,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
   </div>
 </div>
 
-<!-- Step 2: Door Category -->
+<!-- Step 2 -->
 <div class="card hidden" id="card1">
   <div class="card-head">
     <div class="step-badge">2</div>
@@ -313,14 +366,12 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
   <div class="card-body">
     <div class="cat-grid">
       <div class="cat-card" id="cc-nf" onclick="selectCat('non-fire')">
-        <div class="cat-icon">🚪</div>
-        <div class="cat-title">Non-Fire Door</div>
+        <div class="cat-icon">🚪</div><div class="cat-title">Non-Fire Door</div>
         <div class="cat-desc">Standard residential & commercial</div>
         <div class="cat-badge badge-green">Main · Bedroom · Bathroom</div>
       </div>
       <div class="cat-card" id="cc-f" onclick="selectCat('fire')">
-        <div class="cat-icon">🔥</div>
-        <div class="cat-title">Fire Door</div>
+        <div class="cat-icon">🔥</div><div class="cat-title">Fire Door</div>
         <div class="cat-desc">IS 3614 certified fire-rated</div>
         <div class="cat-badge badge-red">60 min · 120 min rated</div>
       </div>
@@ -333,7 +384,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
   </div>
 </div>
 
-<!-- Step 3: Thickness -->
+<!-- Step 3 -->
 <div class="card hidden" id="card2">
   <div class="card-head">
     <div class="step-badge">3</div>
@@ -342,7 +393,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
   <div class="card-body"><div class="thick-grid" id="thick-grid"></div></div>
 </div>
 
-<!-- Step 4: Dimensions -->
+<!-- Step 4 -->
 <div class="card hidden" id="card3">
   <div class="card-head">
     <div class="step-badge">4</div>
@@ -369,7 +420,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
   </div>
 </div>
 
-<!-- Step 4b: Laminate -->
+<!-- Step 4b -->
 <div class="card hidden" id="card4">
   <div class="card-head">
     <div class="step-badge">4</div>
@@ -406,59 +457,116 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
   </div>
 </div>
 
-</div><!-- end calc-tab -->
+</div><!-- calc-tab -->
 
-<!-- PROJECTS TAB -->
+<!-- Projects Tab -->
 <div id="proj-tab" class="hidden">
   <div class="proj-header">
-    <div>
-      <div class="proj-title">📁 Saved Projects</div>
-      <div class="proj-count" id="proj-count">Loading...</div>
-    </div>
+    <div><div class="proj-title">📁 Saved Projects</div><div class="proj-count" id="proj-count">Loading...</div></div>
   </div>
   <div id="proj-list"></div>
   <div class="reset-zone">
     <div class="reset-zone-title">⚠️ Reset All Data</div>
-    <div class="reset-zone-sub">This will permanently delete all saved quotations. This action cannot be undone.</div>
+    <div class="reset-zone-sub">Permanently deletes all saved quotations.</div>
     <button class="reset-btn-red" onclick="openResetModal()">🗑️ Reset All Quotations</button>
   </div>
 </div>
 
-<div style="height:20px"></div>
-</div>
-</div>
+  <div style="height:20px"></div>
+</div><!-- end proj-tab -->
+</div><!-- end container -->
+</div><!-- end page -->
 
 <script>
 var LOGIN_USER = 'HPGeetanjali';
 var LOGIN_PASS = 'RPGeetanjali';
+var PWD_RATES  = 'Hardik@1305';
+var PWD_RESET  = 'GeetanjaliHR';
+var SESSION_TIMEOUT = 10 * 60; // 10 minutes in seconds
+var sessionInterval = null;
+var sessionRemaining = SESSION_TIMEOUT;
+var currentPwdAction = null;
+var viewingQuoteId = null;
+
+/* ===== LOGIN ===== */
+// Generate floating particles
+(function(){
+  var wrap = document.getElementById('particles');
+  for(var i=0;i<20;i++){
+    var p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random()*100+'%';
+    p.style.top = (40+Math.random()*60)+'%';
+    p.style.animationDelay = (Math.random()*6)+'s';
+    p.style.animationDuration = (4+Math.random()*4)+'s';
+    wrap.appendChild(p);
+  }
+})();
 
 function doLogin(){
   var u = document.getElementById('login-user').value.trim();
   var p = document.getElementById('login-pass').value;
+  var err = document.getElementById('login-error');
   if(u === LOGIN_USER && p === LOGIN_PASS){
     document.getElementById('login-screen').style.display = 'none';
-    sessionStorage.setItem('gwpl_auth','1');
+    document.getElementById('main-app').style.display = 'block';
+    err.style.display = 'none';
+    startSessionTimer();
   } else {
-    document.getElementById('login-error').textContent = '❌ Incorrect User ID or Password. Try again.';
+    err.style.display = 'block';
     document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
   }
 }
 
-// Check if already logged in this session
-window.onload = function(){
-  if(sessionStorage.getItem('gwpl_auth')==='1'){
-    document.getElementById('login-screen').style.display = 'none';
-  }
-};
+function doLogout(){
+  clearInterval(sessionInterval);
+  sessionInterval = null;
+  sessionRemaining = SESSION_TIMEOUT;
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
 
-var PWD_RATES = 'Hardik@1305';
-var PWD_RESET   = 'GeetanjaliHR';
-var currentPwdAction = null;
-var viewingQuoteId   = null;
+function startSessionTimer(){
+  sessionRemaining = SESSION_TIMEOUT;
+  updateTimerDisplay();
+  clearInterval(sessionInterval);
+  sessionInterval = setInterval(function(){
+    sessionRemaining--;
+    updateTimerDisplay();
+    if(sessionRemaining <= 0){
+      clearInterval(sessionInterval);
+      alert('⏰ Session expired due to inactivity. Please login again.');
+      doLogout();
+    }
+  }, 1000);
+  // Reset timer on any user activity
+  document.addEventListener('click', resetSessionTimer);
+  document.addEventListener('keydown', resetSessionTimer);
+  document.addEventListener('touchstart', resetSessionTimer);
+}
 
+function resetSessionTimer(){
+  sessionRemaining = SESSION_TIMEOUT;
+}
+
+function updateTimerDisplay(){
+  var m = Math.floor(sessionRemaining/60);
+  var s = sessionRemaining%60;
+  document.getElementById('session-timer').textContent = m+':'+(s<10?'0':'')+s;
+  var el = document.getElementById('session-timer');
+  if(sessionRemaining <= 60) el.style.color = '#ff6b6b';
+  else if(sessionRemaining <= 180) el.style.color = '#e8c86b';
+  else el.style.color = '#c8a84b';
+}
+
+/* ===== APP ===== */
 var RATES = {
-  'non-fire': {'30mm':145,'35mm':150,'40mm':160,'45mm':165},
-  'fire':     {'45mm – 60 mins (IS 3614)':325,'55mm – 120 mins (IS 3614)':425}
+  'non-fire':{'30mm':145,'35mm':150,'40mm':160,'45mm':165},
+  'fire':{'45mm – 60 mins (IS 3614)':325,'55mm – 120 mins (IS 3614)':425}
 };
 var THICK_DESC = {
   '30mm':'Standard lightweight','35mm':'Medium density','40mm':'Heavy duty','45mm':'Premium solid',
@@ -467,40 +575,35 @@ var THICK_DESC = {
 };
 var LAMINATES = [
   {name:'Euro Laminate Proplus',rate08:675},
-  {name:'Euro Mica',            rate08:815},
-  {name:'Merino Calplus',       rate08:775},
-  {name:'Merino Lamp',          rate08:1120}
+  {name:'Euro Mica',rate08:815},
+  {name:'Merino Calplus',rate08:775},
+  {name:'Merino Lamp',rate08:1120}
 ];
-var S = {cat:null,type:null,thick:null,rawRate:null,sqft:0,lam:null,lamThick:null};
-var quoteItems = [];
+var S={cat:null,type:null,thick:null,rawRate:null,sqft:0,lam:null,lamThick:null};
+var quoteItems=[];
 
-function getLamRate(idx,thick){ return thick==='1mm' ? LAMINATES[idx].rate08+200 : LAMINATES[idx].rate08; }
-function show(id){ document.getElementById(id).classList.remove('hidden'); }
-function hide(id){ document.getElementById(id).classList.add('hidden'); }
-function scrollInto(id){ setTimeout(function(){ document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'}); },150); }
+function getLamRate(idx,thick){return thick==='1mm'?LAMINATES[idx].rate08+200:LAMINATES[idx].rate08;}
+function show(id){var el=document.getElementById(id);if(el)el.classList.remove('hidden');}
+function hide(id){var el=document.getElementById(id);if(el)el.classList.add('hidden');}
+function scrollInto(id){setTimeout(function(){var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},150);}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden');setTimeout(function(){t.classList.add('hidden');},2500);}
 
-function showToast(msg){
-  var t=document.getElementById('toast');
-  t.textContent=msg; t.classList.remove('hidden');
-  setTimeout(function(){ t.classList.add('hidden'); },2500);
-}
-
-/* ---- Tabs ---- */
 function switchTab(tab){
   if(tab==='calc'){
-    show('calc-tab'); hide('proj-tab');
+    document.getElementById('calc-tab').style.display='block';
+    document.getElementById('proj-tab').style.display='none';
     document.getElementById('tab-calc').className='tab-btn active';
     document.getElementById('tab-proj').className='tab-btn';
   } else {
-    hide('calc-tab'); show('proj-tab');
+    document.getElementById('calc-tab').style.display='none';
+    document.getElementById('proj-tab').style.display='block';
     document.getElementById('tab-calc').className='tab-btn';
     document.getElementById('tab-proj').className='tab-btn active';
     loadProjects();
   }
 }
 
-/* ---- Calculator steps ---- */
-function proceedToDoors(){ show('card1'); scrollInto('card1'); }
+function proceedToDoors(){show('card1');scrollInto('card1');}
 
 function selectCat(cat){
   S={cat:cat,type:null,thick:null,rawRate:null,sqft:0,lam:null,lamThick:null};
@@ -510,58 +613,49 @@ function selectCat(cat){
   var html='';
   for(var i=0;i<types.length;i++) html+='<div class="chip" onclick="selectType(\''+types[i]+'\',this)">'+types[i]+'</div>';
   document.getElementById('type-chips').innerHTML=html;
-  show('sub-types'); hide('card2'); hide('card3'); hide('card4');
+  show('sub-types');hide('card2');hide('card3');hide('card4');
 }
 
 function selectType(type,el){
-  S.type=type; S.thick=null; S.rawRate=null; S.sqft=0; S.lam=null; S.lamThick=null;
+  S.type=type;S.thick=null;S.rawRate=null;S.sqft=0;S.lam=null;S.lamThick=null;
   var chips=document.querySelectorAll('#type-chips .chip');
   for(var i=0;i<chips.length;i++) chips[i].className='chip';
   el.className='chip'+(S.cat==='fire'?' fire-active':' active');
-  renderThickness(); show('card2'); hide('card3'); hide('card4');
-  scrollInto('card2');
+  renderThickness();show('card2');hide('card3');hide('card4');scrollInto('card2');
 }
 
 function renderThickness(){
   var isFire=S.cat==='fire';
   document.getElementById('thick-sub').textContent=isFire?'IS 3614 certified specifications':'Select thickness in millimetres';
-  var keys=Object.keys(RATES[S.cat]); var html='';
+  var keys=Object.keys(RATES[S.cat]);var html='';
   for(var i=0;i<keys.length;i++){
     var k=keys[i],mm=k.split('–')[0].trim();
-    html+='<div class="thick-card" onclick="selectThick(\''+k+'\','+RATES[S.cat][k]+',this)">'
-        +'<div class="thick-mm">'+mm+'</div>'
-        +'<div class="thick-desc">'+(THICK_DESC[k]||'')+'</div></div>';
+    html+='<div class="thick-card" onclick="selectThick(\''+k+'\','+RATES[S.cat][k]+',this)"><div class="thick-mm">'+mm+'</div><div class="thick-desc">'+(THICK_DESC[k]||'')+'</div></div>';
   }
   document.getElementById('thick-grid').innerHTML=html;
 }
 
 function selectThick(key,rate,el){
-  S.thick=key; S.rawRate=rate; S.sqft=0; S.lam=null; S.lamThick=null;
+  S.thick=key;S.rawRate=rate;S.sqft=0;S.lam=null;S.lamThick=null;
   var cards=document.querySelectorAll('.thick-card');
   for(var i=0;i<cards.length;i++) cards[i].className='thick-card';
   el.className='thick-card'+(S.cat==='fire'?' fire-active':' active');
-  document.getElementById('inp-h').value='';
-  document.getElementById('inp-w').value='';
-  show('card3'); hide('card4'); scrollInto('card3');
+  document.getElementById('inp-h').value='';document.getElementById('inp-w').value='';
+  show('card3');hide('card4');scrollInto('card3');
 }
 
 function calcSqft(){
   var h=parseFloat(document.getElementById('inp-h').value);
   var w=parseFloat(document.getElementById('inp-w').value);
-  if(h>0&&w>0){
-    S.sqft=(h/1000)*(w/1000)*10.76;
-    S.lam=null; S.lamThick=null;
-    renderLaminates(); show('card4'); hide('add-btn'); scrollInto('card4');
-  } else { S.sqft=0; hide('card4'); }
+  if(h>0&&w>0){S.sqft=(h/1000)*(w/1000)*10.76;S.lam=null;S.lamThick=null;renderLaminates();show('card4');hide('add-btn');scrollInto('card4');}
+  else{S.sqft=0;hide('card4');}
 }
 
 function renderLaminates(){
   var html='';
   for(var i=0;i<LAMINATES.length;i++){
     var l=LAMINATES[i],sel=(S.lam===i);
-    html+='<div class="lam-card'+(sel?' selected':'')+'">'
-        +'<div class="lam-name">'+l.name+'</div>'
-        +'<div class="lam-thick-row">'
+    html+='<div class="lam-card'+(sel?' selected':'')+'"><div class="lam-name">'+l.name+'</div><div class="lam-thick-row">'
         +'<button class="lam-thick-btn'+(sel&&S.lamThick==='0.8mm'?' active':'')+'" onclick="pickLam('+i+',\'0.8mm\')">0.8mm</button>'
         +'<button class="lam-thick-btn'+(sel&&S.lamThick==='1mm'?' active':'')+'" onclick="pickLam('+i+',\'1mm\')">1mm</button>'
         +'</div></div>';
@@ -569,37 +663,30 @@ function renderLaminates(){
   document.getElementById('lam-grid').innerHTML=html;
 }
 
-function pickLam(idx,thick){ S.lam=idx; S.lamThick=thick; renderLaminates(); show('add-btn'); scrollInto('add-btn'); }
+function pickLam(idx,thick){S.lam=idx;S.lamThick=thick;renderLaminates();show('add-btn');scrollInto('add-btn');}
 
 function addToQuote(){
   var l=LAMINATES[S.lam];
   var lamRate=getLamRate(S.lam,S.lamThick);
-  var rawAmt=S.rawRate*S.sqft;
-  var total=Math.round(rawAmt+(lamRate*2));
+  var total=Math.round(S.rawRate*S.sqft+(lamRate*2));
   quoteItems.push({cat:S.cat,type:S.type,thick:S.thick,
-    h:document.getElementById('inp-h').value,
-    w:document.getElementById('inp-w').value,
-    sqft:S.sqft,rawRate:S.rawRate,
-    lamName:l.name,lamThick:S.lamThick,lamRate:lamRate,total:total});
-  show('quote-section'); renderQuote(); scrollInto('quote-section'); resetForm();
+    h:document.getElementById('inp-h').value,w:document.getElementById('inp-w').value,
+    sqft:S.sqft,rawRate:S.rawRate,lamName:l.name,lamThick:S.lamThick,lamRate:lamRate,total:total});
+  show('quote-section');renderQuote();scrollInto('quote-section');resetForm();
 }
 
 function renderQuote(){
-  var html=''; var subtotal=0;
+  var html='';var subtotal=0;
   for(var i=0;i<quoteItems.length;i++){
-    var q=quoteItems[i]; subtotal+=q.total;
+    var q=quoteItems[i];subtotal+=q.total;
     html+='<div class="quote-item"><div class="qi-top">'
-        +'<div class="qi-num">'+(i+1)+'</div>'
-        +'<div class="qi-info">'
+        +'<div class="qi-num">'+(i+1)+'</div><div class="qi-info">'
         +'<div class="qi-title">'+(q.cat==='fire'?'🔥 Fire Door':'🚪 Non-Fire Door')+' – '+q.type+'</div>'
-        +'<div class="qi-sub">'+q.thick+' &nbsp;·&nbsp; '+q.h+'×'+q.w+'mm &nbsp;·&nbsp; '+q.lamName+' ('+q.lamThick+')</div>'
-        +'</div>'
+        +'<div class="qi-sub">'+q.thick+' · '+q.h+'×'+q.w+'mm · '+q.lamName+' ('+q.lamThick+')</div></div>'
         +'<div style="text-align:right"><div class="qi-amount">₹'+q.total+'</div>'
-        +'<button class="qi-remove" onclick="removeItem('+i+')">✕</button></div>'
-        +'</div></div>';
+        +'<button class="qi-remove" onclick="removeItem('+i+')">✕</button></div></div></div>';
   }
-  var gst=Math.round(subtotal*0.18);
-  var grand=subtotal+gst;
+  var gst=Math.round(subtotal*0.18);var grand=subtotal+gst;
   document.getElementById('quote-list').innerHTML=html;
   document.getElementById('disp-subtotal').textContent='₹'+subtotal;
   document.getElementById('disp-gst').textContent='₹'+gst;
@@ -607,211 +694,169 @@ function renderQuote(){
   document.getElementById('quote-count').textContent=quoteItems.length+(quoteItems.length===1?' door':' doors');
 }
 
-function removeItem(idx){ quoteItems.splice(idx,1); if(quoteItems.length===0) hide('quote-section'); else renderQuote(); }
-function clearQuote(){ quoteItems=[]; hide('quote-section'); }
+function removeItem(idx){quoteItems.splice(idx,1);if(quoteItems.length===0)hide('quote-section');else renderQuote();}
+function clearQuote(){quoteItems=[];hide('quote-section');}
 
 function resetForm(){
   S={cat:S.cat,type:null,thick:null,rawRate:null,sqft:0,lam:null,lamThick:null};
   document.getElementById('cc-nf').className='cat-card'+(S.cat==='non-fire'?' active':'');
   document.getElementById('cc-f').className='cat-card'+(S.cat==='fire'?' fire-active':'');
   var types=S.cat==='non-fire'?['Main Door','Bedroom Door','Bathroom Door']:['Main Door','Staircase Door','Refuge Door'];
-  var html='';
-  for(var i=0;i<types.length;i++) html+='<div class="chip" onclick="selectType(\''+types[i]+'\',this)">'+types[i]+'</div>';
+  var html='';for(var i=0;i<types.length;i++) html+='<div class="chip" onclick="selectType(\''+types[i]+'\',this)">'+types[i]+'</div>';
   document.getElementById('type-chips').innerHTML=html;
-  show('sub-types'); hide('card2'); hide('card3'); hide('card4'); hide('add-btn');
+  show('sub-types');hide('card2');hide('card3');hide('card4');hide('add-btn');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function getClientData(){
-  return {
-    name:     document.getElementById('cl-name').value     ||'—',
-    phone:    document.getElementById('cl-phone').value    ||'—',
-    gst:      document.getElementById('cl-gst').value      ||'—',
-    project:  document.getElementById('cl-project').value  ||'—',
-    supName:  document.getElementById('cl-sup-name').value ||'—',
-    supPhone: document.getElementById('cl-sup-phone').value||'—',
-    siteAddr: document.getElementById('cl-site-addr').value||'—',
-    billAddr: document.getElementById('cl-bill-addr').value||'—',
-    terms:    document.getElementById('cl-terms').value    ||''
-  };
+  return{name:document.getElementById('cl-name').value||'—',phone:document.getElementById('cl-phone').value||'—',
+    gst:document.getElementById('cl-gst').value||'—',project:document.getElementById('cl-project').value||'—',
+    supName:document.getElementById('cl-sup-name').value||'—',supPhone:document.getElementById('cl-sup-phone').value||'—',
+    siteAddr:document.getElementById('cl-site-addr').value||'—',billAddr:document.getElementById('cl-bill-addr').value||'—',
+    terms:document.getElementById('cl-terms').value||''};
 }
-
 function setClientData(c){
-  document.getElementById('cl-name').value      = c.name     !=='—'?c.name:'';
-  document.getElementById('cl-phone').value     = c.phone    !=='—'?c.phone:'';
-  document.getElementById('cl-gst').value       = c.gst      !=='—'?c.gst:'';
-  document.getElementById('cl-project').value   = c.project  !=='—'?c.project:'';
-  document.getElementById('cl-sup-name').value  = c.supName  !=='—'?c.supName:'';
-  document.getElementById('cl-sup-phone').value = c.supPhone !=='—'?c.supPhone:'';
-  document.getElementById('cl-site-addr').value = c.siteAddr !=='—'?c.siteAddr:'';
-  document.getElementById('cl-bill-addr').value = c.billAddr !=='—'?c.billAddr:'';
-  document.getElementById('cl-terms').value     = c.terms||'';
+  document.getElementById('cl-name').value=c.name!=='—'?c.name:'';
+  document.getElementById('cl-phone').value=c.phone!=='—'?c.phone:'';
+  document.getElementById('cl-gst').value=c.gst!=='—'?c.gst:'';
+  document.getElementById('cl-project').value=c.project!=='—'?c.project:'';
+  document.getElementById('cl-sup-name').value=c.supName!=='—'?c.supName:'';
+  document.getElementById('cl-sup-phone').value=c.supPhone!=='—'?c.supPhone:'';
+  document.getElementById('cl-site-addr').value=c.siteAddr!=='—'?c.siteAddr:'';
+  document.getElementById('cl-bill-addr').value=c.billAddr!=='—'?c.billAddr:'';
+  document.getElementById('cl-terms').value=c.terms||'';
 }
 
-/* ---- Save / Load Projects ---- */
+/* ===== PROJECTS ===== */
 async function saveQuote(){
-  if(quoteItems.length===0){ showToast('⚠️ No doors in quote!'); return; }
-  var c=getClientData();
-  var subtotal=0;
+  if(quoteItems.length===0){showToast('⚠️ No doors in quote!');return;}
+  var c=getClientData();var subtotal=0;
   for(var i=0;i<quoteItems.length;i++) subtotal+=quoteItems[i].total;
-  var gst=Math.round(subtotal*0.18);
-  var grand=subtotal+gst;
+  var gst=Math.round(subtotal*0.18);var grand=subtotal+gst;
   var id='quote_'+Date.now();
-  var data={
-    id:id, savedAt:new Date().toISOString(),
-    client:c, items:quoteItems,
-    subtotal:subtotal, gst:gst, grand:grand
-  };
-  try {
-    await window.storage.set(id, JSON.stringify(data));
-    showToast('✅ Quote saved to Projects!');
-  } catch(e){ showToast('❌ Save failed. Try again.'); }
+  var data={id:id,savedAt:new Date().toISOString(),client:c,items:quoteItems,subtotal:subtotal,gst:gst,grand:grand};
+  try{await window.storage.set(id,JSON.stringify(data));showToast('✅ Quote saved to Projects!');}
+  catch(e){showToast('❌ Save failed.');}
 }
 
 async function loadProjects(){
   var list=document.getElementById('proj-list');
   list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;font-size:13px">Loading...</div>';
-  try {
+  try{
     var keys=await window.storage.list('quote_');
     var projects=[];
     for(var i=0;i<keys.keys.length;i++){
-      try {
-        var r=await window.storage.get(keys.keys[i]);
-        if(r) projects.push(JSON.parse(r.value));
-      } catch(e){}
+      try{var r=await window.storage.get(keys.keys[i]);if(r) projects.push(JSON.parse(r.value));}catch(e){}
     }
-    projects.sort(function(a,b){ return new Date(b.savedAt)-new Date(a.savedAt); });
+    projects.sort(function(a,b){return new Date(b.savedAt)-new Date(a.savedAt);});
     document.getElementById('proj-count').textContent=projects.length+' quotation'+(projects.length===1?'':'s')+' saved';
     if(projects.length===0){
-      list.innerHTML='<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-text">No saved quotations yet</div><div class="empty-sub">Save a quote from the Calculator tab to see it here</div></div>';
-      return;
+      list.innerHTML='<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-text">No saved quotations yet</div><div class="empty-sub">Save a quote from the Calculator tab</div></div>';return;
     }
     var html='';
     for(var j=0;j<projects.length;j++){
       var p=projects[j];
       var d=new Date(p.savedAt);
-      var dateStr=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-      html+='<div class="proj-card" onclick="viewProject(\''+p.id+'\')">'
-          +'<div class="proj-card-top">'
-          +'<div><div class="proj-name">'+p.client.project+'</div>'
-          +'<div class="proj-client">'+p.client.name+' &nbsp;·&nbsp; '+p.client.phone+'</div></div>'
+      var ds=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+      html+='<div class="proj-card" onclick="viewProject(\''+p.id+'\')"><div class="proj-card-top">'
+          +'<div><div class="proj-name">'+p.client.project+'</div><div class="proj-client">'+p.client.name+' · '+p.client.phone+'</div></div>'
           +'<div class="proj-total">₹'+p.grand+'</div></div>'
-          +'<div class="proj-meta">'
-          +'<span>📅 '+dateStr+'</span>'
-          +'<span>🚪 '+p.items.length+' door'+(p.items.length===1?'':'s')+'</span>'
-          +'<span class="proj-badge">Saved</span>'
-          +'</div></div>';
+          +'<div class="proj-meta"><span>📅 '+ds+'</span><span>🚪 '+p.items.length+' door'+(p.items.length===1?'':'s')+'</span><span class="proj-badge">Saved</span></div></div>';
     }
     list.innerHTML=html;
-  } catch(e){
-    list.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Could not load projects</div></div>';
-  }
+  }catch(e){list.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Could not load projects</div></div>';}
 }
 
 async function viewProject(id){
-  try {
-    var r=await window.storage.get(id);
-    if(!r){ showToast('Quote not found'); return; }
-    var p=JSON.parse(r.value);
-    viewingQuoteId=id;
+  try{
+    var r=await window.storage.get(id);if(!r){showToast('Quote not found');return;}
+    var p=JSON.parse(r.value);viewingQuoteId=id;
     var d=new Date(p.savedAt);
-    var dateStr=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-    document.getElementById('view-modal-title').textContent=p.client.project+' — '+dateStr;
-    var body='';
-    body+='<div style="background:#f5f3ee;border-radius:8px;padding:12px;margin-bottom:12px;font-size:12px;line-height:1.8">'
+    var ds=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    document.getElementById('view-modal-title').textContent=p.client.project+' — '+ds;
+    var body='<div style="background:#f5f3ee;border-radius:8px;padding:12px;margin-bottom:12px;font-size:12px;line-height:1.8">'
         +'<b>Client:</b> '+p.client.name+' | '+p.client.phone+'<br>'
         +'<b>GST:</b> '+p.client.gst+'<br>'
         +'<b>Supervisor:</b> '+p.client.supName+' | '+p.client.supPhone+'<br>'
-        +'<b>Site:</b> '+p.client.siteAddr
-        +'</div>';
+        +'<b>Site:</b> '+p.client.siteAddr+'</div>';
     for(var i=0;i<p.items.length;i++){
       var q=p.items[i];
       body+='<div style="border:1px solid #eee;border-radius:8px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">'
           +'<div><div style="font-size:13px;font-weight:700">'+(q.cat==='fire'?'🔥 Fire Door':'🚪 Non-Fire Door')+' – '+q.type+'</div>'
-          +'<div style="font-size:11px;color:#888;margin-top:2px">'+q.thick+' &nbsp;·&nbsp; '+q.h+'×'+q.w+'mm &nbsp;·&nbsp; '+q.lamName+' ('+q.lamThick+')</div></div>'
-          +'<div style="font-size:14px;font-weight:800;color:#2d5a2d">₹'+q.total+'</div>'
-          +'</div>';
+          +'<div style="font-size:11px;color:#888;margin-top:2px">'+q.thick+' · '+q.h+'×'+q.w+'mm · '+q.lamName+' ('+q.lamThick+')</div></div>'
+          +'<div style="font-size:14px;font-weight:800;color:#2d5a2d">₹'+q.total+'</div></div>';
     }
-    body+='<div style="background:#1a2e1a;border-radius:8px;padding:12px;margin-top:4px">'
+    body+='<div style="background:#1a2e1a;border-radius:8px;padding:12px">'
         +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#8aaa8a;margin-bottom:4px"><span>Subtotal</span><span>₹'+p.subtotal+'</span></div>'
         +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#8aaa8a;margin-bottom:8px"><span>GST (18%)</span><span>₹'+p.gst+'</span></div>'
-        +'<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:#c8a84b"><span>Grand Total</span><span>₹'+p.grand+'</span></div>'
-        +'</div>';
+        +'<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:#c8a84b"><span>Grand Total</span><span>₹'+p.grand+'</span></div></div>';
     document.getElementById('view-modal-body').innerHTML=body;
     show('view-modal');
-  } catch(e){ showToast('Error loading quote'); }
+  }catch(e){showToast('Error loading quote');}
 }
 
-function closeViewModal(){ hide('view-modal'); viewingQuoteId=null; }
-
-function editSavedQuote(){
-  hide('view-modal');
-  openPwdModal('edit_quote','✏️ Edit Quote','Enter password to edit this quote.');
-}
+function closeViewModal(){hide('view-modal');viewingQuoteId=null;}
+function editSavedQuote(){hide('view-modal');openPwdModal('edit_quote','✏️ Edit Quote','Enter password to edit this quote.');}
 
 async function doEditQuote(){
   if(!viewingQuoteId) return;
-  try {
+  try{
     var r=await window.storage.get(viewingQuoteId);
-    if(!r){ showToast('Quote not found'); return; }
+    if(!r){showToast('Quote not found');return;}
     var p=JSON.parse(r.value);
     setClientData(p.client);
     quoteItems=p.items;
-    show('quote-section'); renderQuote();
-    // delete old saved quote (will re-save after edits)
     await window.storage.delete(viewingQuoteId);
     viewingQuoteId=null;
     switchTab('calc');
+    show('quote-section');
+    renderQuote();
     show('card1');
-    showToast('✅ Quote loaded for editing. Save again when done!');
-    scrollInto('card0');
-  } catch(e){ showToast('Error loading quote for edit'); }
+    showToast('✅ Quote loaded for editing!');
+    setTimeout(function(){document.getElementById('card0').scrollIntoView({behavior:'smooth',block:'start'});},200);
+  }catch(e){showToast('Error loading quote for edit');}
 }
 
-/* ---- Password Modal ---- */
-function openPwdModal(action, title, sub){
+/* ===== PASSWORD MODAL ===== */
+function openPwdModal(action,title,sub){
   currentPwdAction=action;
   document.getElementById('pwd-modal-title').textContent=title;
   document.getElementById('pwd-modal-sub').textContent=sub;
   document.getElementById('modal-pwd').value='';
   document.getElementById('modal-error').textContent='';
   var btn=document.getElementById('pwd-confirm-btn');
-  btn.className = action==='reset' ? 'modal-btn danger' : 'modal-btn primary';
-  btn.textContent = action==='reset' ? 'Delete All' : 'Confirm';
+  btn.className=action==='reset'?'modal-btn danger':'modal-btn primary';
+  btn.textContent=action==='reset'?'Delete All':'Confirm';
   show('modal-pwd-overlay');
-  setTimeout(function(){ document.getElementById('modal-pwd').focus(); },100);
+  setTimeout(function(){document.getElementById('modal-pwd').focus();},100);
 }
-function openRatePwdModal(){ openPwdModal('edit_rates','🔒 Edit Rates','Enter password to edit locked rates.'); }
-function openResetModal(){ openPwdModal('reset','⚠️ Reset All Data','Enter password to permanently delete all quotations.'); }
-function closeModal(){ hide('modal-pwd-overlay'); currentPwdAction=null; }
+function openRatePwdModal(){openPwdModal('edit_rates','🔒 Edit Rates','Enter password to edit locked rates.');}
+function openResetModal(){openPwdModal('reset','⚠️ Reset All Data','Enter password to permanently delete all quotations.');}
+function closeModal(){hide('modal-pwd-overlay');currentPwdAction=null;}
 
 function verifyPwd(){
   var pwd=document.getElementById('modal-pwd').value;
   var err=document.getElementById('modal-error');
   if(currentPwdAction==='edit_rates'){
-    if(pwd===PWD_RATES){ hide('modal-pwd-overlay'); openRateEditor(); }
-    else{ err.textContent='❌ Incorrect password.'; document.getElementById('modal-pwd').value=''; }
-  } else if(currentPwdAction==='reset'){
-    if(pwd===PWD_RESET){ hide('modal-pwd-overlay'); doResetAll(); }
-    else{ err.textContent='❌ Incorrect password.'; document.getElementById('modal-pwd').value=''; }
-  } else if(currentPwdAction==='edit_quote'){
-    if(pwd===PWD_RATES){ hide('modal-pwd-overlay'); doEditQuote(); }
-    else{ err.textContent='❌ Incorrect password.'; document.getElementById('modal-pwd').value=''; }
+    if(pwd===PWD_RATES){hide('modal-pwd-overlay');openRateEditor();}
+    else{err.textContent='❌ Incorrect password.';document.getElementById('modal-pwd').value='';}
+  }else if(currentPwdAction==='reset'){
+    if(pwd===PWD_RESET){hide('modal-pwd-overlay');doResetAll();}
+    else{err.textContent='❌ Incorrect password.';document.getElementById('modal-pwd').value='';}
+  }else if(currentPwdAction==='edit_quote'){
+    if(pwd===PWD_RATES){hide('modal-pwd-overlay');doEditQuote();}
+    else{err.textContent='❌ Incorrect password.';document.getElementById('modal-pwd').value='';}
   }
 }
 
 async function doResetAll(){
-  try {
+  try{
     var keys=await window.storage.list('quote_');
-    for(var i=0;i<keys.keys.length;i++){
-      try { await window.storage.delete(keys.keys[i]); } catch(e){}
-    }
-    showToast('✅ All quotations deleted.');
-    loadProjects();
-  } catch(e){ showToast('Error resetting data.'); }
+    for(var i=0;i<keys.keys.length;i++){try{await window.storage.delete(keys.keys[i]);}catch(e){}}
+    showToast('✅ All quotations deleted.');loadProjects();
+  }catch(e){showToast('Error resetting data.');}
 }
 
-/* ---- Rate Editor ---- */
 function openRateEditor(){
   document.getElementById('re-nf-30').value=RATES['non-fire']['30mm'];
   document.getElementById('re-nf-35').value=RATES['non-fire']['35mm'];
@@ -822,7 +867,7 @@ function openRateEditor(){
   for(var i=0;i<LAMINATES.length;i++) document.getElementById('re-lam-'+i).value=LAMINATES[i].rate08;
   show('rate-modal');
 }
-function closeRateEditor(){ hide('rate-modal'); }
+function closeRateEditor(){hide('rate-modal');}
 function saveRates(){
   RATES['non-fire']['30mm']=parseFloat(document.getElementById('re-nf-30').value)||145;
   RATES['non-fire']['35mm']=parseFloat(document.getElementById('re-nf-35').value)||150;
@@ -831,39 +876,34 @@ function saveRates(){
   RATES['fire']['45mm – 60 mins (IS 3614)']=parseFloat(document.getElementById('re-f-45').value)||325;
   RATES['fire']['55mm – 120 mins (IS 3614)']=parseFloat(document.getElementById('re-f-55').value)||425;
   for(var i=0;i<LAMINATES.length;i++) LAMINATES[i].rate08=parseFloat(document.getElementById('re-lam-'+i).value)||LAMINATES[i].rate08;
-  hide('rate-modal'); showToast('✅ Rates updated!');
+  hide('rate-modal');showToast('✅ Rates updated!');
 }
 
-/* ---- Download & WhatsApp ---- */
+/* ===== DOWNLOAD ===== */
 function downloadQuote(){
   var c=getClientData();
   var date=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-  var subtotal=0; var rows='';
+  var subtotal=0;var rows='';
   for(var i=0;i<quoteItems.length;i++){
-    var q=quoteItems[i]; subtotal+=q.total;
+    var q=quoteItems[i];subtotal+=q.total;
     var bg=i%2===0?'#fff':'#fafaf7';
-    rows+='<tr style="background:'+bg+'">'
-        +'<td style="padding:9px 8px;font-size:12px;color:#555;border-bottom:1px solid #eee;text-align:center">'+(i+1)+'</td>'
-        +'<td style="padding:9px 8px;font-size:12px;font-weight:600;color:#1a1a1a;border-bottom:1px solid #eee">'+(q.cat==='fire'?'Fire Door':'Non-Fire Door')+' – '+q.type+'</td>'
+    rows+='<tr style="background:'+bg+'"><td style="padding:9px 8px;font-size:12px;color:#555;border-bottom:1px solid #eee;text-align:center">'+(i+1)+'</td>'
+        +'<td style="padding:9px 8px;font-size:12px;font-weight:600;border-bottom:1px solid #eee">'+(q.cat==='fire'?'Fire Door':'Non-Fire Door')+' – '+q.type+'</td>'
         +'<td style="padding:9px 8px;font-size:12px;color:#555;border-bottom:1px solid #eee">'+q.thick+'</td>'
         +'<td style="padding:9px 8px;font-size:12px;color:#555;border-bottom:1px solid #eee">'+q.h+'x'+q.w+' mm</td>'
         +'<td style="padding:9px 8px;font-size:12px;color:#555;border-bottom:1px solid #eee">'+q.lamName+' ('+q.lamThick+')</td>'
-        +'<td style="padding:9px 8px;font-size:12px;font-weight:700;color:#1a2e1a;text-align:right;border-bottom:1px solid #eee">Rs.'+q.total+'</td>'
-        +'</tr>';
+        +'<td style="padding:9px 8px;font-size:12px;font-weight:700;color:#1a2e1a;text-align:right;border-bottom:1px solid #eee">Rs.'+q.total+'</td></tr>';
   }
-  var gst=Math.round(subtotal*0.18); var grand=subtotal+gst;
-  var termsHtml='';
-  var tlines=c.terms.split('\n');
+  var gst=Math.round(subtotal*0.18);var grand=subtotal+gst;
+  var termsHtml='';var tlines=c.terms.split('\n');
   for(var t=0;t<tlines.length;t++) if(tlines[t].trim()) termsHtml+='<div style="margin-bottom:5px">'+tlines[t].trim()+'</div>';
-
   var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Quotation</title>'
     +'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:12px}'
-    +'@media print{body{padding:0}.no-print{display:none!important}@page{margin:12mm;size:A4}}</style>'
-    +'</head><body>'
+    +'@media print{body{padding:0}.no-print{display:none!important}@page{margin:12mm;size:A4}}</style></head><body>'
     +'<div class="no-print" style="text-align:center;margin-bottom:16px">'
     +'<button onclick="window.print()" style="padding:12px 32px;background:#1a2e1a;color:#c8a84b;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">Save as PDF / Print</button>'
     +'<p style="margin-top:8px;font-size:11px;color:#999">Select "Save as PDF" as printer</p></div>'
-    +'<table width="100%" style="background:#1a2e1a;padding:14px 16px;margin-bottom:0"><tr>'
+    +'<table width="100%" style="background:#1a2e1a;padding:14px 16px"><tr>'
     +'<td><div style="font-size:16px;font-weight:700;color:#c8a84b">We Are One Enterprises Pvt. Ltd.</div>'
     +'<div style="font-size:9px;color:#aaa;margin-top:6px;line-height:1.7">#601, Express Chamber, M.V. Road, Near Western Express Highway, Opp. Natraj Rustomjee, Andheri East, Mumbai - 400 069<br>'
     +'sales@weareoneenterprises.com | +91 22 4919 55 55 | GST: 27AAACW8324N1ZU</div></td>'
@@ -899,29 +939,21 @@ function downloadQuote(){
     +'<td style="padding:8px 14px;font-size:12px;font-weight:700;text-align:right">Rs.'+gst+'</td></tr>'
     +'<tr style="background:#1a2e1a"><td style="padding:12px 14px;font-size:12px;font-weight:700;color:#c8a84b;text-transform:uppercase">Grand Total (incl. 18% GST)</td>'
     +'<td style="padding:12px 14px;font-size:20px;font-weight:800;color:#c8a84b;text-align:right">Rs.'+grand+'</td></tr></table>'
-    +(termsHtml?'<div style="margin-top:14px;border:1px solid #ddd">'
-    +'<div style="background:#f0f0eb;padding:7px 10px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase">Payment Terms & Conditions</div>'
+    +(termsHtml?'<div style="margin-top:14px;border:1px solid #ddd"><div style="background:#f0f0eb;padding:7px 10px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase">Payment Terms & Conditions</div>'
     +'<div style="padding:10px 12px;font-size:11px;color:#555;line-height:1.7">'+termsHtml+'</div></div>':'')
     +'<div style="margin-top:16px;font-size:9px;color:#bbb;text-align:center;border-top:1px solid #eee;padding-top:10px">Computer-generated quotation by We Are One Enterprises Pvt. Ltd.</div>'
-    +'<script>window.onload=function(){window.print();}<\/script>'
-    +'</body></html>';
-
-  var blob=new Blob([html],{type:'text/html'});
-  var url=URL.createObjectURL(blob);
+    +'<script>window.onload=function(){window.print();}<\/script></body></html>';
+  var blob=new Blob([html],{type:'text/html'});var url=URL.createObjectURL(blob);
   var win=window.open(url,'_blank');
-  if(!win){
-    var a=document.createElement('a'); a.href=url;
-    a.download='Quotation_'+(c.project||'GWPL').replace(/\s+/g,'_')+'.html';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  }
-  setTimeout(function(){ URL.revokeObjectURL(url); },10000);
+  if(!win){var a=document.createElement('a');a.href=url;a.download='Quotation.html';document.body.appendChild(a);a.click();document.body.removeChild(a);}
+  setTimeout(function(){URL.revokeObjectURL(url);},10000);
 }
 
 function shareWA(){
-  var c=getClientData(); var subtotal=0;
+  var c=getClientData();var subtotal=0;
   var msg='*We Are One Enterprises Pvt. Ltd.*\n*Door Rate Quotation*\n\nClient: '+c.name+' | '+c.phone+'\nProject: '+c.project+'\n\n';
   for(var i=0;i<quoteItems.length;i++){
-    var q=quoteItems[i]; subtotal+=q.total;
+    var q=quoteItems[i];subtotal+=q.total;
     msg+=(i+1)+'. '+(q.cat==='fire'?'Fire Door':'Non-Fire Door')+' - '+q.type+'\n   '+q.thick+' | '+q.h+'x'+q.w+'mm | '+q.lamName+' ('+q.lamThick+')\n   Amount: Rs.'+q.total+'\n\n';
   }
   var gst=Math.round(subtotal*0.18);
