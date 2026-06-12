@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color:#1a1a1a}
+.header{background:linear-gradient(135deg,#0f1a0f 0%,#1a2e1a 60%,#243324 100%);padding:22px 24px 28px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(200,168,75,0.07)}
+.logo-row{display:flex;align-items:center;gap:14px}
+.logo-hex{width:50px;height:50px;background:linear-gradient(135deg,#c8a84b,#e8c86b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#1a2e1a;flex-shrink:0;letter-spacing:0.5px}
+.brand-name{font-size:18px;font-weight:700;color:#fff}
+.brand-sub{font-size:12px;color:#8aaa8a;margin-top:2px;letter-spacing:0.5px}
+.header-tagline{margin-top:18px}
+.header-tagline h2{font-size:22px;font-weight:700;color:#fff;line-height:1.3}
+.header-tagline p{font-size:13px;color:#8aaa8a;margin-top:5px}
+.gold-pill{display:inline-block;background:rgba(200,168,75,0.15);border:1px solid rgba(200,168,75,0.3);border-radius:20px;padding:3px 12px;font-size:11px;color:#c8a84b;font-weight:600;letter-spacing:0.5px;margin-bottom:10px}
+.progress-bar{background:#1a2e1a;padding:14px 24px}
+.progress-steps{display:flex;align-items:center;max-width:600px;margin:0 auto}
+.prog-step{display:flex;align-items:center;gap:6px}
+.prog-dot{width:26px;height:26px;border-radius:50%;border:2px solid #3a5a3a;background:transparent;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#3a5a3a;flex-shrink:0;transition:all 0.3s}
+.prog-dot.done{background:#c8a84b;border-color:#c8a84b;color:#1a2e1a}
+.prog-dot.active{background:#2d5a2d;border-color:#c8a84b;color:#c8a84b}
+.prog-label{font-size:10px;color:#3a5a3a;font-weight:500;white-space:nowrap}
+.prog-label.active{color:#8aaa8a}
+.prog-label.done{color:#c8a84b}
+.prog-line{flex:1;height:1px;background:#2a4a2a;margin:0 6px}
+.prog-line.done{background:#c8a84b}
+.page{background:#f4f3ee;padding:0 0 60px}
+.container{max-width:680px;margin:0 auto;padding:0 16px}
+.top-space{height:20px}
+.card{background:#fff;border-radius:16px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.card-head{padding:16px 20px 14px;border-bottom:1px solid #f0efe9;display:flex;align-items:center;gap:12px}
+.step-badge{width:28px;height:28px;border-radius:8px;background:#1a2e1a;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#c8a84b;flex-shrink:0}
+.card-head-title{font-size:14px;font-weight:700;color:#1a1a1a}
+.card-head-sub{font-size:11px;color:#999;margin-top:1px}
+.card-body{padding:16px 20px 20px}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cat-card{border:2px solid #e8e7e1;border-radius:12px;padding:18px 16px;cursor:pointer;transition:all 0.2s;text-align:center;background:#fafaf7}
+.cat-card:hover{border-color:#2d5a2d;background:#f0f6f0}
+.cat-card.active{border-color:#2d5a2d;background:#f0f6f0}
+.cat-card.fire-active{border-color:#b83b1a;background:#fdf0ed}
+.cat-icon{font-size:28px;margin-bottom:8px}
+.cat-title{font-size:15px;font-weight:700;color:#1a1a1a}
+.cat-desc{font-size:11px;color:#888;margin-top:4px;line-height:1.4}
+.cat-badge{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
+.badge-green{background:#e8f5e8;color:#1a5c1a}
+.badge-red{background:#fde8e3;color:#8b2d15}
+.divider{height:1px;background:#f0efe9;margin:14px 0}
+.sub-label{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+.type-chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:8px 16px;border-radius:30px;border:1.5px solid #e0dfd9;background:#fafaf7;font-size:13px;font-weight:600;color:#555;cursor:pointer;transition:all 0.15s}
+.chip:hover{border-color:#2d5a2d;color:#2d5a2d}
+.chip.active{border-color:#2d5a2d;background:#2d5a2d;color:#fff}
+.chip.fire-active{border-color:#b83b1a;background:#b83b1a;color:#fff}
+.thick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.thick-card{border:2px solid #e8e7e1;border-radius:12px;padding:14px;cursor:pointer;transition:all 0.2s;background:#fafaf7}
+.thick-card:hover{border-color:#2d5a2d;background:#f0f6f0}
+.thick-card.active{border-color:#2d5a2d;background:#f0f6f0}
+.thick-card.fire-active{border-color:#b83b1a;background:#fdf0ed}
+.thick-mm{font-size:20px;font-weight:800;color:#1a1a1a}
+.thick-desc{font-size:11px;color:#888;margin-top:3px}
+.dim-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.dim-box{background:#fafaf7;border:1.5px solid #e8e7e1;border-radius:12px;padding:14px}
+.dim-label{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+.dim-input{width:100%;border:none;background:transparent;font-size:22px;font-weight:700;color:#1a1a1a;outline:none}
+.dim-input::placeholder{color:#ccc;font-weight:400;font-size:18px}
+.dim-unit{font-size:12px;color:#aaa;margin-top:3px}
+.sqft-result{background:linear-gradient(135deg,#1a2e1a,#243324);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:space-between}
+.lam-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lam-card{border:2px solid #e8e7e1;border-radius:12px;padding:14px;background:#fafaf7;transition:all 0.2s}
+.lam-card.selected{border-color:#2d5a2d;background:#f0f6f0}
+.lam-name{font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:10px}
+.lam-thick-row{display:flex;gap:6px}
+.lam-thick-btn{flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid #e0dfd9;background:#fff;font-size:12px;font-weight:700;color:#777;cursor:pointer;text-align:center;transition:all 0.15s}
+.lam-thick-btn:hover{border-color:#2d5a2d;color:#2d5a2d}
+.lam-thick-btn.active{border-color:#2d5a2d;background:#2d5a2d;color:#fff}
+.add-btn{width:100%;margin-top:16px;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#2d5a2d,#1a3a1a);color:#c8a84b;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.3px;transition:all 0.2s}
+.add-btn:hover{background:linear-gradient(135deg,#3a6e3a,#243324)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid.single{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.6px}
+.form-group input,.form-group textarea{padding:10px 12px;border-radius:8px;border:1.5px solid #e0dfd9;font-size:13px;color:#1a1a1a;outline:none;font-family:'Segoe UI',sans-serif;background:#fafaf7}
+.form-group input:focus,.form-group textarea:focus{border-color:#2d5a2d;background:#fff}
+.form-group textarea{resize:vertical;min-height:70px}
+.quote-wrap{background:#fff;border-radius:16px;overflow:hidden;margin-bottom:4px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.quote-header{background:#1a2e1a;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.quote-header-title{font-size:14px;font-weight:700;color:#c8a84b;text-transform:uppercase;letter-spacing:0.8px}
+.quote-count{background:rgba(200,168,75,0.2);border:1px solid rgba(200,168,75,0.4);border-radius:20px;padding:2px 10px;font-size:12px;color:#c8a84b;font-weight:700}
+.quote-item{padding:14px 20px;border-bottom:1px solid #f0efe9}
+.qi-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.qi-num{width:24px;height:24px;border-radius:6px;background:#1a2e1a;color:#c8a84b;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.qi-info{flex:1}
+.qi-title{font-size:13px;font-weight:700;color:#1a1a1a}
+.qi-sub{font-size:11px;color:#888;margin-top:3px;line-height:1.5}
+.qi-amount{font-size:15px;font-weight:800;color:#2d5a2d;white-space:nowrap}
+.qi-remove{background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:2px 6px;border-radius:4px;transition:color 0.15s}
+.qi-remove:hover{color:#b83b1a}
+.quote-totals{background:linear-gradient(135deg,#0f1a0f,#1a2e1a);padding:16px 20px}
+.tot-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.07)}
+.tot-row:last-child{border-bottom:none;padding-top:12px;margin-top:4px}
+.tot-label{font-size:12px;color:#8aaa8a;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.tot-val{font-size:14px;font-weight:700;color:#8aaa8a}
+.tot-row.grand .tot-label{color:#c8a84b;font-size:13px}
+.tot-row.grand .tot-val{color:#c8a84b;font-size:26px;font-weight:800}
+.quote-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:14px 20px;background:#0a120a}
+.q-act-btn{padding:10px 6px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.1);background:transparent;color:#8aaa8a;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;text-align:center}
+.q-act-btn:hover{background:rgba(255,255,255,0.05);color:#fff}
+.q-act-btn.primary{background:rgba(200,168,75,0.15);border-color:rgba(200,168,75,0.3);color:#c8a84b}
+.q-act-btn.primary:hover{background:rgba(200,168,75,0.25);color:#e8c86b}
+.q-act-btn.danger{border-color:rgba(184,59,26,0.3);color:#e8a090}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.modal-title{font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:4px}
+.modal-sub{font-size:12px;color:#999;margin-bottom:20px}
+.modal-input{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #e0dfd9;font-size:15px;color:#1a1a1a;outline:none;margin-bottom:8px}
+.modal-input:focus{border-color:#2d5a2d}
+.modal-error{font-size:12px;color:#b83b1a;margin-bottom:12px;min-height:16px}
+.modal-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-btn{padding:11px;border-radius:10px;border:1.5px solid #e0dfd9;background:#fff;font-size:13px;font-weight:600;color:#555;cursor:pointer}
+.modal-btn.primary{background:#1a2e1a;border-color:#1a2e1a;color:#c8a84b}
+.rate-editor{padding:20px}
+.rate-section-title{font-size:12px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.8px;margin:16px 0 10px}
+.rate-section-title:first-child{margin-top:0}
+.rate-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.rate-row-label{flex:1;font-size:13px;color:#1a1a1a;font-weight:500}
+.rate-input{width:90px;padding:8px 10px;border-radius:8px;border:1.5px solid #e0dfd9;font-size:13px;font-weight:700;color:#1a1a1a;text-align:right;outline:none}
+.rate-input:focus{border-color:#2d5a2d}
+.rate-unit{font-size:11px;color:#999;width:50px}
+.hidden{display:none}
+.fade-in{animation:fadeIn 0.25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- Password Modal -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">🔒 Enter Password</div>
+    <div class="modal-sub">Enter password to edit locked rates.</div>
+    <input class="modal-input" type="password" id="modal-pwd" placeholder="Enter password" onkeydown="if(event.key==='Enter')verifyPwd()">
+    <div class="modal-error" id="modal-error"></div>
+    <div class="modal-btns">
+      <button class="modal-btn" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="verifyPwd()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rate Editor Modal -->
+<div class="modal-overlay hidden" id="rate-modal">
+  <div class="modal" style="max-width:420px;max-height:90vh;overflow-y:auto">
+    <div class="modal-title">⚙️ Edit Rates</div>
+    <div class="modal-sub">1mm = 0.8mm rate + ₹200 automatically.</div>
+    <div class="rate-editor">
+      <div class="rate-section-title">Non-Fire Door – Raw Rates (₹/sq.ft)</div>
+      <div class="rate-row"><span class="rate-row-label">30mm</span><input class="rate-input" id="re-nf-30" type="number"><span class="rate-unit">₹/sq.ft</span></div>
+      <div class="rate-row"><span class="rate-row-label">35mm</span><input class="rate-input" id="re-nf-35" type="number"><span class="rate-unit">₹/sq.ft</span></div>
+      <div class="rate-row"><span class="rate-row-label">40mm</span><input class="rate-input" id="re-nf-40" type="number"><span class="rate-unit">₹/sq.ft</span></div>
+      <div class="rate-row"><span class="rate-row-label">45mm</span><input class="rate-input" id="re-nf-45" type="number"><span class="rate-unit">₹/sq.ft</span></div>
+      <div class="rate-section-title">Fire Door – Raw Rates (₹/sq.ft)</div>
+      <div class="rate-row"><span class="rate-row-label">45mm (60 mins)</span><input class="rate-input" id="re-f-45" type="number"><span class="rate-unit">₹/sq.ft</span></div>
+      <div class="rate-row"><span class="rate-row-label">55mm (120 mins)</span><input class="rate-input" id="re-f-55" type="number"><span class="rate-unit">₹/sq.ft</span></div>
+      <div class="rate-section-title">Laminate 0.8mm Rates (₹/sheet)</div>
+      <div class="rate-row"><span class="rate-row-label">Euro Laminate Proplus</span><input class="rate-input" id="re-lam-0" type="number"><span class="rate-unit">₹/sheet</span></div>
+      <div class="rate-row"><span class="rate-row-label">Euro Mica</span><input class="rate-input" id="re-lam-1" type="number"><span class="rate-unit">₹/sheet</span></div>
+      <div class="rate-row"><span class="rate-row-label">Merino Calplus</span><input class="rate-input" id="re-lam-2" type="number"><span class="rate-unit">₹/sheet</span></div>
+      <div class="rate-row"><span class="rate-row-label">Merino Lamp</span><input class="rate-input" id="re-lam-3" type="number"><span class="rate-unit">₹/sheet</span></div>
+    </div>
+    <div style="padding:0 20px 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="modal-btn" onclick="closeRateEditor()">Cancel</button>
+      <button class="modal-btn primary" onclick="saveRates()">Save Rates</button>
+    </div>
+  </div>
+</div>
+
+<div class="header">
+  <div class="logo-row">
+    <div class="logo-hex">GWPL</div>
+    <div>
+      <div class="brand-name">Geetanjali Woodcraft</div>
+      <div class="brand-sub">PRIVATE LIMITED</div>
+    </div>
+  </div>
+  <div class="header-tagline">
+    <div class="gold-pill">DOOR RATE CALCULATOR</div>
+    <h2>Find the Perfect Door<br>for Your Space</h2>
+    <p>Instant pricing — select your door, dimensions & finish</p>
+  </div>
+</div>
+
+<div class="progress-bar">
+  <div class="progress-steps">
+    <div class="prog-step"><div class="prog-dot active" id="pd1">1</div><span class="prog-label active" id="pl1">Client</span></div>
+    <div class="prog-line" id="pline1"></div>
+    <div class="prog-step"><div class="prog-dot" id="pd2">2</div><span class="prog-label" id="pl2">Category</span></div>
+    <div class="prog-line" id="pline2"></div>
+    <div class="prog-step"><div class="prog-dot" id="pd3">3</div><span class="prog-label" id="pl3">Thickness</span></div>
+    <div class="prog-line" id="pline3"></div>
+    <div class="prog-step"><div class="prog-dot" id="pd4">4</div><span class="prog-label" id="pl4">Size & Finish</span></div>
+  </div>
+</div>
+
+<div class="page">
+<div class="container">
+<div class="top-space"></div>
+
+<!-- Step 1: Client Details -->
+<div class="card" id="card0">
+  <div class="card-head">
+    <div class="step-badge">1</div>
+    <div><div class="card-head-title">Client & Project Details</div><div class="card-head-sub">Fill in client information for the quotation</div></div>
+  </div>
+  <div class="card-body">
+    <div class="form-grid" style="margin-bottom:12px">
+      <div class="form-group"><label>Client Name</label><input type="text" id="cl-name" placeholder="e.g. Rajesh Sharma"></div>
+      <div class="form-group"><label>Client Mobile</label><input type="text" id="cl-phone" placeholder="e.g. +91 98765 43210"></div>
+    </div>
+    <div class="form-grid" style="margin-bottom:12px">
+      <div class="form-group"><label>Client GST</label><input type="text" id="cl-gst" placeholder="e.g. 27AAAAA0000A1Z5"></div>
+      <div class="form-group"><label>Project Name</label><input type="text" id="cl-project" placeholder="e.g. Oberoi Splendor"></div>
+    </div>
+    <div class="form-grid" style="margin-bottom:12px">
+      <div class="form-group"><label>Site Supervisor Name</label><input type="text" id="cl-sup-name" placeholder="e.g. Suresh Kumar"></div>
+      <div class="form-group"><label>Supervisor Mobile</label><input type="text" id="cl-sup-phone" placeholder="e.g. +91 98765 43210"></div>
+    </div>
+    <div class="form-grid single" style="margin-bottom:12px">
+      <div class="form-group"><label>Project / Site Address</label><textarea id="cl-site-addr" placeholder="Enter site address"></textarea></div>
+    </div>
+    <div class="form-grid single" style="margin-bottom:12px">
+      <div class="form-group"><label>Billing Address</label><textarea id="cl-bill-addr" placeholder="Enter billing address"></textarea></div>
+    </div>
+    <div class="form-grid single">
+      <div class="form-group">
+        <label>Payment Terms & Conditions</label>
+        <textarea id="cl-terms" style="min-height:90px">1. 50% advance payment required before production.
+2. Balance 50% before delivery.
+3. GST applicable as per government norms.
+4. Prices are subject to change without prior notice.
+5. Delivery subject to availability.</textarea>
+      </div>
+    </div>
+    <button class="add-btn" style="margin-top:16px" onclick="proceedToDoors()">Continue to Door Selection →</button>
+  </div>
+</div>
+
+<!-- Step 2: Door Category -->
+<div class="card hidden" id="card1">
+  <div class="card-head">
+    <div class="step-badge">2</div>
+    <div><div class="card-head-title">Select Door Category & Type</div><div class="card-head-sub">Choose between fire-rated and standard doors</div></div>
+  </div>
+  <div class="card-body">
+    <div class="cat-grid">
+      <div class="cat-card" id="cc-nf" onclick="selectCat('non-fire')">
+        <div class="cat-icon">🚪</div>
+        <div class="cat-title">Non-Fire Door</div>
+        <div class="cat-desc">Standard residential & commercial doors</div>
+        <div class="cat-badge badge-green">Main · Bedroom · Bathroom</div>
+      </div>
+      <div class="cat-card" id="cc-f" onclick="selectCat('fire')">
+        <div class="cat-icon">🔥</div>
+        <div class="cat-title">Fire Door</div>
+        <div class="cat-desc">IS 3614 certified fire-rated doors</div>
+        <div class="cat-badge badge-red">60 min · 120 min rated</div>
+      </div>
+    </div>
+    <div class="hidden" id="sub-types">
+      <div class="divider"></div>
+      <div class="sub-label">Select Door Type</div>
+      <div class="type-chips" id="type-chips"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 3: Thickness -->
+<div class="card hidden" id="card2">
+  <div class="card-head">
+    <div class="step-badge">3</div>
+    <div><div class="card-head-title">Select Thickness</div><div class="card-head-sub" id="thick-sub">Choose the thickness specification</div></div>
+  </div>
+  <div class="card-body"><div class="thick-grid" id="thick-grid"></div></div>
+</div>
+
+<!-- Step 4: Dimensions -->
+<div class="card hidden" id="card3">
+  <div class="card-head">
+    <div class="step-badge">4</div>
+    <div><div class="card-head-title">Enter Door Dimensions</div><div class="card-head-sub">Enter height and width in millimetres</div></div>
+  </div>
+  <div class="card-body">
+    <div class="dim-grid">
+      <div class="dim-box">
+        <div class="dim-label">Height</div>
+        <input class="dim-input" type="number" id="inp-h" placeholder="2100" oninput="calcSqft()">
+        <div class="dim-unit">millimetres (mm)</div>
+      </div>
+      <div class="dim-box">
+        <div class="dim-label">Width</div>
+        <input class="dim-input" type="number" id="inp-w" placeholder="900" oninput="calcSqft()">
+        <div class="dim-unit">millimetres (mm)</div>
+      </div>
+    </div>
+    <div class="sqft-result">
+      <div><div style="font-size:12px;color:#8aaa8a;font-weight:600">Dimensions Entered ✓</div>
+      <div style="font-size:14px;color:#c8a84b;font-weight:600;margin-top:4px">Select laminate below</div></div>
+      <div style="text-align:right;font-size:11px;color:#4a6a4a">Area auto-calculated</div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 4b: Laminate -->
+<div class="card hidden" id="card4">
+  <div class="card-head">
+    <div class="step-badge">4</div>
+    <div><div class="card-head-title">Select Laminate Finish</div><div class="card-head-sub">Pick laminate brand then select 0.8mm or 1mm</div></div>
+  </div>
+  <div class="card-body">
+    <div class="lam-grid" id="lam-grid"></div>
+    <button class="add-btn hidden" id="add-btn" onclick="addToQuote()">+ Add Door to Quote</button>
+  </div>
+</div>
+
+<!-- Quote Section -->
+<div class="hidden" id="quote-section">
+  <div class="quote-wrap">
+    <div class="quote-header">
+      <span class="quote-header-title">Your Quote</span>
+      <span class="quote-count" id="quote-count">0 doors</span>
+    </div>
+    <div id="quote-list"></div>
+    <div class="quote-totals">
+      <div class="tot-row">
+        <span class="tot-label">Subtotal</span>
+        <span class="tot-val" id="disp-subtotal">₹0</span>
+      </div>
+      <div class="tot-row">
+        <span class="tot-label">GST (18%)</span>
+        <span class="tot-val" id="disp-gst">₹0</span>
+      </div>
+      <div class="tot-row grand">
+        <span class="tot-label">Grand Total (incl. GST)</span>
+        <span class="tot-val" id="disp-grand">₹0</span>
+      </div>
+    </div>
+    <div class="quote-actions">
+      <button class="q-act-btn danger" onclick="clearQuote()">🗑 Clear All</button>
+      <button class="q-act-btn" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="q-act-btn primary" onclick="downloadQuote()">⬇️ Download</button>
+    </div>
+  </div>
+  <div style="text-align:center;padding:8px 0 4px">
+    <button onclick="openModal()" style="background:none;border:none;font-size:11px;color:#aaa;cursor:pointer;text-decoration:underline">⚙️ Edit Locked Rates</button>
+  </div>
+</div>
+
+<div style="height:20px"></div>
+</div>
+</div>
+
+<script>
+var PASSWORD = 'Hardik@1305';
+
+var RATES = {
+  'non-fire': {'30mm':145,'35mm':150,'40mm':160,'45mm':165},
+  'fire':     {'45mm – 60 mins (IS 3614)':325,'55mm – 120 mins (IS 3614)':425}
+};
+var THICK_DESC = {
+  '30mm':'Standard lightweight','35mm':'Medium density','40mm':'Heavy duty','45mm':'Premium solid',
+  '45mm – 60 mins (IS 3614)':'Fire rated · 60 min protection',
+  '55mm – 120 mins (IS 3614)':'Fire rated · 120 min protection'
+};
+var LAMINATES = [
+  {name:'Euro Laminate Proplus', rate08:675},
+  {name:'Euro Mica',             rate08:815},
+  {name:'Merino Calplus',        rate08:775},
+  {name:'Merino Lamp',           rate08:1120}
+];
+
+var S = {cat:null,type:null,thick:null,rawRate:null,sqft:0,lam:null,lamThick:null};
+var quoteItems = [];
+
+/* ---- helpers ---- */
+function getLamRate(idx, thick) {
+  return thick === '1mm' ? LAMINATES[idx].rate08 + 200 : LAMINATES[idx].rate08;
+}
+function show(id){ document.getElementById(id).classList.remove('hidden'); }
+function hide(id){ document.getElementById(id).classList.add('hidden'); }
+function scrollInto(id){ setTimeout(function(){ document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'}); }, 150); }
+function setProgress(step){
+  for(var i=1;i<=4;i++){
+    var dot=document.getElementById('pd'+i), lab=document.getElementById('pl'+i);
+    if(i<step){dot.className='prog-dot done';lab.className='prog-label done';}
+    else if(i===step){dot.className='prog-dot active';lab.className='prog-label active';}
+    else{dot.className='prog-dot';lab.className='prog-label';}
+    if(i<4) document.getElementById('pline'+i).className='prog-line'+(i<step?' done':'');
+  }
+}
+function getClientData(){
+  return {
+    name:     document.getElementById('cl-name').value      || '—',
+    phone:    document.getElementById('cl-phone').value     || '—',
+    gst:      document.getElementById('cl-gst').value       || '—',
+    project:  document.getElementById('cl-project').value   || '—',
+    supName:  document.getElementById('cl-sup-name').value  || '—',
+    supPhone: document.getElementById('cl-sup-phone').value || '—',
+    siteAddr: document.getElementById('cl-site-addr').value || '—',
+    billAddr: document.getElementById('cl-bill-addr').value || '—',
+    terms:    document.getElementById('cl-terms').value     || ''
+  };
+}
+
+/* ---- steps ---- */
+function proceedToDoors(){
+  show('card1'); setProgress(2); scrollInto('card1');
+}
+
+function selectCat(cat){
+  S = {cat:cat,type:null,thick:null,rawRate:null,sqft:0,lam:null,lamThick:null};
+  document.getElementById('cc-nf').className = 'cat-card'+(cat==='non-fire'?' active':'');
+  document.getElementById('cc-f').className  = 'cat-card'+(cat==='fire'?' fire-active':'');
+  var types = cat==='non-fire' ? ['Main Door','Bedroom Door','Bathroom Door'] : ['Main Door','Staircase Door','Refuge Door'];
+  var html = '';
+  for(var i=0;i<types.length;i++) html += '<div class="chip" onclick="selectType(\''+types[i]+'\',this)">'+types[i]+'</div>';
+  document.getElementById('type-chips').innerHTML = html;
+  show('sub-types'); hide('card2'); hide('card3'); hide('card4');
+  setProgress(2);
+}
+
+function selectType(type, el){
+  S.type=type; S.thick=null; S.rawRate=null; S.sqft=0; S.lam=null; S.lamThick=null;
+  var chips = document.querySelectorAll('#type-chips .chip');
+  for(var i=0;i<chips.length;i++) chips[i].className='chip';
+  el.className = 'chip'+(S.cat==='fire'?' fire-active':' active');
+  renderThickness();
+  show('card2'); hide('card3'); hide('card4');
+  setProgress(3); scrollInto('card2');
+}
+
+function renderThickness(){
+  var isFire = S.cat==='fire';
+  document.getElementById('thick-sub').textContent = isFire ? 'IS 3614 certified specifications' : 'Select thickness in millimetres';
+  var keys = Object.keys(RATES[S.cat]);
+  var html = '';
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i], mm=k.split('–')[0].trim();
+    html += '<div class="thick-card" onclick="selectThick(\''+k+'\','+RATES[S.cat][k]+',this)">'
+          + '<div class="thick-mm">'+mm+'</div>'
+          + '<div class="thick-desc">'+(THICK_DESC[k]||'')+'</div>'
+          + '</div>';
+  }
+  document.getElementById('thick-grid').innerHTML = html;
+}
+
+function selectThick(key, rate, el){
+  S.thick=key; S.rawRate=rate; S.sqft=0; S.lam=null; S.lamThick=null;
+  var cards = document.querySelectorAll('.thick-card');
+  for(var i=0;i<cards.length;i++) cards[i].className='thick-card';
+  el.className = 'thick-card'+(S.cat==='fire'?' fire-active':' active');
+  document.getElementById('inp-h').value='';
+  document.getElementById('inp-w').value='';
+  show('card3'); hide('card4');
+  setProgress(4); scrollInto('card3');
+}
+
+function calcSqft(){
+  var h = parseFloat(document.getElementById('inp-h').value);
+  var w = parseFloat(document.getElementById('inp-w').value);
+  if(h>0 && w>0){
+    S.sqft = (h/1000)*(w/1000)*10.76;
+    S.lam=null; S.lamThick=null;
+    renderLaminates();
+    show('card4'); hide('add-btn');
+    scrollInto('card4');
+  } else {
+    S.sqft=0; hide('card4');
+  }
+}
+
+function renderLaminates(){
+  var html='';
+  for(var i=0;i<LAMINATES.length;i++){
+    var l=LAMINATES[i], sel=(S.lam===i);
+    html += '<div class="lam-card'+(sel?' selected':'')+'">'
+          + '<div class="lam-name">'+l.name+'</div>'
+          + '<div class="lam-thick-row">'
+          + '<button class="lam-thick-btn'+(sel&&S.lamThick==='0.8mm'?' active':'')+'" onclick="pickLam('+i+',\'0.8mm\')">0.8mm</button>'
+          + '<button class="lam-thick-btn'+(sel&&S.lamThick==='1mm'?' active':'')+'" onclick="pickLam('+i+',\'1mm\')">1mm</button>'
+          + '</div></div>';
+  }
+  document.getElementById('lam-grid').innerHTML = html;
+}
+
+function pickLam(idx, thick){
+  S.lam=idx; S.lamThick=thick;
+  renderLaminates();
+  show('add-btn');
+  scrollInto('add-btn');
+}
+
+function addToQuote(){
+  var l       = LAMINATES[S.lam];
+  var lamRate = getLamRate(S.lam, S.lamThick);
+  var rawAmt  = S.rawRate * S.sqft;
+  var lamAmt  = lamRate * 2;
+  var total   = Math.round(rawAmt + lamAmt);
+  quoteItems.push({
+    cat:S.cat, type:S.type, thick:S.thick,
+    h:document.getElementById('inp-h').value,
+    w:document.getElementById('inp-w').value,
+    sqft:S.sqft, rawRate:S.rawRate,
+    lamName:l.name, lamThick:S.lamThick, lamRate:lamRate,
+    total:total
+  });
+  show('quote-section');
+  renderQuote();
+  scrollInto('quote-section');
+  resetForm();
+}
+
+function renderQuote(){
+  var html  = '';
+  var subtotal = 0;
+  for(var i=0;i<quoteItems.length;i++){
+    var q = quoteItems[i];
+    subtotal += q.total;
+    var isFire = q.cat==='fire';
+    html += '<div class="quote-item"><div class="qi-top">'
+          + '<div class="qi-num">'+(i+1)+'</div>'
+          + '<div class="qi-info">'
+          + '<div class="qi-title">'+(isFire?'🔥 Fire Door':'🚪 Non-Fire Door')+' – '+q.type+'</div>'
+          + '<div class="qi-sub">Thickness: '+q.thick+'<br>Dimensions: '+q.h+'mm × '+q.w+'mm &nbsp;·&nbsp; Laminate: '+q.lamName+' ('+q.lamThick+')</div>'
+          + '</div>'
+          + '<div style="text-align:right">'
+          + '<div class="qi-amount">₹'+q.total+'</div>'
+          + '<button class="qi-remove" onclick="removeItem('+i+')">✕</button>'
+          + '</div></div></div>';
+  }
+  var gst   = Math.round(subtotal * 0.18);
+  var grand = subtotal + gst;
+  document.getElementById('quote-list').innerHTML     = html;
+  document.getElementById('disp-subtotal').textContent = '₹'+subtotal;
+  document.getElementById('disp-gst').textContent      = '₹'+gst;
+  document.getElementById('disp-grand').textContent    = '₹'+grand;
+  document.getElementById('quote-count').textContent   = quoteItems.length+(quoteItems.length===1?' door':' doors');
+}
+
+function removeItem(idx){
+  quoteItems.splice(idx,1);
+  if(quoteItems.length===0) hide('quote-section');
+  else renderQuote();
+}
+
+function clearQuote(){
+  quoteItems=[];
+  hide('quote-section');
+}
+
+function resetForm(){
+  S = {cat:S.cat,type:null,thick:null,rawRate:null,sqft:0,lam:null,lamThick:null};
+  document.getElementById('cc-nf').className = 'cat-card'+(S.cat==='non-fire'?' active':'');
+  document.getElementById('cc-f').className  = 'cat-card'+(S.cat==='fire'?' fire-active':'');
+  var types = S.cat==='non-fire' ? ['Main Door','Bedroom Door','Bathroom Door'] : ['Main Door','Staircase Door','Refuge Door'];
+  var html='';
+  for(var i=0;i<types.length;i++) html+='<div class="chip" onclick="selectType(\''+types[i]+'\',this)">'+types[i]+'</div>';
+  document.getElementById('type-chips').innerHTML=html;
+  show('sub-types'); hide('card2'); hide('card3'); hide('card4'); hide('add-btn');
+  setProgress(2);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---- download PDF ---- */
+function downloadQuote(){
+  var c    = getClientData();
+  var date = new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  var subtotal = 0;
+  var rows = '';
+  for(var i=0;i<quoteItems.length;i++){
+    var q = quoteItems[i];
+    subtotal += q.total;
+    var bg = i%2===0 ? '#ffffff' : '#fafaf7';
+    rows += '<tr style="background:'+bg+'">'
+          + '<td style="padding:9px 8px;font-size:12px;color:#555;border-bottom:1px solid #eee;text-align:center">'+(i+1)+'</td>'
+          + '<td style="padding:9px 8px;font-size:12px;font-weight:600;color:#1a1a1a;border-bottom:1px solid #eee">'+(q.cat==='fire'?'Fire Door':'Non-Fire Door')+' – '+q.type+'</td>'
+          + '<td style="padding:9px 8px;font-size:12px;color:#555;border-bottom:1px solid #eee">'+q.thick+'</td>'
+          + '<td style="padding:9px 8px;font-size:12px;color:#555;border-bottom:1px solid #eee">'+q.h+'×'+q.w+' mm</td>'
+          + '<td style="padding:9px 8px;font-size:12px;color:#555;border-bottom:1px solid #eee">'+q.lamName+' ('+q.lamThick+')</td>'
+          + '<td style="padding:9px 8px;font-size:12px;font-weight:700;color:#1a2e1a;text-align:right;border-bottom:1px solid #eee">&#8377;'+q.total+'</td>'
+          + '</tr>';
+  }
+  var gst   = Math.round(subtotal * 0.18);
+  var grand = subtotal + gst;
+
+  var termsHtml = '';
+  var termLines = c.terms.split('\n');
+  for(var t=0;t<termLines.length;t++){
+    if(termLines[t].trim()) termsHtml += '<div style="margin-bottom:5px">'+termLines[t].trim()+'</div>';
+  }
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    +'<title>Quotation – '+c.project+'</title>'
+    +'<style>'
+    +'*{box-sizing:border-box;margin:0;padding:0}'
+    +'body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:12px}'
+    +'@media print{'
+    +'  body{padding:0}'
+    +'  .no-print{display:none!important}'
+    +'  @page{margin:12mm;size:A4}'
+    +'}'
+    +'</style>'
+    +'</head><body>'
+
+    /* print button */
+    +'<div class="no-print" style="text-align:center;margin-bottom:16px">'
+    +'<button onclick="window.print()" style="padding:12px 32px;background:#1a2e1a;color:#c8a84b;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">🖨️ Save as PDF / Print</button>'
+    +'<p style="margin-top:8px;font-size:11px;color:#999">Click above → choose "Save as PDF" as printer</p>'
+    +'</div>'
+
+    /* header */
+    +'<table width="100%" style="background:#1a2e1a;padding:14px 16px;margin-bottom:0"><tr>'
+    +'<td style="padding:0">'
+    +'<div style="font-size:16px;font-weight:700;color:#c8a84b">We Are One Enterprises Pvt. Ltd.</div>'
+    +'<div style="font-size:9px;color:#aaa;margin-top:6px;line-height:1.7">'
+    +'#601, Express Chamber, M.V. Road, Near Western Express Highway, Opposite Natraj Rustomjee, Andheri East, Mumbai &#8211; 400 069<br>'
+    +'sales@weareoneenterprises.com &nbsp;|&nbsp; +91 22 4919 55 55 &nbsp;|&nbsp; GST: 27AAACW8324N1ZU'
+    +'</div></td>'
+    +'<td style="text-align:right;vertical-align:top;padding:0">'
+    +'<div style="font-size:14px;font-weight:700;color:#c8a84b">DOOR QUOTATION</div>'
+    +'<div style="font-size:9px;color:#8aaa8a;margin-top:4px">Date: '+date+'</div>'
+    +'</td></tr></table>'
+
+    /* client info */
+    +'<table width="100%" style="border-collapse:collapse;margin-top:0;border:1px solid #ddd">'
+    +'<tr style="background:#f0f0eb"><td colspan="4" style="padding:7px 10px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.8px">Client &amp; Project Information</td></tr>'
+    +'<tr>'
+    +'<td style="padding:7px 10px;font-size:10px;color:#888;font-weight:700;width:16%;border-top:1px solid #eee">Client Name</td>'
+    +'<td style="padding:7px 10px;font-size:11px;font-weight:600;width:34%;border-top:1px solid #eee">'+c.name+'<br><span style="font-weight:400;color:#555">'+c.phone+'</span></td>'
+    +'<td style="padding:7px 10px;font-size:10px;color:#888;font-weight:700;width:16%;border-top:1px solid #eee">Project</td>'
+    +'<td style="padding:7px 10px;font-size:11px;font-weight:600;width:34%;border-top:1px solid #eee">'+c.project+'</td>'
+    +'</tr><tr style="background:#fafaf7">'
+    +'<td style="padding:7px 10px;font-size:10px;color:#888;font-weight:700;border-top:1px solid #eee">Client GST</td>'
+    +'<td style="padding:7px 10px;font-size:11px;border-top:1px solid #eee">'+c.gst+'</td>'
+    +'<td style="padding:7px 10px;font-size:10px;color:#888;font-weight:700;border-top:1px solid #eee">Supervisor</td>'
+    +'<td style="padding:7px 10px;font-size:11px;border-top:1px solid #eee">'+c.supName+' &nbsp;|&nbsp; '+c.supPhone+'</td>'
+    +'</tr><tr>'
+    +'<td style="padding:7px 10px;font-size:10px;color:#888;font-weight:700;border-top:1px solid #eee">Site Address</td>'
+    +'<td colspan="3" style="padding:7px 10px;font-size:11px;border-top:1px solid #eee">'+c.siteAddr+'</td>'
+    +'</tr><tr style="background:#fafaf7">'
+    +'<td style="padding:7px 10px;font-size:10px;color:#888;font-weight:700;border-top:1px solid #eee">Billing Address</td>'
+    +'<td colspan="3" style="padding:7px 10px;font-size:11px;border-top:1px solid #eee">'+c.billAddr+'</td>'
+    +'</tr></table>'
+
+    /* door items */
+    +'<table width="100%" style="border-collapse:collapse;margin-top:12px">'
+    +'<thead><tr style="background:#1a2e1a">'
+    +'<th style="padding:9px 8px;font-size:11px;color:#c8a84b;text-align:center;width:5%">#</th>'
+    +'<th style="padding:9px 8px;font-size:11px;color:#c8a84b;text-align:left">Door Type</th>'
+    +'<th style="padding:9px 8px;font-size:11px;color:#c8a84b;text-align:left">Thickness</th>'
+    +'<th style="padding:9px 8px;font-size:11px;color:#c8a84b;text-align:left">Dimensions</th>'
+    +'<th style="padding:9px 8px;font-size:11px;color:#c8a84b;text-align:left">Laminate</th>'
+    +'<th style="padding:9px 8px;font-size:11px;color:#c8a84b;text-align:right">Amount</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>'
+
+    /* totals */
+    +'<table width="100%" style="border-collapse:collapse;margin-top:0">'
+    +'<tr style="background:#f5f3ee">'
+    +'<td style="padding:8px 14px;font-size:11px;color:#666;font-weight:600">Subtotal</td>'
+    +'<td style="padding:8px 14px;font-size:12px;font-weight:700;text-align:right">&#8377;'+subtotal+'</td>'
+    +'</tr><tr style="background:#eeece8">'
+    +'<td style="padding:8px 14px;font-size:11px;color:#666;font-weight:600">GST (18%)</td>'
+    +'<td style="padding:8px 14px;font-size:12px;font-weight:700;text-align:right">&#8377;'+gst+'</td>'
+    +'</tr><tr style="background:#1a2e1a">'
+    +'<td style="padding:12px 14px;font-size:12px;font-weight:700;color:#c8a84b;text-transform:uppercase;letter-spacing:0.5px">Grand Total (incl. 18% GST)</td>'
+    +'<td style="padding:12px 14px;font-size:20px;font-weight:800;color:#c8a84b;text-align:right">&#8377;'+grand+'</td>'
+    +'</tr></table>'
+
+    /* terms */
+    +(termsHtml ? '<div style="margin-top:16px;border:1px solid #ddd">'
+    +'<div style="background:#f0f0eb;padding:7px 10px;font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.8px">Payment Terms &amp; Conditions</div>'
+    +'<div style="padding:10px 12px;font-size:11px;color:#555;line-height:1.7">'+termsHtml+'</div>'
+    +'</div>' : '')
+
+    +'<div style="margin-top:20px;font-size:9px;color:#bbb;text-align:center;border-top:1px solid #eee;padding-top:10px">This is a computer-generated quotation by We Are One Enterprises Pvt. Ltd.</div>'
+    +'<script>window.onload=function(){window.print();}<\/script>'
+    +'</body></html>';
+
+  var blob = new Blob([html],{type:'text/html'});
+  var url  = URL.createObjectURL(blob);
+  var win  = window.open(url,'_blank');
+  if(!win){
+    /* fallback: direct download if popup blocked */
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'Quotation_'+(c.project||'GWPL').replace(/\s+/g,'_')+'_'+date.replace(/ /g,'-')+'.html';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+  }
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 10000);
+}
+
+/* ---- whatsapp ---- */
+function shareWA(){
+  var c = getClientData();
+  var subtotal = 0;
+  var msg = '*We Are One Enterprises Pvt. Ltd.*\n*Door Rate Quotation*\n\n'
+          + 'Client: '+c.name+' | '+c.phone+'\nProject: '+c.project+'\n\n';
+  for(var i=0;i<quoteItems.length;i++){
+    var q=quoteItems[i]; subtotal+=q.total;
+    msg += (i+1)+'. '+(q.cat==='fire'?'Fire Door':'Non-Fire Door')+' – '+q.type+'\n'
+         + '   Thickness: '+q.thick+'\n'
+         + '   Size: '+q.h+'mm × '+q.w+'mm\n'
+         + '   Laminate: '+q.lamName+' ('+q.lamThick+')\n'
+         + '   Amount: ₹'+q.total+'\n\n';
+  }
+  var gst = Math.round(subtotal*0.18);
+  msg += 'Subtotal: ₹'+subtotal+'\nGST (18%): ₹'+gst+'\n*Grand Total: ₹'+(subtotal+gst)+'*';
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+/* ---- password & rate editor ---- */
+function openModal(){
+  document.getElementById('modal-pwd').value='';
+  document.getElementById('modal-error').textContent='';
+  show('modal-overlay');
+  setTimeout(function(){document.getElementById('modal-pwd').focus();},100);
+}
+function closeModal(){ hide('modal-overlay'); }
+function verifyPwd(){
+  if(document.getElementById('modal-pwd').value===PASSWORD){ hide('modal-overlay'); openRateEditor(); }
+  else{ document.getElementById('modal-error').textContent='❌ Incorrect password. Try again.'; document.getElementById('modal-pwd').value=''; }
+}
+function openRateEditor(){
+  document.getElementById('re-nf-30').value = RATES['non-fire']['30mm'];
+  document.getElementById('re-nf-35').value = RATES['non-fire']['35mm'];
+  document.getElementById('re-nf-40').value = RATES['non-fire']['40mm'];
+  document.getElementById('re-nf-45').value = RATES['non-fire']['45mm'];
+  document.getElementById('re-f-45').value  = RATES['fire']['45mm – 60 mins (IS 3614)'];
+  document.getElementById('re-f-55').value  = RATES['fire']['55mm – 120 mins (IS 3614)'];
+  for(var i=0;i<LAMINATES.length;i++) document.getElementById('re-lam-'+i).value = LAMINATES[i].rate08;
+  show('rate-modal');
+}
+function closeRateEditor(){ hide('rate-modal'); }
+function saveRates(){
+  RATES['non-fire']['30mm'] = parseFloat(document.getElementById('re-nf-30').value)||145;
+  RATES['non-fire']['35mm'] = parseFloat(document.getElementById('re-nf-35').value)||150;
+  RATES['non-fire']['40mm'] = parseFloat(document.getElementById('re-nf-40').value)||160;
+  RATES['non-fire']['45mm'] = parseFloat(document.getElementById('re-nf-45').value)||165;
+  RATES['fire']['45mm – 60 mins (IS 3614)']  = parseFloat(document.getElementById('re-f-45').value)||325;
+  RATES['fire']['55mm – 120 mins (IS 3614)'] = parseFloat(document.getElementById('re-f-55').value)||425;
+  for(var i=0;i<LAMINATES.length;i++) LAMINATES[i].rate08 = parseFloat(document.getElementById('re-lam-'+i).value)||LAMINATES[i].rate08;
+  hide('rate-modal');
+  alert('✅ Rates updated successfully!');
+}
+</script>
+</body>
+</html>
