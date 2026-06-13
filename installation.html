@@ -621,7 +621,9 @@ function renderDoorRow(projectId,floorId,door){
     const sr=el('select');sr.innerHTML='<option value="">Hold reason…</option>'+HOLD_REASONS.map(r=>`<option value="${r}"${r===door.holdReason?' selected':''}>${r}</option>`).join('');
     sr.onchange=e=>setField('holdReason',e.target.value);
     const dr=el('input');dr.type='date';dr.value=door.promisedDate||'';dr.onchange=e=>setField('promisedDate',e.target.value);
-    const nr=el('input');nr.placeholder='Notes…';nr.value=door.notes||'';nr.oninput=e=>setField('notes',e.target.value);
+    const nr=el('input');nr.placeholder='Notes…';nr.value=door.notes||'';
+    nr.onblur=e=>setField('notes',e.target.value);
+    nr.onkeydown=e=>{if(e.key==='Enter')setField('notes',e.target.value);};
     hp.append(sr,dr,nr);row.appendChild(hp);
   }
   return row;
