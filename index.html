@@ -403,7 +403,22 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
 
 </div><!-- app -->
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
+var firebaseConfig = {
+  apiKey: "AIzaSyA85fL8UlXcRebkzdcuirydrL4aC4UXw8",
+  authDomain: "gwpl-operations.firebaseapp.com",
+  databaseURL: "https://gwpl-operations-default-rtdb.asia-southeast1.firebaseio.com",
+  projectId: "gwpl-operations",
+  storageBucket: "gwpl-operations.appspot.com",
+  messagingSenderId: "221660611344",
+  appId: "1:221660611344:web:5403a7cc455c83d5f09b95"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.database();
+</script>
 var LU='HPGeetanjali', LP='RPGeetanjali', PR='Hardik@1305', PX='GeetanjaliHR';
 var TIMEOUT=600, remain=600, stInt=null, pwdAction=null, viewId=null;
 var RATES={'nf':{'30mm':145,'35mm':150,'40mm':160,'45mm':165},'f':{'45mm – 60 mins (IS 3614)':325,'55mm – 120 mins (IS 3614)':425}};
@@ -591,30 +606,38 @@ function setClient(c){
   g('ct').value=c.terms||'';
 }
 
-/* PROJECTS - localStorage */
+/* PROJECTS - Firebase Realtime Database */
+function getNextQNum(callback){
+  db.ref('meta/lastQNum').transaction(function(current){
+    return (current||0)+1;
+  }, function(err, committed, snap){
+    callback(committed ? snap.val() : Math.floor(Math.random()*9000)+1000);
+  });
+}
+
 function saveQ(){
   if(QI.length===0){toast('⚠️ No doors in quote!');return;}
   var c=getClient(), sub=0;
   for(var i=0;i<QI.length;i++) sub+=QI[i].tot;
   var gst=Math.round(sub*0.18), grand=sub+gst;
-  var id='q_'+Date.now();
-  var data={id:id,at:new Date().toISOString(),client:c,items:QI,sub:sub,gst:gst,grand:grand};
-  try{localStorage.setItem(id,JSON.stringify(data));toast('✅ Saved to Projects!');}
-  catch(e){toast('❌ Save failed.');}
+  getNextQNum(function(num){
+    var qNum='QT-'+String(num).padStart(4,'0');
+    var id='q_'+Date.now();
+    var data={id:id,qNum:qNum,at:new Date().toISOString(),client:c,items:QI,sub:sub,gst:gst,grand:grand};
+    db.ref('quotes/'+id).set(data, function(err){
+      if(err) toast('❌ Save failed. Check connection.');
+      else toast('✅ Saved as '+qNum+' in Projects!');
+    });
+  });
 }
 
 function loadProj(){
   var list=g('plist');
   list.innerHTML='<div style="text-align:center;padding:28px;color:#aaa;font-size:12px">Loading...</div>';
-  var proj=[];
-  try{
-    for(var i=0;i<localStorage.length;i++){
-      var k=localStorage.key(i);
-      if(k&&k.indexOf('q_')===0){
-        try{var v=localStorage.getItem(k);if(v)proj.push(JSON.parse(v));}catch(e){}
-      }
-    }
-    proj.sort(function(a,b){return new Date(b.at)-new Date(a.at);});
+  db.ref('quotes').orderByChild('at').once('value', function(snap){
+    var proj=[];
+    snap.forEach(function(child){ proj.push(child.val()); });
+    proj.reverse();
     g('pcnt').textContent=proj.length+' quotation'+(proj.length===1?'':'s')+' saved';
     if(proj.length===0){
       list.innerHTML='<div class="empty"><div class="empty-icon">📂</div><div class="empty-text">No saved quotations yet</div><div class="empty-sub">Save a quote from the Calculator tab</div></div>';
@@ -625,22 +648,29 @@ function loadProj(){
       var p=proj[j], d=new Date(p.at);
       var ds=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
       h+='<div class="pcard" onclick="viewProj(\''+p.id+'\')"><div class="pctop">'
-        +'<div><div class="pcname">'+p.client.project+'</div><div class="pcclient">'+p.client.name+' · '+p.client.phone+'</div></div>'
+        +'<div>'
+        +'<div style="font-size:10px;font-weight:700;color:#c8a84b;letter-spacing:.5px;margin-bottom:2px">'+(p.qNum||'—')+'</div>'
+        +'<div class="pcname">'+p.client.project+'</div>'
+        +'<div class="pcclient">'+p.client.name+' · '+p.client.phone+'</div></div>'
         +'<div class="pctotal">₹'+p.grand+'</div></div>'
-        +'<div class="pcmeta"><span>📅 '+ds+'</span><span>🚪 '+p.items.length+' door'+(p.items.length===1?'':'s')+'</span><span class="pcbadge">Saved</span></div></div>';
+        +'<div class="pcmeta"><span>📅 '+ds+'</span><span>🚪 '+p.items.length+' door'+(p.items.length===1?'':'s')+'</span><span class="pcbadge">'+( p.qNum||'Saved')+'</span></div></div>';
     }
     list.innerHTML=h;
-  }catch(e){list.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Could not load projects</div></div>';}
+  }, function(err){
+    list.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Could not load. Check connection.</div></div>';
+  });
 }
 
 function viewProj(id){
-  try{
-    var v=localStorage.getItem(id); if(!v){toast('Not found');return;}
-    var p=JSON.parse(v); viewId=id;
+  db.ref('quotes/'+id).once('value', function(snap){
+    var p=snap.val();
+    if(!p){toast('Not found');return;}
+    viewId=id;
     var d=new Date(p.at);
     var ds=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-    g('mvtitle').textContent=p.client.project+' — '+ds;
+    g('mvtitle').textContent=(p.qNum||'')+' — '+p.client.project+' — '+ds;
     var b='<div style="background:#f5f3ee;border-radius:8px;padding:11px;margin-bottom:11px;font-size:11px;line-height:1.8">'
+      +'<b>Quotation No:</b> '+(p.qNum||'—')+'<br>'
       +'<b>Client:</b> '+p.client.name+' | '+p.client.phone+'<br>'
       +'<b>GST:</b> '+p.client.gst+'<br>'
       +'<b>Supervisor:</b> '+p.client.supName+' | '+p.client.supPhone+'<br>'
@@ -658,31 +688,34 @@ function viewProj(id){
       +'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;color:#c8a84b"><span>Grand Total</span><span>₹'+p.grand+'</span></div></div>';
     g('mvbody').innerHTML=b;
     g('mview').style.display='flex';
-  }catch(e){toast('Error loading quote');}
+  });
 }
 
 function editSaved(){
   g('mview').style.display='none';
   openPwd('edit','✏️ Edit Quote','Enter password to edit.');
 }
+
 function doEditQuote(){
   if(!viewId)return;
-  try{
-    var v=localStorage.getItem(viewId); if(!v){toast('Not found');return;}
-    var p=JSON.parse(v);
+  db.ref('quotes/'+viewId).once('value', function(snap){
+    var p=snap.val();
+    if(!p){toast('Not found');return;}
     setClient(p.client); QI=p.items;
-    localStorage.removeItem(viewId); viewId=null;
+    db.ref('quotes/'+viewId).remove();
+    viewId=null;
     switchTab('calc'); show('qsec'); renderQ();
     show('card1'); toast('✅ Quote loaded for editing!');
     setTimeout(function(){g('cn').scrollIntoView({behavior:'smooth',block:'start'});},200);
-  }catch(e){toast('Error loading quote');}
+  });
 }
 
 function doReset(){
-  var del=[];
-  for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('q_')===0)del.push(k);}
-  for(var j=0;j<del.length;j++) localStorage.removeItem(del[j]);
-  toast('✅ All quotations deleted.'); loadProj();
+  db.ref('quotes').remove(function(err){
+    if(err) toast('❌ Reset failed.');
+    else { toast('✅ All quotations deleted.'); loadProj(); }
+  });
+  db.ref('meta').remove();
 }
 
 /* PASSWORD MODAL */
