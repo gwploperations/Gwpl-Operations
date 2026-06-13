@@ -972,12 +972,25 @@ function renderActivity(){
 }
 
 // ── dashboard ──
+let dashFilter='all';
 function renderDashboard(){
   const wrap=div('');
   if(!projects.length){wrap.appendChild(div('empty','Add a project to see the dashboard.'));return wrap;}
+
+  // filter dropdown
+  const fd=div('');fd.style.cssText='display:flex;align-items:center;gap:10px;margin-bottom:16px';
+  fd.innerHTML='<span style="font-size:13px;color:#a8a29e;font-weight:500">Showing:</span>';
+  const sel=el('select');sel.style.cssText='flex:1;max-width:300px;font-weight:600';
+  const allOpt=el('option');allOpt.value='all';allOpt.textContent='All Projects';sel.appendChild(allOpt);
+  projects.forEach(p=>{const o=el('option');o.value=p.id;o.textContent=p.name;if(dashFilter===p.id)o.selected=true;sel.appendChild(o);});
+  if(dashFilter==='all')allOpt.selected=true;
+  sel.onchange=e=>{dashFilter=e.target.value;render();};
+  fd.appendChild(sel);wrap.appendChild(fd);
+
+  const filtered=dashFilter==='all'?projects:projects.filter(p=>p.id===dashFilter);
   let T=0,R=0,H=0,P=0,FT=0,FI=0,DT=0,DI=0,HD=0,FA=0;
   const per={},reasons={};
-  projects.forEach(p=>p.floors.forEach(f=>f.doors.forEach(raw=>{
+  filtered.forEach(p=>p.floors.forEach(f=>f.doors.forEach(raw=>{
     const c=normDoor(raw);const pend=Math.max(c.total-c.readyQty-c.holdQty,0);
     T+=c.total;R+=c.readyQty;H+=c.holdQty;P+=pend;FA+=c.faultyQty||0;
     if(c.holdQty>0&&c.holdReason) reasons[c.holdReason]=(reasons[c.holdReason]||0)+c.holdQty;
@@ -1023,15 +1036,29 @@ function renderDashboard(){
 }
 
 // ── followups ──
+let followFilter='all';
 function getFollowups(){
+  const filtered=followFilter==='all'?projects:projects.filter(p=>p.id===followFilter);
   const rows=[];
-  projects.forEach(p=>p.floors.forEach(f=>f.doors.forEach(raw=>{
+  filtered.forEach(p=>p.floors.forEach(f=>f.doors.forEach(raw=>{
     const c=normDoor(raw);if(c.holdQty>0) rows.push({id:p.id+f.id+c.id,project:p.name,builder:p.builder,floor:f.name,type:c.label,qty:c.holdQty,reason:c.holdReason||'—',date:c.promisedDate,notes:c.notes});
   })));
   return rows.sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
 }
 function renderFollowups(){
-  const rows=getFollowups();const wrap=div('');
+  const wrap=div('');
+
+  // filter dropdown
+  const fd=div('');fd.style.cssText='display:flex;align-items:center;gap:10px;margin-bottom:16px';
+  fd.innerHTML='<span style="font-size:13px;color:#a8a29e;font-weight:500">Showing:</span>';
+  const sel=el('select');sel.style.cssText='flex:1;max-width:300px;font-weight:600';
+  const allOpt=el('option');allOpt.value='all';allOpt.textContent='All Projects';sel.appendChild(allOpt);
+  projects.forEach(p=>{const o=el('option');o.value=p.id;o.textContent=p.name;if(followFilter===p.id)o.selected=true;sel.appendChild(o);});
+  if(followFilter==='all')allOpt.selected=true;
+  sel.onchange=e=>{followFilter=e.target.value;render();};
+  fd.appendChild(sel);wrap.appendChild(fd);
+
+  const rows=getFollowups();
   if(!rows.length){wrap.appendChild(div('empty','No doors on hold. Everything is clear! ✅'));return wrap;}
   wrap.appendChild(Object.assign(div(''),{innerHTML:'<p style="font-size:13px;color:#a8a29e;margin-bottom:12px">All held doors — chase the builder to finish this work, then mark them Ready.</p>'}));
   rows.forEach(r=>{

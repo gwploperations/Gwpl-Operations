@@ -4,13 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GWPL Door Rate Calculator</title>
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color:#1a1a1a}
-/* LOGIN */
 #login-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:#0a0f0a}
 .login-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(45,90,45,0.4),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(200,168,75,0.15),transparent 50%),linear-gradient(135deg,#0a0f0a,#0f1a0f 40%,#1a2e1a);pointer-events:none}
 .ring{position:absolute;border-radius:50%;border:1px solid rgba(200,168,75,0.08);animation:rp 4s ease-in-out infinite;pointer-events:none}
@@ -39,7 +37,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
 .login-btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(200,168,75,0.5)}
 .login-err{margin-top:12px;padding:9px 13px;border-radius:9px;background:rgba(184,59,26,0.15);border:1px solid rgba(184,59,26,0.3);font-size:12px;color:#ff8a75;text-align:center;display:none}
 .login-foot{text-align:center;font-size:10px;color:rgba(255,255,255,0.15);margin-top:24px;line-height:1.6}
-/* APP */
 .header{background:linear-gradient(135deg,#0f1a0f,#1a2e1a 60%,#243324);padding:16px 20px;position:relative;overflow:hidden}
 .header::before{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:rgba(200,168,75,0.06);pointer-events:none}
 .logo-row{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
@@ -181,7 +178,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-bg"></div>
   <div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div>
@@ -204,11 +200,9 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
   </div>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none">
 <div class="toast" id="toast"></div>
 
-<!-- PWD Modal -->
 <div class="moverlay" id="mpwd">
   <div class="modal">
     <div class="mtitle" id="mtitle">🔒 Enter Password</div>
@@ -222,7 +216,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
   </div>
 </div>
 
-<!-- Rate Modal -->
 <div class="moverlay" id="mrate">
   <div class="modal" style="max-width:410px;max-height:88vh;overflow-y:auto">
     <div class="mtitle">⚙️ Edit Rates</div>
@@ -249,7 +242,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
   </div>
 </div>
 
-<!-- View Modal -->
 <div class="moverlay" id="mview">
   <div class="modal" style="max-width:480px;max-height:88vh;overflow-y:auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -277,10 +269,8 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
   <button class="tab" id="t2" onclick="switchTab('proj')">📁 Projects</button>
 </div>
 
-<div class="page"><div class="wrap"><div class="gap">
-</div>
+<div class="page"><div class="wrap"><div class="gap"></div>
 <div id="tcalc">
-
 <div class="card">
   <div class="ch"><div class="sb">1</div><div><div class="cht">Client & Project Details</div><div class="chs">Fill in client information</div></div></div>
   <div class="cb">
@@ -367,12 +357,12 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
     <button onclick="openRatePwd()" style="background:none;border:none;font-size:10px;color:#aaa;cursor:pointer;text-decoration:underline">⚙️ Edit Locked Rates</button>
   </div>
 </div>
-
-</div><!-- tcalc -->
+</div>
 
 <div id="tproj" style="display:none">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
     <div><div style="font-size:15px;font-weight:700;color:#1a1a1a">📁 Saved Projects</div><div style="font-size:11px;color:#999;margin-top:2px" id="pcnt">Loading...</div></div>
+    <button onclick="loadProj()" style="background:#1a2e1a;border:none;color:#c8a84b;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">🔄 Refresh</button>
   </div>
   <div id="plist"></div>
   <div class="rzone">
@@ -384,14 +374,13 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f3ee;min-height:100vh;color
 
 <div style="height:20px"></div>
 </div></div>
-</div><!-- app -->
+</div>
 
 <script>
-// Firebase init
 var firebaseConfig = {
   apiKey: "AIzaSyA85fL8UlXcRebkzdcuirydrL4aC4UXw8",
   authDomain: "gwpl-operations.firebaseapp.com",
-  databaseURL: "https://gwpl-operations-default-rtdb.asia-southeast1.firebaseio.com",
+  databaseURL: "https://gwpl-operations-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "gwpl-operations",
   storageBucket: "gwpl-operations.appspot.com",
   messagingSenderId: "221660611344",
@@ -412,9 +401,8 @@ function g(id){return document.getElementById(id);}
 function show(id){var e=g(id);if(e){e.classList.remove('hide');}}
 function hide(id){var e=g(id);if(e){e.classList.add('hide');}}
 function sc(id){setTimeout(function(){var e=g(id);if(e)e.scrollIntoView({behavior:'smooth',block:'start'});},150);}
-function toast(m){var t=g('toast');t.textContent=m;t.style.display='block';setTimeout(function(){t.style.display='none';},2500);}
+function toast(m,dur){var t=g('toast');t.textContent=m;t.style.display='block';setTimeout(function(){t.style.display='none';},(dur||2500));}
 
-// LOGIN
 function doLogin(){
   var u=g('lu').value.trim(), p=g('lp').value;
   if(u===LU && p===LP){
@@ -430,19 +418,18 @@ function doLogin(){
 }
 
 function doLogout(){
-  clearInterval(stInt); stInt=null; remain=TIMEOUT;
+  clearInterval(stInt);stInt=null;remain=TIMEOUT;
   g('app').style.display='none';
   g('login-screen').style.display='flex';
-  g('lu').value=''; g('lp').value='';
+  g('lu').value='';g('lp').value='';
   g('lerr').style.display='none';
 }
 
 function startTimer(){
-  remain=TIMEOUT; updateTimer();
+  remain=TIMEOUT;updateTimer();
   clearInterval(stInt);
   stInt=setInterval(function(){
-    remain--;
-    updateTimer();
+    remain--;updateTimer();
     if(remain<=0){clearInterval(stInt);alert('⏰ Session expired. Please login again.');doLogout();}
   },1000);
   ['click','keydown','touchstart'].forEach(function(ev){
@@ -451,27 +438,22 @@ function startTimer(){
 }
 
 function updateTimer(){
-  var m=Math.floor(remain/60), s=remain%60;
+  var m=Math.floor(remain/60),s=remain%60;
   var el=g('stimer');
-  if(el){
-    el.textContent=m+':'+(s<10?'0':'')+s;
-    el.style.color=remain<=60?'#ff6b6b':remain<=180?'#e8c86b':'#c8a84b';
-  }
+  if(el){el.textContent=m+':'+(s<10?'0':'')+s;el.style.color=remain<=60?'#ff6b6b':remain<=180?'#e8c86b':'#c8a84b';}
 }
 
-// TABS
 function switchTab(t){
   if(t==='calc'){
-    g('tcalc').style.display='block'; g('tproj').style.display='none';
-    g('t1').className='tab on'; g('t2').className='tab';
+    g('tcalc').style.display='block';g('tproj').style.display='none';
+    g('t1').className='tab on';g('t2').className='tab';
   } else {
-    g('tcalc').style.display='none'; g('tproj').style.display='block';
-    g('t1').className='tab'; g('t2').className='tab on';
+    g('tcalc').style.display='none';g('tproj').style.display='block';
+    g('t1').className='tab';g('t2').className='tab on';
     loadProj();
   }
 }
 
-// DOOR SELECTION
 function selCat(cat){
   S={cat:cat,type:null,thick:null,rate:null,sqft:0,lam:null,lt:null};
   g('ccnf').className='cc'+(cat==='nf'?' on':'');
@@ -480,50 +462,50 @@ function selCat(cat){
   var h='';
   for(var i=0;i<types.length;i++) h+='<div class="chip" onclick="selType(\''+types[i]+'\',this)">'+types[i]+'</div>';
   g('tchips').innerHTML=h;
-  show('stypes'); hide('card2'); hide('card3'); hide('card4');
+  show('stypes');hide('card2');hide('card3');hide('card4');
 }
 
 function selType(t,el){
-  S.type=t; S.thick=null; S.rate=null; S.sqft=0; S.lam=null; S.lt=null;
+  S.type=t;S.thick=null;S.rate=null;S.sqft=0;S.lam=null;S.lt=null;
   var ch=g('tchips').querySelectorAll('.chip');
   for(var i=0;i<ch.length;i++) ch[i].className='chip';
   el.className='chip'+(S.cat==='f'?' fon':' on');
-  renderThick(); show('card2'); hide('card3'); hide('card4'); sc('card2');
+  renderThick();show('card2');hide('card3');hide('card4');sc('card2');
 }
 
 function renderThick(){
   var isF=S.cat==='f';
   g('thicksub').textContent=isF?'IS 3614 specifications':'Select thickness';
-  var keys=Object.keys(RATES[S.cat]), h='';
+  var keys=Object.keys(RATES[S.cat]),h='';
   for(var i=0;i<keys.length;i++){
-    var k=keys[i], mm=k.split('–')[0].trim();
+    var k=keys[i],mm=k.split('–')[0].trim();
     h+='<div class="tc" onclick="selThick(\''+k+'\','+RATES[S.cat][k]+',this)"><div class="tmm">'+mm+'</div><div class="tdesc">'+(TDESC[k]||'')+'</div></div>';
   }
   g('tgrid').innerHTML=h;
 }
 
 function selThick(k,r,el){
-  S.thick=k; S.rate=r; S.sqft=0; S.lam=null; S.lt=null;
+  S.thick=k;S.rate=r;S.sqft=0;S.lam=null;S.lt=null;
   var tc=document.querySelectorAll('.tc');
   for(var i=0;i<tc.length;i++) tc[i].className='tc';
   el.className='tc'+(S.cat==='f'?' fon':' on');
-  g('dh').value=''; g('dw').value='';
-  show('card3'); hide('card4'); sc('card3');
+  g('dh').value='';g('dw').value='';
+  show('card3');hide('card4');sc('card3');
 }
 
 function calcSqft(){
-  var h=parseFloat(g('dh').value), w=parseFloat(g('dw').value);
+  var h=parseFloat(g('dh').value),w=parseFloat(g('dw').value);
   if(h>0&&w>0){
     S.sqft=(h/1000)*(w/1000)*10.76;
-    S.lam=null; S.lt=null;
-    renderLams(); show('card4'); hide('addbtn'); sc('card4');
-  } else { S.sqft=0; hide('card4'); }
+    S.lam=null;S.lt=null;
+    renderLams();show('card4');hide('addbtn');sc('card4');
+  } else {S.sqft=0;hide('card4');}
 }
 
 function renderLams(){
   var h='';
   for(var i=0;i<LAMS.length;i++){
-    var l=LAMS[i], on=(S.lam===i);
+    var l=LAMS[i],on=(S.lam===i);
     h+='<div class="lc'+(on?' on':'')+'"><div class="lnm">'+l.n+'</div><div class="ltrow">'
       +'<button class="ltb'+(on&&S.lt==='0.8mm'?' on':'')+'" onclick="pickLam('+i+',\'0.8mm\')">0.8mm</button>'
       +'<button class="ltb'+(on&&S.lt==='1mm'?' on':'')+'" onclick="pickLam('+i+',\'1mm\')">1mm</button>'
@@ -536,23 +518,23 @@ function pickLam(i,t){S.lam=i;S.lt=t;renderLams();show('addbtn');sc('addbtn');}
 function getLR(i,t){return t==='1mm'?LAMS[i].r+200:LAMS[i].r;}
 
 function addToQuote(){
-  var l=LAMS[S.lam], lr=getLR(S.lam,S.lt);
+  var l=LAMS[S.lam],lr=getLR(S.lam,S.lt);
   var tot=Math.round(S.rate*S.sqft+lr*2);
   QI.push({cat:S.cat,type:S.type,thick:S.thick,h:g('dh').value,w:g('dw').value,sqft:S.sqft,rate:S.rate,ln:l.n,lt:S.lt,lr:lr,tot:tot});
-  show('qsec'); renderQ(); sc('qsec'); resetForm();
+  show('qsec');renderQ();sc('qsec');resetForm();
 }
 
 function renderQ(){
-  var h='', sub=0;
+  var h='',sub=0;
   for(var i=0;i<QI.length;i++){
-    var q=QI[i]; sub+=q.tot;
+    var q=QI[i];sub+=q.tot;
     h+='<div class="qi"><div class="qitop"><div class="qinum">'+(i+1)+'</div><div class="qiinfo">'
       +'<div class="qititle">'+(q.cat==='f'?'🔥 Fire Door':'🚪 Non-Fire Door')+' – '+q.type+'</div>'
       +'<div class="qisub">'+q.thick+' · '+q.h+'×'+q.w+'mm · '+q.ln+' ('+q.lt+')</div></div>'
       +'<div style="text-align:right"><div class="qiamt">₹'+q.tot+'</div>'
       +'<button class="qirem" onclick="remQ('+i+')">✕</button></div></div></div>';
   }
-  var gst=Math.round(sub*0.18), grand=sub+gst;
+  var gst=Math.round(sub*0.18),grand=sub+gst;
   g('qlist').innerHTML=h;
   g('tsub').textContent='₹'+sub;
   g('tgst').textContent='₹'+gst;
@@ -571,7 +553,7 @@ function resetForm(){
   var h='';
   for(var i=0;i<types.length;i++) h+='<div class="chip" onclick="selType(\''+types[i]+'\',this)">'+types[i]+'</div>';
   g('tchips').innerHTML=h;
-  show('stypes'); hide('card2'); hide('card3'); hide('card4'); hide('addbtn');
+  show('stypes');hide('card2');hide('card3');hide('card4');hide('addbtn');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -581,14 +563,13 @@ function getClient(){
     billing:g('cba').value||'—',terms:g('ctr').value||''};
 }
 function setClient(c){
-  g('cn').value=c.name!=='—'?c.name:''; g('cm').value=c.phone!=='—'?c.phone:'';
-  g('cg').value=c.gst!=='—'?c.gst:''; g('cp').value=c.project!=='—'?c.project:'';
-  g('cs').value=c.supName!=='—'?c.supName:''; g('csm').value=c.supPhone!=='—'?c.supPhone:'';
-  g('ca').value=c.site!=='—'?c.site:''; g('cba').value=c.billing!=='—'?c.billing:'';
+  g('cn').value=c.name!=='—'?c.name:'';g('cm').value=c.phone!=='—'?c.phone:'';
+  g('cg').value=c.gst!=='—'?c.gst:'';g('cp').value=c.project!=='—'?c.project:'';
+  g('cs').value=c.supName!=='—'?c.supName:'';g('csm').value=c.supPhone!=='—'?c.supPhone:'';
+  g('ca').value=c.site!=='—'?c.site:'';g('cba').value=c.billing!=='—'?c.billing:'';
   g('ctr').value=c.terms||'';
 }
 
-// FIREBASE PROJECTS
 function getNextQNum(cb){
   db.ref('meta/lastQNum').transaction(function(cur){return (cur||0)+1;},function(err,ok,snap){
     cb(ok?snap.val():Math.floor(Math.random()*9000)+1000);
@@ -597,16 +578,17 @@ function getNextQNum(cb){
 
 function saveQ(){
   if(QI.length===0){toast('⚠️ No doors in quote!');return;}
-  var c=getClient(), sub=0;
+  toast('💾 Saving...', 5000);
+  var c=getClient(),sub=0;
   for(var i=0;i<QI.length;i++) sub+=QI[i].tot;
-  var gst=Math.round(sub*0.18), grand=sub+gst;
+  var gst=Math.round(sub*0.18),grand=sub+gst;
   getNextQNum(function(num){
     var qNum='QT-'+String(num).padStart(4,'0');
     var id='q_'+Date.now();
     var data={id:id,qNum:qNum,at:new Date().toISOString(),client:c,items:QI,sub:sub,gst:gst,grand:grand};
     db.ref('quotes/'+id).set(data,function(err){
-      if(err) toast('❌ Save failed. Check internet.');
-      else toast('✅ Saved as '+qNum+'!');
+      if(err){toast('❌ Save failed: '+err.message);}
+      else{toast('✅ Saved as '+qNum+'!');}
     });
   });
 }
@@ -625,7 +607,7 @@ function loadProj(){
     }
     var h='';
     for(var j=0;j<proj.length;j++){
-      var p=proj[j], d=new Date(p.at);
+      var p=proj[j],d=new Date(p.at);
       var ds=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
       h+='<div class="pcard" onclick="viewProj(\''+p.id+'\')"><div class="pctop"><div>'
         +'<div class="pcqnum">'+(p.qNum||'—')+'</div>'
@@ -636,14 +618,14 @@ function loadProj(){
         +'<span class="pcbadge">'+(p.qNum||'Saved')+'</span></div></div>';
     }
     list.innerHTML=h;
-  },function(){
-    list.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Could not load. Check internet.</div></div>';
+  },function(err){
+    list.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Could not load. Check internet.</div><div class="empty-sub">'+err.message+'</div></div>';
   });
 }
 
 function viewProj(id){
   db.ref('quotes/'+id).once('value',function(snap){
-    var p=snap.val(); if(!p){toast('Not found');return;}
+    var p=snap.val();if(!p){toast('Not found');return;}
     viewId=id;
     var d=new Date(p.at);
     var ds=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
@@ -678,11 +660,11 @@ function editSaved(){
 function doEditQuote(){
   if(!viewId)return;
   db.ref('quotes/'+viewId).once('value',function(snap){
-    var p=snap.val(); if(!p){toast('Not found');return;}
-    setClient(p.client); QI=p.items;
+    var p=snap.val();if(!p){toast('Not found');return;}
+    setClient(p.client);QI=p.items;
     db.ref('quotes/'+viewId).remove();
     viewId=null;
-    switchTab('calc'); show('qsec'); renderQ(); show('card1');
+    switchTab('calc');show('qsec');renderQ();show('card1');
     toast('✅ Quote loaded for editing!');
     setTimeout(function(){g('cn').scrollIntoView({behavior:'smooth',block:'start'});},200);
   });
@@ -696,11 +678,10 @@ function doReset(){
   db.ref('meta').remove();
 }
 
-// PASSWORD
 function openPwd(action,title,sub){
   pwdAction=action;
-  g('mtitle').textContent=title; g('msub').textContent=sub;
-  g('mpwd-inp').value=''; g('merr').textContent='';
+  g('mtitle').textContent=title;g('msub').textContent=sub;
+  g('mpwd-inp').value='';g('merr').textContent='';
   var btn=g('mconfirm');
   btn.className=action==='reset'?'mbtn dan':'mbtn pri';
   btn.textContent=action==='reset'?'Delete All':'Confirm';
@@ -711,7 +692,7 @@ function openRatePwd(){openPwd('rates','🔒 Edit Rates','Enter password to edit
 function openResetPwd(){openPwd('reset','⚠️ Reset All','Enter password to delete all quotations.');}
 function closePwd(){g('mpwd').style.display='none';pwdAction=null;}
 function verifyPwd(){
-  var p=g('mpwd-inp').value, err=g('merr');
+  var p=g('mpwd-inp').value,err=g('merr');
   if(pwdAction==='rates'){
     if(p===PR){g('mpwd').style.display='none';openRateEditor();}
     else{err.textContent='❌ Incorrect.';g('mpwd-inp').value='';}
@@ -724,10 +705,9 @@ function verifyPwd(){
   }
 }
 
-// RATES
 function openRateEditor(){
-  g('r0').value=RATES.nf['30mm']; g('r1').value=RATES.nf['35mm'];
-  g('r2').value=RATES.nf['40mm']; g('r3').value=RATES.nf['45mm'];
+  g('r0').value=RATES.nf['30mm'];g('r1').value=RATES.nf['35mm'];
+  g('r2').value=RATES.nf['40mm'];g('r3').value=RATES.nf['45mm'];
   g('r4').value=RATES.f['45mm – 60 mins (IS 3614)'];
   g('r5').value=RATES.f['55mm – 120 mins (IS 3614)'];
   for(var i=0;i<LAMS.length;i++) g('r'+(6+i)).value=LAMS[i].r;
@@ -741,15 +721,14 @@ function saveRates(){
   RATES.f['45mm – 60 mins (IS 3614)']=parseFloat(g('r4').value)||325;
   RATES.f['55mm – 120 mins (IS 3614)']=parseFloat(g('r5').value)||425;
   for(var i=0;i<LAMS.length;i++) LAMS[i].r=parseFloat(g('r'+(6+i)).value)||LAMS[i].r;
-  g('mrate').style.display='none'; toast('✅ Rates updated!');
+  g('mrate').style.display='none';toast('✅ Rates updated!');
 }
 
-// DOWNLOAD
 function dlQ(){
-  var c=getClient(), date=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-  var sub=0, rows='';
+  var c=getClient(),date=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  var sub=0,rows='';
   for(var i=0;i<QI.length;i++){
-    var q=QI[i]; sub+=q.tot;
+    var q=QI[i];sub+=q.tot;
     rows+='<tr style="background:'+(i%2===0?'#fff':'#fafaf7')+'">'
       +'<td style="padding:8px;font-size:11px;color:#555;border-bottom:1px solid #eee;text-align:center">'+(i+1)+'</td>'
       +'<td style="padding:8px;font-size:11px;font-weight:600;border-bottom:1px solid #eee">'+(q.cat==='f'?'Fire Door':'Non-Fire Door')+' – '+q.type+'</td>'
@@ -758,17 +737,16 @@ function dlQ(){
       +'<td style="padding:8px;font-size:11px;color:#555;border-bottom:1px solid #eee">'+q.ln+' ('+q.lt+')</td>'
       +'<td style="padding:8px;font-size:11px;font-weight:700;color:#1a2e1a;text-align:right;border-bottom:1px solid #eee">Rs.'+q.tot+'</td></tr>';
   }
-  var gst=Math.round(sub*0.18), grand=sub+gst;
-  var tl=''; var tlines=c.terms.split('\n');
+  var gst=Math.round(sub*0.18),grand=sub+gst;
+  var tl='';var tlines=c.terms.split('\n');
   for(var t=0;t<tlines.length;t++) if(tlines[t].trim()) tl+='<div style="margin-bottom:4px">'+tlines[t].trim()+'</div>';
   var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Quotation</title>'
     +'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:12px}'
     +'@media print{body{padding:0}.np{display:none}@page{margin:12mm;size:A4}}</style></head><body>'
     +'<div class="np" style="text-align:center;margin-bottom:14px"><button onclick="window.print()" style="padding:11px 28px;background:#1a2e1a;color:#c8a84b;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Save as PDF / Print</button></div>'
     +'<table width="100%" style="background:#1a2e1a;padding:13px 15px"><tr>'
-    +'<td><div style="font-size:15px;font-weight:700;color:#c8a84b">We Are One Enterprises Pvt. Ltd.</div>'
-    +'<div style="font-size:8px;color:#aaa;margin-top:5px;line-height:1.7">#601, Express Chamber, M.V. Road, Near Western Express Highway, Opp. Natraj Rustomjee, Andheri East, Mumbai - 400 069<br>'
-    +'sales@weareoneenterprises.com | +91 22 4919 55 55 | GST: 27AAACW8324N1ZU</div></td>'
+    +'<td><div style="font-size:15px;font-weight:700;color:#c8a84b">Geetanjali Woodcraft Pvt. Ltd.</div>'
+    +'<div style="font-size:8px;color:#aaa;margin-top:5px;line-height:1.7">Panvel, Raigad, Maharashtra</div></td>'
     +'<td style="text-align:right;vertical-align:top"><div style="font-size:13px;font-weight:700;color:#c8a84b">DOOR QUOTATION</div><div style="font-size:8px;color:#8aaa8a;margin-top:3px">Date: '+date+'</div></td></tr></table>'
     +'<table width="100%" style="border-collapse:collapse;border:1px solid #ddd">'
     +'<tr style="background:#f0f0eb"><td colspan="4" style="padding:6px 9px;font-size:9px;font-weight:700;color:#555;text-transform:uppercase">Client & Project Information</td></tr>'
@@ -792,7 +770,7 @@ function dlQ(){
     +'<tr style="background:#1a2e1a"><td style="padding:11px 13px;font-size:11px;font-weight:700;color:#c8a84b;text-transform:uppercase">Grand Total (incl. 18% GST)</td>'
     +'<td style="padding:11px 13px;font-size:18px;font-weight:800;color:#c8a84b;text-align:right">Rs.'+grand+'</td></tr></table>'
     +(tl?'<div style="margin-top:12px;border:1px solid #ddd"><div style="background:#f0f0eb;padding:6px 9px;font-size:9px;font-weight:700;color:#555;text-transform:uppercase">Payment Terms & Conditions</div><div style="padding:9px 11px;font-size:10px;color:#555;line-height:1.7">'+tl+'</div></div>':'')
-    +'<div style="margin-top:14px;font-size:8px;color:#bbb;text-align:center;border-top:1px solid #eee;padding-top:9px">Computer-generated quotation by We Are One Enterprises Pvt. Ltd.</div>'
+    +'<div style="margin-top:14px;font-size:8px;color:#bbb;text-align:center;border-top:1px solid #eee;padding-top:9px">Computer-generated quotation by Geetanjali Woodcraft Pvt. Ltd.</div>'
     +'<scr'+'ipt>window.onload=function(){window.print();}<'+'/script></body></html>';
   var blob=new Blob([html],{type:'text/html'});
   var url=URL.createObjectURL(blob);
@@ -802,10 +780,10 @@ function dlQ(){
 }
 
 function shareWA(){
-  var c=getClient(), sub=0;
-  var msg='*We Are One Enterprises Pvt. Ltd.*\n*Door Rate Quotation*\n\nClient: '+c.name+' | '+c.phone+'\nProject: '+c.project+'\n\n';
+  var c=getClient(),sub=0;
+  var msg='*Geetanjali Woodcraft Pvt. Ltd.*\n*Door Rate Quotation*\n\nClient: '+c.name+' | '+c.phone+'\nProject: '+c.project+'\n\n';
   for(var i=0;i<QI.length;i++){
-    var q=QI[i]; sub+=q.tot;
+    var q=QI[i];sub+=q.tot;
     msg+=(i+1)+'. '+(q.cat==='f'?'Fire Door':'Non-Fire Door')+' - '+q.type+'\n   '+q.thick+' | '+q.h+'x'+q.w+'mm | '+q.ln+' ('+q.lt+')\n   Amount: Rs.'+q.tot+'\n\n';
   }
   var gst=Math.round(sub*0.18);
