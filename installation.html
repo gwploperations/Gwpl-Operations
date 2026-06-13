@@ -3,659 +3,735 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Geetanjali Wood Craft — Door Tracker</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-const SUPABASE_URL = 'https://hjcangcnosrgmnssxslq.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqY2FuZ2Nub3NyZ21uc3N4c2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3MDI4NTgsImV4cCI6MjA2NTI3ODg1OH0.sb_publishable_y-rsEi1gJ71oRutCzXFSvA_Fw4hsYE_';
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-window._supabase = supabase;
-window._appReady = true;
-window.dispatchEvent(new Event('supabase-ready'));
-</script>
+<title>Geetanjali Wood Craft — Installation Tracker</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#1c1917;--bg2:#292524;--bg3:#3f3a36;--border:#44403c;--text:#e7e5e4;--text2:#a8a29e;--text3:#78716c;--amber:#f59e0b;--amber2:#fbbf24;--amber-bg:#451a03;--emerald:#10b981;--emerald-bg:#022c22;--orange:#f97316;--orange-bg:#431407;--red:#ef4444;--red-bg:#450a0a;--sky:#0ea5e9;--sky-bg:#082f49;--violet:#8b5cf6;--violet-bg:#2e1065}
-body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh}
-.app{max-width:900px;margin:0 auto;padding:16px 16px 80px}
-header{display:flex;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:20px}
-.logo{width:40px;height:40px;border-radius:10px;background:var(--amber);display:flex;align-items:center;justify-content:center;color:#1c1917;flex-shrink:0}
-.logo svg{width:22px;height:22px}
-h1{font-size:17px;font-weight:700;color:var(--amber);line-height:1.2}
-.subtitle{font-size:11px;color:var(--text2)}
+body{background:#1c1917;color:#e7e5e4;font-family:system-ui,sans-serif;min-height:100vh}
+.wrap{max-width:900px;margin:0 auto;padding:16px 16px 80px}
+header{display:flex;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid #44403c;margin-bottom:20px}
+.logo{width:40px;height:40px;border-radius:10px;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
-.btn-amber{background:var(--amber);color:#1c1917}.btn-amber:hover{background:var(--amber2)}
-.btn-ghost{background:var(--bg2);color:var(--text2)}.btn-ghost:hover{background:var(--bg3)}
-.btn-sm{padding:6px 10px;font-size:12px}
-.btn-icon{padding:8px;border-radius:8px;background:var(--bg2);border:none;color:var(--text2);cursor:pointer}.btn-icon:hover{background:var(--bg3)}
-.btn-icon svg{width:16px;height:16px;display:block}
 nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
-.nav-btn{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;background:var(--bg2);color:var(--text2);transition:.15s}
-.nav-btn:hover{background:var(--bg3)}
-.nav-btn.active{background:var(--amber);color:#1c1917}
-.nav-btn svg{width:15px;height:15px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px}
-.card:hover{border-color:#a16207}
+.nav-btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;background:#292524;color:#a8a29e;transition:.15s}
+.nav-btn:hover{background:#3f3a36}
+.nav-btn.active{background:#f59e0b;color:#1c1917}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600}
+.btn-amber{background:#f59e0b;color:#1c1917}.btn-amber:hover{background:#fbbf24}
+.btn-ghost{background:#292524;color:#a8a29e}.btn-ghost:hover{background:#3f3a36}
+.btn-sm{padding:6px 10px;font-size:12px}
+.btn-danger{background:#450a0a;color:#f87171}.btn-danger:hover{background:#7f1d1d}
+.card{background:#292524;border:1px solid #44403c;border-radius:12px;padding:16px;margin-bottom:12px}
+.card-hover{cursor:pointer}.card-hover:hover{border-color:#a16207}
+input,select,textarea{background:#1c1917;border:1px solid #44403c;border-radius:8px;padding:8px 10px;color:#e7e5e4;font-size:14px;outline:none;width:100%}
+input:focus,select:focus{border-color:#f59e0b}
+input:disabled{opacity:0.5}
+label>span{font-size:12px;color:#a8a29e;display:block;margin-bottom:4px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:600px){.grid2{grid-template-columns:1fr}}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-@media(max-width:600px){.grid3{grid-template-columns:1fr 1fr}}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-@media(max-width:600px){.grid4{grid-template-columns:1fr 1fr}}
-input,select,textarea{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;outline:none;width:100%}
-input:focus,select:focus{border-color:var(--amber)}
-label span{font-size:12px;color:var(--text2);display:block;margin-bottom:4px}
-.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
-.tag-amber{background:var(--amber-bg);color:var(--amber)}
-.tag-emerald{background:var(--emerald-bg);color:var(--emerald)}
-.tag-orange{background:var(--orange-bg);color:var(--orange)}
-.tag-red{background:var(--red-bg);color:var(--red)}
-.tag-sky{background:var(--sky-bg);color:var(--sky)}
-.tag-violet{background:var(--violet-bg);color:var(--violet)}
-.tag-stone{background:var(--bg3);color:var(--text2)}
-.progress{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
-.progress-bar{height:100%;border-radius:4px;transition:.3s}
-.stat-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px}
-.stat-val{font-size:22px;font-weight:700;margin-top:4px}
-.stat-lbl{font-size:11px;color:var(--text2);margin-top:2px}
-.stepper{display:flex;align-items:center;gap:4px}
-.stepper button{width:24px;height:24px;border-radius:6px;background:var(--bg3);border:none;color:var(--text);cursor:pointer;font-size:15px;line-height:1}
-.stepper input{width:44px;text-align:center;padding:3px 4px;font-size:13px}
-.floor-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px}
-.floor-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg)}
-.door-row{padding:12px 16px;border-bottom:1px solid var(--border)}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+@media(max-width:600px){.grid2,.grid3,.grid4{grid-template-columns:1fr 1fr}}
+.progress{height:8px;background:#44403c;border-radius:4px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;border-radius:4px;transition:.3s}
+.empty{text-align:center;padding:48px 16px;color:#78716c;border:1px dashed #44403c;border-radius:12px}
+.tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.floor-card{background:#292524;border:1px solid #44403c;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.floor-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1c1917;border-bottom:1px solid #44403c}
+.door-row{padding:12px 16px;border-bottom:1px solid #44403c}
 .door-row:last-child{border-bottom:none}
-.hold-panel{background:#431407;border:1px solid #7c2d12;border-radius:8px;padding:10px;margin-top:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-@media(max-width:600px){.hold-panel{grid-template-columns:1fr}}
-.faulty-panel{background:var(--red-bg);border:1px solid #7f1d1d;border-radius:8px;padding:10px;margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center;z-index:100;padding:0}
-@media(min-width:600px){.modal-overlay{align-items:center;padding:16px}}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:20px;max-height:92vh;overflow-y:auto}
-@media(min-width:600px){.modal{border-radius:16px}}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.cert-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;overflow:auto;padding:16px}
-.cert-paper{background:#fff;color:#1c1917;max-width:750px;margin:0 auto;border-radius:8px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.cert-no-print{display:flex;justify-content:flex-end;gap:8px;max-width:750px;margin:0 auto 12px}
-.lock-bar{display:flex;align-items:center;justify-content:space-between;border-radius:12px;padding:10px 16px;margin-bottom:16px;border:1px solid var(--border);background:var(--bg2)}
-.lock-bar.unlocked{background:#451a0320;border-color:#92400e}
-.empty{text-align:center;padding:48px 16px;color:var(--text3);border:1px dashed var(--border);border-radius:12px}
-.activity-row{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
-.avatar{width:32px;height:32px;border-radius:50%;background:var(--amber-bg);color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.followup-row{background:var(--bg2);border:1px solid var(--border);border-left:4px solid var(--orange);border-radius:12px;padding:12px;margin-bottom:8px}
+.stepper{display:inline-flex;align-items:center;gap:4px}
+.stepper button{width:26px;height:26px;border-radius:6px;background:#44403c;border:none;color:#e7e5e4;cursor:pointer;font-size:16px;line-height:1}
+.stepper button:hover{background:#57534e}
+.stepper input{width:46px;text-align:center;padding:2px 4px;font-size:13px}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal{background:#292524;border:1px solid #44403c;border-radius:16px;width:100%;max-width:480px;padding:20px;max-height:90vh;overflow-y:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.lock-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-radius:10px;border:1px solid #44403c;background:#292524;margin-bottom:16px}
+.stat-box{background:#292524;border:1px solid #44403c;border-radius:10px;padding:12px;text-align:center}
+.stat-val{font-size:22px;font-weight:700;margin:4px 0}
+.stat-lbl{font-size:11px;color:#a8a29e}
+.activity-row{display:flex;align-items:center;gap:10px;padding:10px;background:#292524;border:1px solid #44403c;border-radius:10px;margin-bottom:8px}
+.avatar{width:32px;height:32px;border-radius:50%;background:#451a03;color:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.followup-row{background:#292524;border:1px solid #44403c;border-left:4px solid #f97316;border-radius:10px;padding:12px;margin-bottom:8px}
+.hw-row{background:#292524;border:1px solid #44403c;border-left:4px solid #44403c;border-radius:10px;padding:12px;margin-bottom:8px}
+.cert-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;overflow:auto;padding:16px}
+.cert-paper{background:#fff;color:#1c1917;max-width:750px;margin:0 auto;border-radius:8px;padding:32px;font-family:Georgia,serif}
+.cert-actions{display:flex;justify-content:flex-end;gap:8px;max-width:750px;margin:0 auto 12px}
 .spin{animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.contacts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-@media(max-width:600px){.contacts-grid{grid-template-columns:1fr}}
-.contact-card{border:1px solid var(--border);border-radius:10px;padding:10px;background:#0c0a0920}
-.contact-card.gwpl{border-color:#92400e;background:#451a0320}
-.splash{min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--amber);font-size:16px}
-.auth-box{max-width:360px;width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:24px}
-.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
-.hw-row{background:var(--bg2);border:1px solid var(--border);border-left:4px solid var(--bg3);border-radius:12px;padding:12px;margin-bottom:8px}
-.hw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-@media(max-width:600px){.hw-grid{grid-template-columns:1fr 1fr}}
-.daily-row{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
-@media print{.app{display:none!important}.cert-overlay{position:static!important;background:#fff!important;padding:0!important}.cert-no-print{display:none!important}.cert-paper{box-shadow:none!important;margin:0!important;max-width:none!important}}
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;background:#1c1917}
+.auth-box{background:#292524;border:1px solid #44403c;border-radius:16px;padding:24px;width:100%;max-width:360px}
+.hold-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;background:#431407;border:1px solid #7c2d12;border-radius:8px;padding:10px;margin-top:8px}
+.fault-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#450a0a;border:1px solid #7f1d1d;border-radius:8px;padding:10px;margin-top:8px}
+@media(max-width:600px){.hold-grid{grid-template-columns:1fr}.fault-grid{grid-template-columns:1fr}}
+@media print{.wrap{display:none!important}.cert-bg{position:static!important;background:#fff!important;padding:0!important}.cert-actions{display:none!important}.cert-paper{box-shadow:none!important}}
 </style>
 </head>
 <body>
-<div id="root"><div class="splash">Loading…</div></div>
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+<div id="app"><div style="min-height:100vh;display:flex;align-items:center;justify-content:center;color:#f59e0b">Loading…</div></div>
 
-const SUPABASE_URL = 'https://hjcangcnosrgmnssxslq.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqY2FuZ2Nub3NyZ21uc3N4c2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNjM4NjEsImV4cCI6MjA5NjgzOTg2MX0.up93hDiyIrrfPzQIKAszq3Iioh-0olreU0ZyhNLy-z4';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+// ── config ──
+const URL_ = 'https://hjcangcnosrgmnssxslq.supabase.co';
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqY2FuZ2Nub3NyZ21uc3N4c2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNjM4NjEsImV4cCI6MjA5NjgzOTg2MX0.up93hDiyIrrfPzQIKAszq3Iioh-0olreU0ZyhNLy-z4';
+const sb   = createClient(URL_, KEY);
 
 // ── constants ──
-const STANDARD_DOORS=[{key:"main",label:"Main Door",frame:true},{key:"commonBed",label:"Common Bedroom",frame:true},{key:"masterBed",label:"Master Bedroom",frame:true},{key:"commonBath",label:"Common Bathroom",frame:false},{key:"masterBath",label:"Master Bathroom",frame:false},{key:"staircase",label:"Staircase Door",frame:true}];
-const HOLD_REASONS=["Gypsum incomplete","Tiling incomplete","Frame not ready","Material not given","Other"];
-const FAULT_REASONS=["Damaged in transit","Wrong size","Manufacturing defect","Poor finish / polish","Broken on site","Warped / bent","Other"];
-const HW_ITEMS=["Hinges","Mortise Lock","Door Handle Set","Door Closer","Tower Bolt","Aldrop","Door Stopper","Magnetic Catcher","Peephole / Eye Viewer","Latch","Screws / Fasteners","Door Knob","Floor Spring","Concealed Hinge"];
-const HW_STATUS=["Pending","Sent","Received"];
-const CONTACT_ROLES=[{key:"sitePerson",label:"Geetanjali Site Person"},{key:"site",label:"Site Incharge"},{key:"head",label:"Project Head Incharge"},{key:"store",label:"Store Keeper"},{key:"qc",label:"QC Incharge"}];
+const STD_DOORS = [
+  {label:'Main Door',frame:true},{label:'Common Bedroom',frame:true},
+  {label:'Master Bedroom',frame:true},{label:'Common Bathroom',frame:false},
+  {label:'Master Bathroom',frame:false},{label:'Staircase Door',frame:true}
+];
+const HOLD_REASONS = ['Gypsum incomplete','Tiling incomplete','Frame not ready','Material not given','Other'];
+const FAULT_REASONS= ['Damaged in transit','Wrong size','Manufacturing defect','Poor finish / polish','Broken on site','Warped / bent','Other'];
+const HW_ITEMS = ['Hinges','Mortise Lock','Door Handle Set','Door Closer','Tower Bolt','Aldrop','Door Stopper','Magnetic Catcher','Peephole','Latch','Screws','Door Knob','Floor Spring','Concealed Hinge'];
+const HW_STATUS= ['Pending','Sent','Received'];
+const CONTACTS= [{key:'sitePerson',label:'Geetanjali Site Person'},{key:'site',label:'Site Incharge'},{key:'head',label:'Project Head'},{key:'store',label:'Store Keeper'},{key:'qc',label:'QC Incharge'}];
 
 // ── helpers ──
-const uid=()=>Math.random().toString(36).slice(2,10);
-const num=v=>isNaN(parseInt(v))?0:parseInt(v);
-const fmtDate=s=>s?s.split("-").reverse().join("/"):"";
-const todayISO=()=>new Date().toISOString().slice(0,10);
-const todayStr=()=>new Date().toLocaleDateString("en-GB");
-const rel=ts=>{if(!ts)return"";const s=Math.floor((Date.now()-ts)/1000);if(s<45)return"just now";const m=Math.floor(s/60);if(m<60)return`${m}m ago`;const h=Math.floor(m/60);if(h<24)return`${h}h ago`;return`${Math.floor(h/24)}d ago`};
-const emptyContacts=()=>CONTACT_ROLES.reduce((a,r)=>({...a,[r.key]:{name:"",phone:""}}),{});
-const normContacts=(c={})=>CONTACT_ROLES.reduce((a,r)=>({...a,[r.key]:{name:c?.[r.key]?.name||"",phone:c?.[r.key]?.phone||""}}),{});
-const emptyDoor=(label,frame,custom=false)=>({id:uid(),label,frame,custom,total:0,readyQty:0,holdQty:0,holdReason:"",promisedDate:"",notes:"",framesInstalled:0,doorsInstalled:0,handoverQty:0,faultyQty:0,faultyReason:"",faultyNotes:""});
-const emptyFloor=name=>({id:uid(),name,handoverDate:"",acceptedBy:"",doors:STANDARD_DOORS.map(d=>emptyDoor(d.label,d.frame,false))});
-const gd=d=>({label:"Door",frame:true,custom:false,total:0,readyQty:0,holdQty:0,holdReason:"",promisedDate:"",notes:"",framesInstalled:0,doorsInstalled:0,handoverQty:0,faultyQty:0,faultyReason:"",faultyNotes:"",...d});
-
-const migrateFloor=f=>{
-  if(f.doors)return f;
-  const doors=[];
-  STANDARD_DOORS.forEach(d=>{const c=(f.cells||{})[d.key]||{};doors.push({...emptyDoor(d.label,d.frame,false),...c,id:uid(),label:d.label,frame:d.frame,custom:false})});
-  Object.keys(f.cells||{}).forEach(k=>{if(!STANDARD_DOORS.find(d=>d.key===k)){const c=f.cells[k]||{};doors.push({...emptyDoor(c.label||k,true,true),...c,id:uid(),custom:true})}});
-  const{cells,...rest}=f;return{...rest,doors};
+const uid = () => Math.random().toString(36).slice(2,10);
+const num = v => isNaN(parseInt(v)) ? 0 : parseInt(v);
+const clamp = (v,min,max) => Math.min(Math.max(v,min), max!=null?max:9999);
+const today = () => new Date().toISOString().slice(0,10);
+const fmtDate = s => s ? s.split('-').reverse().join('/') : '';
+const todayStr = () => new Date().toLocaleDateString('en-GB');
+const rel = ts => {
+  if(!ts) return '';
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s<60) return 'just now';
+  const m = Math.floor(s/60); if(m<60) return m+'m ago';
+  const h = Math.floor(m/60); if(h<24) return h+'h ago';
+  return Math.floor(h/24)+'d ago';
 };
-const normalizeProjects=parsed=>(parsed||[]).map(p=>({...p,floors:(p.floors||[]).map(migrateFloor),dailyLog:p.dailyLog||[],hardwareLog:p.hardwareLog||[],orderNo:p.orderNo||"",contacts:normContacts(p.contacts)}));
-
-// ── supabase kv ──
-const kvGet=async key=>{const{data,error}=await supabase.from("kv").select("value").eq("key",key).maybeSingle();if(error){console.error(error);return null;}return data?data.value:null};
-const kvSet=async(key,value)=>{const{error}=await supabase.from("kv").upsert({key,value,updated_at:new Date().toISOString()},{onConflict:"key"});if(error)console.error(error)};
+const emptyContacts = () => CONTACTS.reduce((a,r)=>({...a,[r.key]:{name:'',phone:''}}),{});
+const normContacts  = (c={}) => CONTACTS.reduce((a,r)=>({...a,[r.key]:{name:c?.[r.key]?.name||'',phone:c?.[r.key]?.phone||''}}),{});
+const emptyDoor = (label,frame,custom=false) => ({id:uid(),label,frame,custom,total:0,readyQty:0,holdQty:0,holdReason:'',promisedDate:'',notes:'',framesInstalled:0,doorsInstalled:0,handoverQty:0,faultyQty:0,faultyReason:'',faultyNotes:''});
+const emptyFloor = name => ({id:uid(),name,handoverDate:'',acceptedBy:'',doors:STD_DOORS.map(d=>emptyDoor(d.label,d.frame))});
+const normDoor = d => ({...emptyDoor('Door',true),...d});
 
 // ── state ──
-let session=null,projects=[],activity=[],pin=null,clientPin=null;
-let unlocked=false,clientUnlocked=false;
-let tab="projects",activeId=null,certId=null;
-let loading=true,syncing=false;
-let lastSaved={projects:null,activity:null};
-let lastSeen=parseInt(localStorage.getItem("gwc-seen")||"0")||0;
-let saveTimer={projects:null,activity:null};
-let showModal=null; // 'addProject'|'pin'|'clientPin'
+let session=null, loading=true, syncing=false;
+let projects=[], activity=[], adminPin=null, clientPin=null;
+let adminUnlocked=false, clientUnlocked=false;
+let tab='projects', activeId=null, certId=null;
+let modal=null; // 'addProject'|'adminPin'|'clientPin'
+let installSel=null, dailySel=null, hwSel=null, handoverSel=null;
+let lastSeen = parseInt(localStorage.getItem('gwc-seen')||'0')||0;
+let rtChannel=null;
+const saveTimers={};
 
-const userName=()=>session?.user?.user_metadata?.name||session?.user?.email||"Someone";
+const userName = () => session?.user?.user_metadata?.name || session?.user?.email || 'Team';
 
-// ── render engine ──
-const R=document.getElementById("root");
-const h=(tag,attrs,children)=>{
-  const el=document.createElement(tag);
-  if(attrs)Object.entries(attrs).forEach(([k,v])=>{
-    if(k==="class")el.className=v;
-    else if(k==="style")Object.assign(el.style,v);
-    else if(k.startsWith("on"))el.addEventListener(k.slice(2).toLowerCase(),v);
-    else if(k==="html")el.innerHTML=v;
-    else el.setAttribute(k,v);
-  });
-  const append=c=>{if(c==null||c===false||c===undefined)return;if(Array.isArray(c))c.forEach(append);else if(typeof c==="string"||typeof c==="number")el.appendChild(document.createTextNode(""+c));else if(c instanceof Node)el.appendChild(c)};
-  if(children)append(children);
-  return el;
-};
-const svgIcon=(name,size=16)=>{const el=document.createElementNS("http://www.w3.org/2000/svg","svg");el.setAttribute("width",size);el.setAttribute("height",size);el.setAttribute("viewBox","0 0 24 24");el.setAttribute("fill","none");el.setAttribute("stroke","currentColor");el.setAttribute("stroke-width","2");el.setAttribute("stroke-linecap","round");el.setAttribute("stroke-linejoin","round");
-const paths={hammer:'<path d="m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9"/><path d="m18 15 4-4"/><path d="m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 3 11 5l-3 3 2 2 3.5-1.5 4 4"/>',
-building:'<rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/>',
-dashboard:'<rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>',
-list:'<line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>',
-plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
-trash:'<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
-chevronLeft:'<path d="m15 18-6-6 6-6"/>',
-x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
-alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
-check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/>',
-clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
-factory:'<path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/>',
-wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
-door:'<path d="M13 4h3a2 2 0 0 1 2 2v14"/><path d="M2 20h3"/><path d="M13 20h9"/><path d="M10 12v.01"/><path d="M13 4.562v16.157a1 1 0 0 1-1.242.97L5 20V5.562a2 2 0 0 1 1.515-1.94l4-1A2 2 0 0 1 13 4.561Z"/>',
-panel:'<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>',
-lock:'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
-unlock:'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',
-clipboard:'<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
-key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>',
-file:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>',
-printer:'<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/>',
-calendar:'<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
-users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-package:'<path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
-phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.1 3.4 2 2 0 0 1 3.08 1.2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92"/>',
-hash:'<line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/>',
-refresh:'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
-user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-history:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
-logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
-mappin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
-};
-el.innerHTML=paths[name]||'<circle cx="12" cy="12" r="5"/>';
-return el};
-
-function icon(name,size=16,color=""){const el=svgIcon(name,size);if(color)el.style.color=color;return el}
-
-// ── stepper component ──
-function makeStepper(value,onSet,color,max,disabled){
-  const wrap=h("div",{class:"stepper"});
-  if(disabled){wrap.appendChild(h("span",{style:{minWidth:"44px",textAlign:"center",color:color||"inherit",fontSize:"13px",opacity:.7}},[""+value]));return wrap}
-  const clamp=v=>Math.min(Math.max(v,0),max!=null?max:9999);
-  const btnM=h("button",{},{});btnM.textContent="−";btnM.onclick=()=>onSet(clamp(value-1));
-  const inp=h("input",{type:"number",value:""+value,style:{color:color||"inherit"}});
-  inp.onchange=e=>onSet(clamp(num(e.target.value)));
-  const btnP=h("button",{},{});btnP.textContent="+";btnP.onclick=()=>onSet(clamp(value+1));
-  wrap.append(btnM,inp,btnP);return wrap;
+// ── supabase kv ──
+async function kvGet(key){
+  const {data,error} = await sb.from('kv').select('value').eq('key',key).maybeSingle();
+  if(error){console.error('kvGet',error);return null;}
+  return data ? data.value : null;
 }
-
-// ── save helpers ──
-function scheduleSave(key,data){
-  if(saveTimer[key])clearTimeout(saveTimer[key]);
-  saveTimer[key]=setTimeout(()=>kvSet(key,data),800);
+async function kvSet(key,value){
+  const {error} = await sb.from('kv').upsert({key,value,updated_at:new Date().toISOString()},{onConflict:'key'});
+  if(error) console.error('kvSet',error);
 }
-function saveProjects(){if(JSON.stringify(projects)!==lastSaved.projects){lastSaved.projects=JSON.stringify(projects);scheduleSave("projects",projects)}}
-function saveActivity(){if(JSON.stringify(activity)!==lastSaved.activity){lastSaved.activity=JSON.stringify(activity);scheduleSave("activity",activity)}}
-function pushActivity(projectName,section){
-  const who=userName(),now=Date.now();
-  const top=activity[0];
-  if(top&&top.who===who&&top.project===projectName&&top.section===section&&now-top.ts<90000){activity[0]={...top,ts:now}}
-  else activity=[{id:uid(),who,ts:now,project:projectName,section},...activity].slice(0,200);
-  saveActivity();
+function scheduleSave(key,value){
+  clearTimeout(saveTimers[key]);
+  saveTimers[key]=setTimeout(()=>kvSet(key,value),800);
 }
-function updateProject(id,fn){
-  const now=Date.now();const p=projects.find(x=>x.id===id);
-  projects=projects.map(x=>x.id===id?{...fn(x),lastUpdate:{who:userName(),ts:now}}:x);
-  pushActivity(p?.name||"a project",currentSection());
-  saveProjects();render();
-}
-function currentSection(){return{projects:"Project",install:"Installation",daily:"Daily Log",hardware:"Hardware",handover:"Handover"}[tab]||"Project"}
 
 // ── realtime ──
-let realtimeSetup=false;
 function setupRealtime(){
-  if(realtimeSetup)return;realtimeSetup=true;
-  supabase.channel("kv-rt").on("postgres_changes",{event:"*",schema:"public",table:"kv"},p=>{
-    const row=p.new;if(!row)return;
-    if(row.key==="projects"){const v=row.value||[];lastSaved.projects=JSON.stringify(v);projects=normalizeProjects(v);render()}
-    else if(row.key==="activity"){const v=row.value||[];lastSaved.activity=JSON.stringify(v);activity=v;render()}
-    else if(row.key==="admin_pin")pin=row.value||null;
-    else if(row.key==="client_pin")clientPin=row.value||null;
-  }).subscribe();
+  if(rtChannel) return;
+  rtChannel = sb.channel('kv-changes')
+    .on('postgres_changes',{event:'*',schema:'public',table:'kv'},row=>{
+      if(!row.new) return;
+      const {key,value} = row.new;
+      if(key==='projects'){projects=normalizeProjects(value||[]);render();}
+      else if(key==='activity'){activity=value||[];render();}
+      else if(key==='admin_pin'){adminPin=value||null;}
+      else if(key==='client_pin'){clientPin=value||null;}
+    })
+    .subscribe();
+}
+
+// ── data ──
+function normalizeProjects(arr){
+  return (arr||[]).map(p=>({
+    ...p,
+    floors:(p.floors||[]).map(f=>({
+      ...f,
+      doors:(f.doors||f.cells) ? normalizeDoors(f) : STD_DOORS.map(d=>emptyDoor(d.label,d.frame))
+    })),
+    dailyLog:p.dailyLog||[],
+    hardwareLog:p.hardwareLog||[],
+    orderNo:p.orderNo||'',
+    contacts:normContacts(p.contacts)
+  }));
+}
+function normalizeDoors(f){
+  if(f.doors) return f.doors.map(normDoor);
+  const doors=[];
+  STD_DOORS.forEach(d=>{const c=(f.cells||{})[d.key]||{};doors.push({...emptyDoor(d.label,d.frame),...c,id:uid()})});
+  return doors;
+}
+
+async function loadData(){
+  loading=true; render();
+  const [pj,ac,ap,cp] = await Promise.all([kvGet('projects'),kvGet('activity'),kvGet('admin_pin'),kvGet('client_pin')]);
+  projects = normalizeProjects(pj||[]);
+  activity = ac||[];
+  adminPin = ap||null;
+  clientPin= cp||null;
+  loading=false;
+  setupRealtime();
+  render();
+}
+
+async function refresh(){
+  syncing=true; render();
+  const [pj,ac] = await Promise.all([kvGet('projects'),kvGet('activity')]);
+  projects=normalizeProjects(pj||[]);
+  activity=ac||[];
+  syncing=false; render();
+}
+
+function saveProjects(){ scheduleSave('projects',projects); }
+function saveActivity(){ scheduleSave('activity',activity); }
+
+function pushActivity(projectName,section){
+  const who=userName(), now=Date.now();
+  const top=activity[0];
+  if(top && top.who===who && top.project===projectName && top.section===section && now-top.ts<90000){
+    activity[0]={...top,ts:now};
+  } else {
+    activity=[{id:uid(),who,ts:now,project:projectName,section},...activity].slice(0,200);
+  }
+  saveActivity();
+}
+
+function updateProject(id,fn){
+  projects=projects.map(p=>{
+    if(p.id!==id) return p;
+    const updated=fn(p);
+    return {...updated, lastUpdate:{who:userName(),ts:Date.now()}};
+  });
+  const p=projects.find(x=>x.id===id);
+  pushActivity(p?.name||'a project', currentSection());
+  saveProjects();
+  render();
+}
+
+function currentSection(){
+  return {projects:'Project',install:'Installation',daily:'Daily Log',hardware:'Hardware',handover:'Handover'}[tab]||'Project';
 }
 
 // ── auth ──
 async function init(){
-  const{data}=await supabase.auth.getSession();
-  session=data.session;
-  supabase.auth.onAuthStateChange((_,s)=>{session=s;if(s)loadData();else{loading=false;render()}});
-  if(session)await loadData();else{loading=false;render()}
+  const {data} = await sb.auth.getSession();
+  session = data.session;
+  sb.auth.onAuthStateChange((_,s)=>{
+    const wasNull = !session;
+    session=s;
+    if(s && wasNull) loadData();
+    else if(!s){ loading=false; render(); }
+  });
+  if(session) await loadData();
+  else { loading=false; render(); }
 }
-async function loadData(){
-  loading=true;render();
-  const pj=await kvGet("projects");if(pj){const arr=normalizeProjects(pj);lastSaved.projects=JSON.stringify(arr);projects=arr}
-  pin=await kvGet("admin_pin");
-  clientPin=await kvGet("client_pin");
-  const ac=await kvGet("activity");if(ac){lastSaved.activity=JSON.stringify(ac);activity=ac}
-  loading=false;setupRealtime();render();
-}
-async function doRefresh(){
-  syncing=true;render();
-  const pj=await kvGet("projects");if(pj){const arr=normalizeProjects(pj);lastSaved.projects=JSON.stringify(arr);projects=arr}
-  const ac=await kvGet("activity");if(ac){lastSaved.activity=JSON.stringify(ac);activity=ac}
-  pin=await kvGet("admin_pin");clientPin=await kvGet("client_pin");
-  setTimeout(()=>{syncing=false;render()},400);
-}
+
+// ── DOM helpers ──
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!==undefined)e.innerHTML=html;return e;};
+const div=(cls,html)=>el('div',cls,html);
+const btn=(cls,txt,onclick)=>{const b=el('button',cls);b.textContent=txt;b.onclick=onclick;return b;};
 
 // ── render ──
+const app=document.getElementById('app');
 function render(){
-  R.innerHTML="";
-  if(!session){R.appendChild(renderAuth());return}
-  if(loading){const d=h("div",{class:"splash"},"Loading your data…");R.appendChild(d);return}
-  R.appendChild(renderApp());
+  app.innerHTML='';
+  if(!session){ app.appendChild(renderAuth()); return; }
+  if(loading){ app.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;color:#f59e0b">Loading your data…</div>'; return; }
+  app.appendChild(renderMain());
 }
 
+// ── auth screen ──
 function renderAuth(){
-  let mode="signin",email="",password="",name="",err="",msg="",busy=false;
-  const wrap=h("div",{class:"auth-wrap"});
-  const box=h("div",{class:"auth-box"});
+  const wrap=div('auth-wrap');
+  const box=div('auth-box');
+  let mode='signin', busy=false;
+
   const rebuild=()=>{
-    box.innerHTML="";
-    const hd=h("div",{style:{display:"flex",alignItems:"center",gap:"12px",marginBottom:"20px"}});
-    const logo=h("div",{class:"logo"});logo.appendChild(icon("hammer",22));hd.appendChild(logo);
-    const tt=h("div");tt.appendChild(h("div",{style:{fontSize:"17px",fontWeight:"700",color:"var(--amber)"}},["Geetanjali Wood Craft"]));tt.appendChild(h("div",{style:{fontSize:"11px",color:"var(--text2)"}},["Door Tracker — team login"]));hd.appendChild(tt);box.appendChild(hd);
-    if(mode==="signup"){const ni=h("input",{type:"text",placeholder:"Your name",value:name});ni.oninput=e=>name=e.target.value;ni.style.marginBottom="10px";box.appendChild(ni)}
-    const ei=h("input",{type:"email",placeholder:"Email",value:email});ei.oninput=e=>email=e.target.value;ei.style.marginBottom="10px";box.appendChild(ei);
-    const pi=h("input",{type:"password",placeholder:"Password",value:password});pi.oninput=e=>password=e.target.value;pi.style.marginBottom="10px";
-    pi.onkeydown=async e=>{if(e.key==="Enter")await go()};box.appendChild(pi);
-    if(err)box.appendChild(h("p",{style:{color:"#f87171",fontSize:"12px",marginBottom:"8px"}},[err]));
-    if(msg)box.appendChild(h("p",{style:{color:"#34d399",fontSize:"12px",marginBottom:"8px"}},[msg]));
-    const gb=h("button",{class:"btn btn-amber",style:{width:"100%",justifyContent:"center",marginBottom:"10px"}},busy?["Please wait…"]:mode==="signup"?["Create account"]:["Sign in"]);
-    gb.disabled=busy;gb.onclick=go;box.appendChild(gb);
-    const tb=h("button",{style:{width:"100%",background:"none",border:"none",color:"var(--text3)",fontSize:"12px",cursor:"pointer"}},mode==="signup"?["Already have an account? Sign in"]:["New here? Create an account"]);
-    tb.onclick=()=>{mode=mode==="signup"?"signin":"signup";err="";msg="";rebuild()};box.appendChild(tb);
+    box.innerHTML=`
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+        <div class="logo">🔨</div>
+        <div>
+          <div style="font-size:17px;font-weight:700;color:#f59e0b">Geetanjali Wood Craft</div>
+          <div style="font-size:11px;color:#a8a29e">Installation Tracker — team login</div>
+        </div>
+      </div>
+    `;
+    if(mode==='signup'){
+      const ni=el('input'); ni.placeholder='Your name'; ni.style.marginBottom='10px'; box.appendChild(ni);
+      box._nameEl=ni;
+    }
+    const ei=el('input'); ei.type='email'; ei.placeholder='Email'; ei.style.marginBottom='10px'; box.appendChild(ei);
+    const pi=el('input'); pi.type='password'; pi.placeholder='Password (min 6 chars)'; pi.style.marginBottom='10px'; box.appendChild(pi);
+    pi.onkeydown=e=>{if(e.key==='Enter') go();};
+    box._emailEl=ei; box._passEl=pi;
+    const errEl=div(''); errEl.style.cssText='color:#f87171;font-size:12px;margin-bottom:8px;min-height:16px'; box.appendChild(errEl);
+    box._errEl=errEl;
+    const gb=el('button','btn btn-amber'); gb.style.cssText='width:100%;justify-content:center;margin-bottom:10px';
+    gb.textContent=busy?'Please wait…':mode==='signup'?'Create Account':'Sign In';
+    gb.disabled=busy; gb.onclick=go; box.appendChild(gb);
+    const tb=el('button'); tb.style.cssText='width:100%;background:none;border:none;color:#78716c;font-size:12px;cursor:pointer';
+    tb.textContent=mode==='signup'?'Already have an account? Sign in':'New here? Create an account';
+    tb.onclick=()=>{mode=mode==='signup'?'signin':'signup'; rebuild();};
+    box.appendChild(tb);
   };
+
   const go=async()=>{
-    err="";msg="";if(!email||!password){err="Enter email and password.";rebuild();return}
-    busy=true;rebuild();
-    if(mode==="signup"){const{error}=await supabase.auth.signUp({email,password,options:{data:{name:name.trim()||email.split("@")[0]}}});if(error)err=error.message;else msg="Account created! Sign in now."}
-    else{const{error}=await supabase.auth.signInWithPassword({email,password});if(error)err=error.message}
-    busy=false;rebuild();
+    const email=box._emailEl.value.trim();
+    const pass=box._passEl.value;
+    const name=box._nameEl?.value.trim()||'';
+    if(!email||!pass){box._errEl.textContent='Please enter email and password.';return;}
+    if(pass.length<6){box._errEl.textContent='Password must be at least 6 characters.';return;}
+    busy=true; rebuild();
+    if(mode==='signup'){
+      const {error}=await sb.auth.signUp({email,password:pass,options:{data:{name:name||email.split('@')[0]}}});
+      if(error){busy=false;rebuild();box._errEl.textContent=error.message;}
+      else{busy=false;rebuild();box._errEl.style.color='#34d399';box._errEl.textContent='Account created! Please sign in.';}
+    } else {
+      const {error}=await sb.auth.signInWithPassword({email,password:pass});
+      if(error){busy=false;rebuild();box._errEl.textContent=error.message;}
+    }
   };
-  rebuild();wrap.appendChild(box);return wrap;
+
+  rebuild();
+  wrap.appendChild(box);
+  return wrap;
 }
 
-function renderApp(){
-  const wrap=h("div",{class:"app"});
+// ── main layout ──
+function renderMain(){
+  const wrap=div('wrap');
+
   // header
-  const hd=h("header");
-  const logo=h("div",{class:"logo"});logo.appendChild(icon("hammer",22));hd.appendChild(logo);
-  const ti=h("div",{style:{minWidth:0}});ti.appendChild(h("div",{style:{fontSize:"17px",fontWeight:"700",color:"var(--amber)"}},["Geetanjali Wood Craft"]));ti.appendChild(h("div",{class:"subtitle"},["Readiness · Production · Installation · Handover"]));hd.appendChild(ti);
-  const hr=h("div",{class:"header-right"});
-  const rb=h("button",{class:"btn-icon",title:"Refresh"});rb.appendChild(icon("refresh",16));if(syncing)rb.querySelector("svg").classList.add("spin");rb.onclick=doRefresh;hr.appendChild(rb);
-  const un=h("span",{style:{display:"flex",alignItems:"center",gap:"6px",padding:"6px 10px",borderRadius:"8px",background:"var(--bg2)",color:"var(--text2)",fontSize:"12px"}});un.appendChild(icon("user",14));un.appendChild(document.createTextNode(" "+userName()));hr.appendChild(un);
-  const lo=h("button",{class:"btn-icon",title:"Sign out"});lo.appendChild(icon("logout",16));lo.onclick=()=>supabase.auth.signOut();hr.appendChild(lo);
-  hd.appendChild(hr);wrap.appendChild(hd);
+  const hdr=el('header');
+  hdr.innerHTML=`<div class="logo">🔨</div><div><div style="font-size:17px;font-weight:700;color:#f59e0b">Geetanjali Wood Craft</div><div style="font-size:11px;color:#a8a29e">Readiness · Installation · Handover</div></div>`;
+  const hr=div('header-right');
+  const rb=el('button','btn btn-ghost btn-sm'); rb.innerHTML='↻'; rb.title='Refresh';
+  if(syncing) rb.style.animation='spin 1s linear infinite';
+  rb.onclick=refresh; hr.appendChild(rb);
+  const un=div(''); un.style.cssText='padding:6px 10px;background:#292524;border-radius:8px;font-size:12px;color:#a8a29e';
+  un.textContent='👤 '+userName(); hr.appendChild(un);
+  const lo=btn('btn btn-ghost btn-sm','Sign out',()=>sb.auth.signOut());
+  hr.appendChild(lo); hdr.appendChild(hr); wrap.appendChild(hdr);
 
   // nav
   const newCount=activity.filter(a=>a.ts>lastSeen).length;
   const followups=getFollowups();
-  const navItems=[
-    {k:"projects",ic:"building",l:"Projects"},
-    {k:"install",ic:"wrench",l:"Installation"},
-    {k:"daily",ic:"calendar",l:"Daily Log"},
-    {k:"hardware",ic:"package",l:"Hardware"},
-    {k:"handover",ic:"clipboard",l:"Handover"},
-    {k:"activity",ic:"history",l:`Activity${newCount?` (${newCount})`:""}`,ring:newCount>0},
-    {k:"dashboard",ic:"dashboard",l:"Dashboard"},
-    {k:"followups",ic:"list",l:`Follow-ups${followups.length?` (${followups.length})`:""}` },
+  const tabs=[
+    {k:'projects',l:'🏗 Projects'},
+    {k:'install',l:'🔧 Installation'},
+    {k:'daily',l:'📅 Daily Log'},
+    {k:'hardware',l:'📦 Hardware'},
+    {k:'handover',l:'✅ Handover'},
+    {k:'activity',l:`👥 Activity${newCount?' ('+newCount+')':''}`},
+    {k:'dashboard',l:'📊 Dashboard'},
+    {k:'followups',l:`📋 Follow-ups${followups.length?' ('+followups.length+')':''}`},
   ];
-  const nav=h("nav");
-  navItems.forEach(t=>{
-    const b=h("button",{class:"nav-btn"+(tab===t.k?" active":"")+(t.ring&&tab!==t.k?" ring":"")} );
-    if(t.ring&&tab!==t.k)b.style.outline="1px solid var(--amber)";
-    b.appendChild(icon(t.ic,15));b.appendChild(document.createTextNode(" "+t.l));
-    b.onclick=()=>{tab=t.k;if(t.k!=="projects")activeId=null;if(t.k==="activity"){lastSeen=Date.now();localStorage.setItem("gwc-seen",String(lastSeen))}render()};
+  const nav=div('');nav.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px';
+  tabs.forEach(t=>{
+    const b=el('button','nav-btn'+(tab===t.k?' active':''));
+    b.textContent=t.l;
+    b.onclick=()=>{
+      tab=t.k;
+      if(t.k!=='projects') activeId=null;
+      if(t.k==='activity'){lastSeen=Date.now();localStorage.setItem('gwc-seen',String(lastSeen));}
+      render();
+    };
     nav.appendChild(b);
   });
   wrap.appendChild(nav);
 
   // content
-  const content=h("div");
-  if(tab==="projects"){
-    if(!activeId)content.appendChild(renderProjectList());
-    else{const p=projects.find(x=>x.id===activeId);if(p)content.appendChild(renderProjectDetail(p))}
-  }else if(tab==="install")content.appendChild(renderInstallTab());
-  else if(tab==="daily")content.appendChild(renderDailyTab());
-  else if(tab==="hardware")content.appendChild(renderHardwareTab());
-  else if(tab==="handover")content.appendChild(renderHandoverTab());
-  else if(tab==="activity")content.appendChild(renderActivityTab());
-  else if(tab==="dashboard")content.appendChild(renderDashboard());
-  else if(tab==="followups")content.appendChild(renderFollowups());
+  const content=div('');
+  if(tab==='projects'){
+    if(!activeId) content.appendChild(renderProjectList());
+    else { const p=projects.find(x=>x.id===activeId); if(p) content.appendChild(renderProjectDetail(p)); }
+  }
+  else if(tab==='install')   content.appendChild(renderInstall());
+  else if(tab==='daily')     content.appendChild(renderDaily());
+  else if(tab==='hardware')  content.appendChild(renderHardware());
+  else if(tab==='handover')  content.appendChild(renderHandover());
+  else if(tab==='activity')  content.appendChild(renderActivity());
+  else if(tab==='dashboard') content.appendChild(renderDashboard());
+  else if(tab==='followups') content.appendChild(renderFollowups());
   wrap.appendChild(content);
 
   // modals
-  if(showModal==="addProject")wrap.appendChild(renderAddProjectModal());
-  else if(showModal==="pin")wrap.appendChild(renderPinModal(false));
-  else if(showModal==="clientPin")wrap.appendChild(renderPinModal(true));
+  if(modal==='addProject') wrap.appendChild(renderAddProjectModal());
+  else if(modal==='adminPin')  wrap.appendChild(renderPinModal(false));
+  else if(modal==='clientPin') wrap.appendChild(renderPinModal(true));
 
   // certificate
-  if(certId){const cp=projects.find(x=>x.id===certId);if(cp)wrap.appendChild(renderCertificate(cp))}
+  if(certId){const p=projects.find(x=>x.id===certId);if(p) wrap.appendChild(renderCert(p));}
+
+  return wrap;
+}
+
+// ── stepper ──
+function makeStepper(val,onChange,color,max,disabled){
+  const wrap=div('stepper');
+  if(disabled){
+    const s=div('');s.style.cssText=`min-width:46px;text-align:center;color:${color||'#e7e5e4'};font-size:13px;opacity:.7`;
+    s.textContent=val; wrap.appendChild(s); return wrap;
+  }
+  const clampV=v=>clamp(v,0,max);
+  const minus=el('button');minus.textContent='−';minus.onclick=()=>onChange(clampV(val-1));
+  const inp=el('input');inp.type='number';inp.value=val;inp.style.color=color||'#e7e5e4';
+  inp.onchange=e=>onChange(clampV(num(e.target.value)));
+  const plus=el('button');plus.textContent='+';plus.onclick=()=>onChange(clampV(val+1));
+  wrap.append(minus,inp,plus);
   return wrap;
 }
 
 // ── project list ──
 function renderProjectList(){
-  const wrap=h("div");
-  const bar=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}});
-  bar.appendChild(h("h2",{style:{fontSize:"15px",fontWeight:"600"}},["All Projects"]));
-  const ab=h("button",{class:"btn btn-amber"});ab.appendChild(icon("plus",16));ab.appendChild(document.createTextNode(" New Project"));ab.onclick=()=>{showModal="addProject";render()};bar.appendChild(ab);
-  wrap.appendChild(bar);
-  if(!projects.length){wrap.appendChild(h("div",{class:"empty"},["No projects yet. Tap New Project to begin."]));return wrap}
-  const grid=h("div",{class:"grid2"});
+  const wrap=div('');
+  const bar=div('');bar.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px';
+  bar.innerHTML='<h2 style="font-size:15px;font-weight:600">All Projects</h2>';
+  const ab=btn('btn btn-amber','＋ New Project',()=>{modal='addProject';render();});
+  bar.appendChild(ab); wrap.appendChild(bar);
+
+  if(!projects.length){wrap.appendChild(div('empty','No projects yet. Tap New Project to begin.'));return wrap;}
+
+  const grid=div('grid2');
   projects.forEach(p=>{
     let total=0,ready=0,hold=0;
-    p.floors.forEach(f=>(f.doors||[]).forEach(raw=>{const c=gd(raw);total+=c.total;ready+=c.readyQty;hold+=c.holdQty}));
-    const card=h("div",{class:"card",style:{cursor:"pointer"}});
-    card.onclick=()=>{activeId=p.id;render()};
-    const top=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}});
-    const info=h("div");info.appendChild(h("div",{style:{fontWeight:"600",fontSize:"15px"}},[ p.name]));
-    const bl=h("div",{style:{display:"flex",alignItems:"center",gap:"4px",fontSize:"12px",color:"var(--text2)",marginTop:"3px"}});bl.appendChild(icon("building",12));bl.appendChild(document.createTextNode(" "+(p.builder||"")));info.appendChild(bl);
-    if(p.location){const ll=h("div",{style:{display:"flex",alignItems:"center",gap:"4px",fontSize:"11px",color:"var(--text3)",marginTop:"2px"}});ll.appendChild(icon("mappin",11));ll.appendChild(document.createTextNode(" "+p.location));info.appendChild(ll)}
-    top.appendChild(info);
-    const del=h("button",{style:{background:"none",border:"none",color:"var(--text3)",cursor:"pointer",padding:"2px"}});del.appendChild(icon("trash",16));del.onclick=e=>{e.stopPropagation();if(confirm("Delete this project and all data?")){{projects=projects.filter(x=>x.id!==p.id);saveProjects();render()}}};top.appendChild(del);
-    card.appendChild(top);
-    const tags=h("div",{style:{display:"flex",gap:"6px",flexWrap:"wrap",marginTop:"10px"}});
-    tags.appendChild(h("span",{class:"tag tag-stone"},[p.floors.length+" floors"]));
-    if(p.orderNo)tags.appendChild(h("span",{class:"tag tag-sky"},[p.orderNo]));
-    card.appendChild(tags);
-    const nums=h("div",{style:{display:"flex",gap:"12px",marginTop:"10px",fontSize:"12px"}});
-    nums.appendChild(h("span",{style:{color:"var(--text2)"}},["Total ",h("b",{style:{color:"var(--text)"}},[""+total])]));
-    nums.appendChild(h("span",{style:{color:"var(--emerald)"}},["Ready ",h("b",{},[" "+ready])]));
-    nums.appendChild(h("span",{style:{color:"var(--orange)"}},["Hold ",h("b",{},[" "+hold])]));
-    card.appendChild(nums);
-    if(p.lastUpdate){const lu=h("div",{style:{fontSize:"11px",color:"var(--text3)",marginTop:"8px",display:"flex",alignItems:"center",gap:"4px"}});lu.appendChild(icon("history",11));lu.appendChild(document.createTextNode(" Updated by "+p.lastUpdate.who+" · "+rel(p.lastUpdate.ts)));card.appendChild(lu)}
+    p.floors.forEach(f=>f.doors.forEach(d=>{const c=normDoor(d);total+=c.total;ready+=c.readyQty;hold+=c.holdQty;}));
+    const card=div('card card-hover');
+    card.onclick=()=>{activeId=p.id;render();};
+    card.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-weight:600;font-size:15px">${p.name}</div>
+          <div style="font-size:12px;color:#a8a29e;margin-top:3px">🏢 ${p.builder||'—'}</div>
+          ${p.location?`<div style="font-size:11px;color:#78716c;margin-top:2px">📍 ${p.location}</div>`:''}
+        </div>
+        <button onclick="event.stopPropagation();deleteProject('${p.id}')" style="background:none;border:none;color:#78716c;cursor:pointer;font-size:16px">🗑</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <span class="tag" style="background:#292524;border:1px solid #44403c;color:#a8a29e">${p.floors.length} floors</span>
+        ${p.orderNo?`<span class="tag" style="background:#082f49;color:#38bdf8">${p.orderNo}</span>`:''}
+      </div>
+      <div style="display:flex;gap:12px;margin-top:10px;font-size:12px">
+        <span style="color:#a8a29e">Total <b style="color:#e7e5e4">${total}</b></span>
+        <span style="color:#10b981">Ready <b>${ready}</b></span>
+        <span style="color:#f97316">Hold <b>${hold}</b></span>
+      </div>
+      ${p.lastUpdate?`<div style="font-size:11px;color:#78716c;margin-top:8px">🕐 ${p.lastUpdate.who} · ${rel(p.lastUpdate.ts)}</div>`:''}
+    `;
     grid.appendChild(card);
   });
-  wrap.appendChild(grid);return wrap;
+  wrap.appendChild(grid);
+  return wrap;
 }
+
+window.deleteProject=id=>{
+  if(!confirm('Delete this project and all its data?')) return;
+  projects=projects.filter(p=>p.id!==id);
+  saveProjects(); render();
+};
 
 // ── add project modal ──
 function renderAddProjectModal(){
-  let name="",orderNo="",builder="",location="",contacts=emptyContacts();
-  const overlay=h("div",{class:"modal-overlay"});
-  overlay.onclick=()=>{showModal=null;render()};
-  const modal=h("div",{class:"modal"});modal.onclick=e=>e.stopPropagation();
-  const mh=h("div",{class:"modal-header"});mh.appendChild(h("h3",{style:{color:"var(--amber)",fontWeight:"600"}},["New Project"]));
-  const xb=h("button",{style:{background:"none",border:"none",color:"var(--text3)",cursor:"pointer"}});xb.appendChild(icon("x",20));xb.onclick=()=>{showModal=null;render()};mh.appendChild(xb);modal.appendChild(mh);
-  const mkField=(lbl,placeholder,val,cb,type="text")=>{const l=h("label",{style:{marginBottom:"10px",display:"block"}});l.appendChild(h("span",[],[lbl]));const i=h("input",{type,placeholder,value:val});i.oninput=e=>cb(e.target.value);l.appendChild(i);return l};
-  modal.appendChild(mkField("Project / Site name","e.g. Shree Heights",name,v=>name=v));
-  modal.appendChild(mkField("Order number","e.g. GWC-2026-014",orderNo,v=>orderNo=v));
-  modal.appendChild(mkField("Builder name","e.g. ABC Developers",builder,v=>builder=v));
-  modal.appendChild(mkField("Location","e.g. Panvel",location,v=>location=v));
-  const ct=h("div",{style:{marginTop:"12px"}});ct.appendChild(h("div",{style:{fontSize:"12px",fontWeight:"600",color:"var(--amber)",marginBottom:"8px"}},["Site Team Contacts"]));
-  CONTACT_ROLES.forEach(r=>{
-    const rw=h("div",{style:{marginBottom:"10px"}});rw.appendChild(h("span",{style:{fontSize:"12px",color:"var(--text2)",display:"block",marginBottom:"4px"}},[r.label]));
-    const gr=h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px"}});
-    const ni=h("input",{type:"text",placeholder:"Name",value:contacts[r.key].name});ni.oninput=e=>{contacts[r.key].name=e.target.value};
-    const pi=h("input",{type:"tel",placeholder:"Mobile",value:contacts[r.key].phone});pi.oninput=e=>{contacts[r.key].phone=e.target.value};
-    gr.append(ni,pi);rw.appendChild(gr);ct.appendChild(rw);
-  });
-  modal.appendChild(ct);
-  const sb=h("button",{class:"btn btn-amber",style:{width:"100%",justifyContent:"center",marginTop:"16px"}},["Create Project"]);
-  sb.onclick=()=>{
-    if(!name.trim())return;
-    const np={id:uid(),createdAt:Date.now(),name:name.trim(),orderNo:orderNo.trim(),builder:builder.trim(),location:location.trim(),contacts,floors:[],dailyLog:[],hardwareLog:[],lastUpdate:{who:userName(),ts:Date.now()}};
-    projects=[np,...projects];saveProjects();pushActivity(np.name,"Project (new)");showModal=null;activeId=np.id;tab="projects";render();
+  const bg=div('modal-bg');
+  bg.onclick=()=>{modal=null;render();};
+  const box=div('modal');
+  box.onclick=e=>e.stopPropagation();
+
+  let contacts=emptyContacts();
+  box.innerHTML=`<div class="modal-head"><h3 style="color:#f59e0b;font-weight:600">New Project</h3><button onclick="closeModal()" style="background:none;border:none;color:#78716c;cursor:pointer;font-size:20px">✕</button></div>`;
+
+  const addField=(lbl,placeholder,id,type='text')=>{
+    const l=el('label');l.style.marginBottom='10px';l.style.display='block';
+    l.innerHTML=`<span>${lbl}</span>`;
+    const i=el('input');i.type=type;i.placeholder=placeholder;i.id='np_'+id;
+    l.appendChild(i);box.appendChild(l);
   };
-  modal.appendChild(sb);overlay.appendChild(modal);return overlay;
+  addField('Project / Site name','e.g. Shree Heights, Kharghar','name');
+  addField('Order number','e.g. GWC-2026-014','order');
+  addField('Builder name','e.g. ABC Developers','builder');
+  addField('Location','e.g. Panvel','location');
+
+  const ctitle=div('');ctitle.style.cssText='font-size:12px;font-weight:600;color:#f59e0b;margin:12px 0 8px';ctitle.textContent='Site Team Contacts';box.appendChild(ctitle);
+  CONTACTS.forEach(r=>{
+    const rw=div('');rw.style.marginBottom='10px';
+    const lbl=div('');lbl.style.cssText='font-size:12px;color:#a8a29e;margin-bottom:4px';lbl.textContent=r.label;rw.appendChild(lbl);
+    const gr=div('grid2');gr.style.gap='6px';
+    const ni=el('input');ni.placeholder='Name';ni.id='c_'+r.key+'_name';
+    const pi=el('input');pi.placeholder='Mobile';pi.type='tel';pi.id='c_'+r.key+'_phone';
+    gr.append(ni,pi);rw.appendChild(gr);box.appendChild(rw);
+  });
+
+  const sb2=btn('btn btn-amber','Create Project',()=>{
+    const name=document.getElementById('np_name')?.value.trim();
+    if(!name){alert('Please enter a project name.');return;}
+    const c=emptyContacts();
+    CONTACTS.forEach(r=>{c[r.key]={name:document.getElementById('c_'+r.key+'_name')?.value.trim()||'',phone:document.getElementById('c_'+r.key+'_phone')?.value.trim()||''};});
+    const np={id:uid(),createdAt:Date.now(),name,orderNo:document.getElementById('np_order')?.value.trim()||'',builder:document.getElementById('np_builder')?.value.trim()||'',location:document.getElementById('np_location')?.value.trim()||'',contacts:c,floors:[],dailyLog:[],hardwareLog:[],lastUpdate:{who:userName(),ts:Date.now()}};
+    projects=[np,...projects];saveProjects();pushActivity(np.name,'Project (new)');modal=null;activeId=np.id;render();
+  });
+  sb2.style.cssText='width:100%;justify-content:center;margin-top:16px';
+  box.appendChild(sb2);bg.appendChild(box);return bg;
 }
+window.closeModal=()=>{modal=null;render();};
 
 // ── project detail ──
 function renderProjectDetail(project){
-  const wrap=h("div");
-  const bb=h("button",{class:"btn btn-ghost btn-sm",style:{marginBottom:"12px"}});bb.appendChild(icon("chevronLeft",16));bb.appendChild(document.createTextNode(" Back"));bb.onclick=()=>{activeId=null;render()};wrap.appendChild(bb);
-  const meta=h("div",{class:"card",style:{marginBottom:"12px"}});
-  meta.appendChild(h("div",{style:{fontSize:"17px",fontWeight:"700",marginBottom:"12px"}},[project.name]));
-  const mg=h("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"8px"}});
-  const mkMeta=(lbl,val,key)=>{const l=h("label");l.appendChild(h("span",[],[lbl]));const i=h("input",{type:"text",value:val||"",placeholder:lbl});i.oninput=e=>updateProject(project.id,p=>({...p,[key]:e.target.value}));l.appendChild(i);return l};
-  mg.append(mkMeta("Order No",project.orderNo,"orderNo"),mkMeta("Builder",project.builder,"builder"),mkMeta("Location",project.location,"location"));
-  meta.appendChild(mg);
-  if(project.lastUpdate){const lu=h("div",{style:{fontSize:"11px",color:"var(--text3)",marginTop:"8px",display:"flex",alignItems:"center",gap:"4px"}});lu.appendChild(icon("history",11));lu.appendChild(document.createTextNode(" "+project.lastUpdate.who+" · "+rel(project.lastUpdate.ts)));meta.appendChild(lu)}
-  wrap.appendChild(meta);
+  const wrap=div('');
+  const bb=btn('btn btn-ghost btn-sm','◀ Back',()=>{activeId=null;render();});
+  bb.style.marginBottom='12px';wrap.appendChild(bb);
+
+  // meta card
+  const mc=div('card');
+  mc.innerHTML=`<div style="font-size:17px;font-weight:700;margin-bottom:12px">${project.name}</div>
+  <div class="grid3" style="gap:8px;margin-bottom:8px">
+    <label><span>Order No</span><input id="pd_order" value="${project.orderNo||''}" placeholder="Order No"></label>
+    <label><span>Builder</span><input id="pd_builder" value="${project.builder||''}" placeholder="Builder"></label>
+    <label><span>Location</span><input id="pd_location" value="${project.location||''}" placeholder="Location"></label>
+  </div>
+  ${project.lastUpdate?`<div style="font-size:11px;color:#78716c">🕐 ${project.lastUpdate.who} · ${rel(project.lastUpdate.ts)}</div>`:''}`;
+  ['order','builder','location'].forEach(k=>{
+    const inp=mc.querySelector('#pd_'+k);
+    if(inp) inp.onchange=e=>updateProject(project.id,p=>({...p,[k==='order'?'orderNo':k]:e.target.value}));
+  });
+  wrap.appendChild(mc);
 
   // contacts
-  const cc=h("div",{class:"card",style:{marginBottom:"12px"}});cc.appendChild(h("div",{style:{fontWeight:"600",fontSize:"13px",color:"var(--amber)",marginBottom:"10px"}},["Site Team"]));
-  const cg=h("div",{class:"contacts-grid"});
+  const cc=div('card');
+  cc.innerHTML='<div style="font-weight:600;font-size:13px;color:#f59e0b;margin-bottom:10px">👥 Site Team</div>';
+  const cg=div('grid2');
   const nc=normContacts(project.contacts);
-  CONTACT_ROLES.forEach(r=>{
-    const cd=h("div",{class:"contact-card"+(r.key==="sitePerson"?" gwpl":"")});
-    const ch=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}});
-    ch.appendChild(h("span",{style:{fontSize:"12px",fontWeight:"500",color:"var(--text)"}},[r.label]));
-    if(nc[r.key].phone){const ca=h("a",{href:"tel:"+nc[r.key].phone,style:{display:"flex",alignItems:"center",gap:"4px",fontSize:"11px",color:"var(--emerald)",textDecoration:"none"}});ca.appendChild(icon("phone",11));ca.appendChild(document.createTextNode("Call"));ch.appendChild(ca)}
-    cd.appendChild(ch);
-    const ni=h("input",{type:"text",placeholder:"Name",value:nc[r.key].name,style:{marginBottom:"6px"}});
-    ni.oninput=e=>updateProject(project.id,p=>{const cc2=normContacts(p.contacts);return{...p,contacts:{...cc2,[r.key]:{...cc2[r.key],name:e.target.value}}}});
-    const pi=h("input",{type:"tel",placeholder:"Mobile",value:nc[r.key].phone});
-    pi.oninput=e=>updateProject(project.id,p=>{const cc2=normContacts(p.contacts);return{...p,contacts:{...cc2,[r.key]:{...cc2[r.key],phone:e.target.value}}}});
+  CONTACTS.forEach(r=>{
+    const cd=div('');cd.style.cssText=`border:1px solid ${r.key==='sitePerson'?'#92400e':'#44403c'};border-radius:10px;padding:10px;background:${r.key==='sitePerson'?'#451a0320':'#1c191720'}`;
+    cd.innerHTML=`<div style="font-size:12px;font-weight:500;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+      <span>${r.label}</span>
+      ${nc[r.key].phone?`<a href="tel:${nc[r.key].phone}" style="font-size:11px;color:#10b981;text-decoration:none">📞 Call</a>`:''}
+    </div>`;
+    const ni=el('input');ni.placeholder='Name';ni.value=nc[r.key].name;ni.style.marginBottom='6px';
+    ni.oninput=e=>updateProject(project.id,p=>{const cc2=normContacts(p.contacts);return{...p,contacts:{...cc2,[r.key]:{...cc2[r.key],name:e.target.value}}};});
+    const pi=el('input');pi.placeholder='Mobile';pi.type='tel';pi.value=nc[r.key].phone;
+    pi.oninput=e=>updateProject(project.id,p=>{const cc2=normContacts(p.contacts);return{...p,contacts:{...cc2,[r.key]:{...cc2[r.key],phone:e.target.value}}};});
     cd.append(ni,pi);cg.appendChild(cd);
   });
   cc.appendChild(cg);wrap.appendChild(cc);
 
   // lock bar
-  wrap.appendChild(renderLockBar(unlocked,()=>{unlocked=false;render()},()=>{showModal="pin";render()}));
+  wrap.appendChild(renderLockBar(adminUnlocked,()=>{adminUnlocked=false;render();},()=>{modal='adminPin';render();}));
 
   // add floor
-  const fa=h("div",{style:{display:"flex",gap:"8px",marginBottom:"16px"}});
-  const fi=h("input",{type:"text",placeholder:"Floor name (e.g. 3rd Floor)",style:{flex:"1"}});
-  const fb=h("button",{class:"btn btn-amber"});fb.appendChild(icon("plus",16));fb.appendChild(document.createTextNode(" Floor"));
-  fb.onclick=()=>{const nm=fi.value.trim()||`Floor ${project.floors.length+1}`;updateProject(project.id,p=>({...p,floors:[...p.floors,emptyFloor(nm)]}));fi.value=""};
+  const fa=div('');fa.style.cssText='display:flex;gap:8px;margin-bottom:16px';
+  const fi=el('input');fi.placeholder='Floor name (e.g. 3rd Floor)';fi.style.flex='1';
+  const fb=btn('btn btn-amber','＋ Floor',()=>{
+    const nm=fi.value.trim()||`Floor ${project.floors.length+1}`;
+    updateProject(project.id,p=>({...p,floors:[...p.floors,emptyFloor(nm)]}));
+    fi.value='';
+  });
   fa.append(fi,fb);wrap.appendChild(fa);
 
-  if(!project.floors.length){wrap.appendChild(h("div",{class:"empty"},["Add floors and enter door quantities."]));return wrap}
+  if(!project.floors.length){wrap.appendChild(div('empty','Add floors and enter door quantities.'));return wrap;}
   project.floors.forEach(f=>wrap.appendChild(renderFloorCard(project.id,f)));
   return wrap;
 }
 
-function renderLockBar(isUnlocked,onLock,onUnlock){
-  const bar=h("div",{class:"lock-bar"+(isUnlocked?" unlocked":""),style:{marginBottom:"16px"}});
-  const left=h("span",{style:{fontSize:"12px",display:"flex",alignItems:"center",gap:"8px"}});
-  if(isUnlocked){left.appendChild(icon("unlock",14,"var(--amber)"));left.appendChild(document.createTextNode("Unlocked — edit totals & door types"))}
-  else{left.appendChild(icon("lock",14,"var(--text2)"));left.appendChild(document.createTextNode("Totals & door types are locked"))}
-  bar.appendChild(left);
-  if(isUnlocked){const b=h("button",{class:"btn btn-ghost btn-sm"},["Lock again"]);b.onclick=onLock;bar.appendChild(b)}
-  else{const b=h("button",{class:"btn btn-amber btn-sm"},["Unlock to edit"]);b.onclick=onUnlock;bar.appendChild(b)}
+function renderLockBar(unlocked,onLock,onUnlock){
+  const bar=div('lock-bar'+(unlocked?' unlocked':''));
+  if(unlocked){
+    bar.innerHTML='<span style="font-size:12px;color:#f59e0b">🔓 Unlocked — edit totals & door types</span>';
+    bar.appendChild(btn('btn btn-ghost btn-sm','Lock again',onLock));
+  } else {
+    bar.innerHTML='<span style="font-size:12px;color:#a8a29e">🔒 Totals & door types are locked</span>';
+    bar.appendChild(btn('btn btn-amber btn-sm','Unlock to edit',onUnlock));
+  }
   return bar;
 }
 
 function renderFloorCard(projectId,floor){
   let ft=0,fr=0,fh=0;
-  (floor.doors||[]).forEach(raw=>{const c=gd(raw);ft+=c.total;fr+=c.readyQty;fh+=c.holdQty});
-  const fc=h("div",{class:"floor-card"});
-  const fh2=h("div",{class:"floor-header"});
-  fh2.appendChild(h("span",{style:{fontWeight:"600",color:"var(--amber)"}},[floor.name]));
-  const fr2=h("div",{style:{display:"flex",alignItems:"center",gap:"12px",fontSize:"12px"}});
-  fr2.appendChild(h("span",{style:{color:"var(--text2)"}},["Tot "+ft]));
-  fr2.appendChild(h("span",{style:{color:"var(--emerald)"}},["Rdy "+fr]));
-  fr2.appendChild(h("span",{style:{color:"var(--orange)"}},["Hold "+fh]));
-  const db=h("button",{style:{background:"none",border:"none",color:"var(--text3)",cursor:"pointer"}});db.appendChild(icon("trash",15));
-  db.onclick=()=>updateProject(projectId,p=>({...p,floors:p.floors.filter(f=>f.id!==floor.id)}));
-  fr2.appendChild(db);fh2.appendChild(fr2);fc.appendChild(fh2);
-  (floor.doors||[]).forEach(raw=>fc.appendChild(renderDoorRow(projectId,floor.id,gd(raw))));
+  floor.doors.forEach(d=>{const c=normDoor(d);ft+=c.total;fr+=c.readyQty;fh+=c.holdQty;});
+  const fc=div('floor-card');
+  const fh2=div('floor-head');
+  fh2.innerHTML=`<span style="font-weight:600;color:#f59e0b">${floor.name}</span>
+  <div style="display:flex;align-items:center;gap:10px;font-size:12px">
+    <span style="color:#a8a29e">Tot ${ft}</span>
+    <span style="color:#10b981">Rdy ${fr}</span>
+    <span style="color:#f97316">Hold ${fh}</span>
+    <button onclick="deleteFloor('${projectId}','${floor.id}')" style="background:none;border:none;color:#78716c;cursor:pointer">🗑</button>
+  </div>`;
+  fc.appendChild(fh2);
+  floor.doors.forEach(d=>fc.appendChild(renderDoorRow(projectId,floor.id,normDoor(d))));
   fc.appendChild(renderAddCustomDoor(projectId,floor.id));
   return fc;
 }
+window.deleteFloor=(pid,fid)=>updateProject(pid,p=>({...p,floors:p.floors.filter(f=>f.id!==fid)}));
 
 function renderDoorRow(projectId,floorId,door){
   const pending=Math.max(door.total-door.readyQty-door.holdQty,0);
-  const row=h("div",{class:"door-row"});
-  const top=h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"8px"}});
-  const nameEl=h("div",{style:{width:"140px",display:"flex",alignItems:"center",gap:"4px"}});
+  const row=div('door-row');
+  const top=div('');top.style.cssText='display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px';
+
+  // label
+  const nameDiv=div('');nameDiv.style.cssText='width:140px;display:flex;align-items:center;gap:4px';
   if(door.custom){
-    const ni=h("input",{type:"text",value:door.label,style:{width:"110px"}});ni.disabled=unlocked?false:true;
-    ni.onchange=e=>updateProject(projectId,p=>({...p,floors:p.floors.map(f=>f.id===floorId?{...f,doors:f.doors.map(d=>d.id===door.id?{...gd(d),label:e.target.value}:d)}:f)}));
-    nameEl.appendChild(ni);
-    if(!unlocked){const db2=h("button",{style:{background:"none",border:"none",color:"var(--text3)",cursor:"pointer"}});db2.appendChild(icon("x",14));db2.onclick=()=>updateProject(projectId,p=>({...p,floors:p.floors.map(f=>f.id===floorId?{...f,doors:f.doors.filter(d=>d.id!==door.id)}:f)}));nameEl.appendChild(db2)}
-  }else{nameEl.appendChild(h("span",{style:{fontSize:"13px",fontWeight:"500"}},[door.label]))}
-  top.appendChild(nameEl);
-  const cols=h("div",{style:{display:"flex",alignItems:"center",gap:"12px",flexWrap:"wrap",fontSize:"12px"}});
-  const setTotal=v=>{const ready=Math.min(door.readyQty,v);const hold=Math.max(Math.min(door.holdQty,v-ready),0);updateProject(projectId,p=>({...p,floors:p.floors.map(f=>f.id===floorId?{...f,doors:f.doors.map(d=>d.id===door.id?{...gd(d),total:v,readyQty:ready,holdQty:hold}:d)}:f)}))};
-  const setDoorField=(field,val)=>updateProject(projectId,p=>({...p,floors:p.floors.map(f=>f.id===floorId?{...f,doors:f.doors.map(d=>d.id===door.id?{...gd(d),[field]:val}:d)}:f)}));
-  const mkCol=(lbl,color,stepper)=>{const c=h("div",{style:{textAlign:"center"}});c.appendChild(h("div",{style:{color:"var(--text3)",fontSize:"11px",marginBottom:"3px"}},[lbl]));c.appendChild(stepper);return c};
-  cols.appendChild(mkCol("Total",null,makeStepper(door.total,setTotal,null,null,!unlocked)));
-  cols.appendChild(mkCol("Ready",null,makeStepper(door.readyQty,v=>setDoorField("readyQty",v),"var(--emerald)",door.total-door.holdQty)));
-  cols.appendChild(mkCol("On Hold",null,makeStepper(door.holdQty,v=>setDoorField("holdQty",v),"var(--orange)",door.total-door.readyQty)));
-  const pendEl=h("div",{style:{textAlign:"center"}});pendEl.appendChild(h("div",{style:{color:"var(--text3)",fontSize:"11px",marginBottom:"3px"}},["Pending"]));pendEl.appendChild(h("div",{style:{color:"var(--amber)",fontWeight:"700",padding:"3px 0"}},[""+pending]));cols.appendChild(pendEl);
+    const ni=el('input');ni.value=door.label;ni.disabled=!adminUnlocked;ni.style.cssText='width:110px;font-size:13px;font-weight:500';
+    ni.onchange=e=>updateProject(projectId,p=>({...p,floors:p.floors.map(f=>f.id===floorId?{...f,doors:f.doors.map(d=>d.id===door.id?{...normDoor(d),label:e.target.value}:d)}:f)}));
+    nameDiv.appendChild(ni);
+    if(adminUnlocked){
+      const db=el('button');db.textContent='✕';db.style.cssText='background:none;border:none;color:#78716c;cursor:pointer;font-size:12px';
+      db.onclick=()=>updateProject(projectId,p=>({...p,floors:p.floors.map(f=>f.id===floorId?{...f,doors:f.doors.filter(d=>d.id!==door.id)}:f)}));
+      nameDiv.appendChild(db);
+    }
+  } else {
+    nameDiv.innerHTML=`<span style="font-size:13px;font-weight:500">${door.label}</span>`;
+  }
+  top.appendChild(nameDiv);
+
+  const cols=div('');cols.style.cssText='display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px';
+  const mkCol=(lbl,color,stepper)=>{
+    const c=div('');c.style.textAlign='center';
+    const l=div('');l.style.cssText=`color:${color||'#78716c'};font-size:11px;margin-bottom:3px`;l.textContent=lbl;
+    c.append(l,stepper);return c;
+  };
+  const setField=(field,val)=>updateProject(projectId,p=>({...p,floors:p.floors.map(f=>f.id===floorId?{...f,doors:f.doors.map(d=>d.id===door.id?{...normDoor(d),[field]:val}:d)}:f)}));
+  const setTotal=v=>{
+    const ready=Math.min(door.readyQty,v);
+    const hold=Math.min(door.holdQty,v-ready);
+    updateProject(projectId,p=>({...p,floors:p.floors.map(f=>f.id===floorId?{...f,doors:f.doors.map(d=>d.id===door.id?{...normDoor(d),total:v,readyQty:ready,holdQty:Math.max(hold,0)}:d)}:f)}));
+  };
+  cols.appendChild(mkCol('Total','#78716c',makeStepper(door.total,setTotal,null,null,!adminUnlocked)));
+  cols.appendChild(mkCol('Ready','#10b981',makeStepper(door.readyQty,v=>setField('readyQty',v),'#10b981',door.total-door.holdQty)));
+  cols.appendChild(mkCol('On Hold','#f97316',makeStepper(door.holdQty,v=>setField('holdQty',v),'#f97316',door.total-door.readyQty)));
+  const pendCol=div('');pendCol.style.textAlign='center';
+  pendCol.innerHTML=`<div style="color:#78716c;font-size:11px;margin-bottom:3px">Pending</div><div style="color:#f59e0b;font-weight:700;padding:3px 8px">${pending}</div>`;
+  cols.appendChild(pendCol);
   top.appendChild(cols);row.appendChild(top);
+
   if(door.holdQty>0){
-    const hp=h("div",{class:"hold-panel"});
-    const sr=h("select");HOLD_REASONS.forEach(r=>{const o=h("option",{value:r},[r]);if(r===door.holdReason)o.selected=true;sr.appendChild(o)});sr.onchange=e=>setDoorField("holdReason",e.target.value);
-    const dr=h("input",{type:"date",value:door.promisedDate||""});dr.onchange=e=>setDoorField("promisedDate",e.target.value);
-    const nr=h("input",{type:"text",placeholder:"Notes…",value:door.notes||""});nr.oninput=e=>setDoorField("notes",e.target.value);
+    const hp=div('hold-grid');
+    const sr=el('select');sr.innerHTML='<option value="">Hold reason…</option>'+HOLD_REASONS.map(r=>`<option value="${r}"${r===door.holdReason?' selected':''}>${r}</option>`).join('');
+    sr.onchange=e=>setField('holdReason',e.target.value);
+    const dr=el('input');dr.type='date';dr.value=door.promisedDate||'';dr.onchange=e=>setField('promisedDate',e.target.value);
+    const nr=el('input');nr.placeholder='Notes…';nr.value=door.notes||'';nr.oninput=e=>setField('notes',e.target.value);
     hp.append(sr,dr,nr);row.appendChild(hp);
   }
   return row;
 }
 
 function renderAddCustomDoor(projectId,floorId){
-  const wrap=h("div",{style:{padding:"10px 16px",borderTop:"1px dashed var(--border)",background:"#0c0a0920"}});
-  if(!unlocked){const l=h("div",{style:{display:"flex",alignItems:"center",gap:"6px",fontSize:"12px",color:"var(--text3)"}});l.appendChild(icon("lock",12));l.appendChild(document.createTextNode("Unlock to add custom door types"));wrap.appendChild(l);return wrap}
-  let name="",frame=true;
-  const row=h("div",{style:{display:"flex",flexWrap:"wrap",alignItems:"center",gap:"8px"}});
-  const ni=h("input",{type:"text",placeholder:"Custom door name",style:{flex:"1",minWidth:"160px"}});ni.oninput=e=>name=e.target.value;
-  const ft=h("button",{class:"btn btn-sm",style:{background:"var(--sky-bg)",color:"var(--sky)"}},["Frame + Door"]);
-  const fo=h("button",{class:"btn btn-sm",style:{background:"var(--bg3)",color:"var(--text2)"}},["Door only"]);
-  ft.onclick=()=>{frame=true;ft.style.background="var(--sky-bg)";ft.style.color="var(--sky)";fo.style.background="var(--bg3)";fo.style.color="var(--text2)"};
-  fo.onclick=()=>{frame=false;fo.style.background="var(--sky-bg)";fo.style.color="var(--sky)";ft.style.background="var(--bg3)";ft.style.color="var(--text2)"};
-  const ab=h("button",{class:"btn btn-amber btn-sm"});ab.appendChild(icon("plus",14));ab.appendChild(document.createTextNode(" Add"));
-  ab.onclick=()=>{if(!name.trim())return;updateProject(projectId,p=>({...p,floors:p.floors.map(f=>f.id===floorId?{...f,doors:[...f.doors,emptyDoor(name.trim(),frame,true)]}:f)}));ni.value="";name=""};
-  row.append(ni,ft,fo,ab);wrap.appendChild(row);return wrap;
+  const wrap=div('');wrap.style.cssText='padding:10px 16px;border-top:1px dashed #44403c;background:#1c191920';
+  if(!adminUnlocked){
+    wrap.innerHTML='<span style="font-size:12px;color:#78716c">🔒 Unlock to add custom door types</span>';
+    return wrap;
+  }
+  const row=div('');row.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px';
+  const ni=el('input');ni.placeholder='Custom door name';ni.style.flex='1';ni.style.minWidth='160px';
+  let isFrame=true;
+  const ft=btn('btn btn-sm','Frame + Door',()=>{isFrame=true;ft.style.background='#082f49';ft.style.color='#38bdf8';fo.style.background='#44403c';fo.style.color='#a8a29e';});
+  const fo=btn('btn btn-sm','Door only',()=>{isFrame=false;fo.style.background='#082f49';fo.style.color='#38bdf8';ft.style.background='#44403c';ft.style.color='#a8a29e';});
+  ft.style.cssText='background:#082f49;color:#38bdf8;padding:6px 10px;font-size:12px';
+  fo.style.cssText='background:#44403c;color:#a8a29e;padding:6px 10px;font-size:12px';
+  const ab=btn('btn btn-amber btn-sm','＋ Add',()=>{
+    if(!ni.value.trim()) return;
+    updateProject(projectId,p=>({...p,floors:p.floors.map(f=>f.id===floorId?{...f,doors:[...f.doors,emptyDoor(ni.value.trim(),isFrame,true)]}:f)}));
+    ni.value='';
+  });
+  row.append(ni,ft,fo,ab);wrap.appendChild(row);
+  return wrap;
 }
 
 // ── PIN modal ──
 function renderPinModal(isClient){
-  const isNew=isClient?clientPin===null:pin===null;
-  const name=isClient?"Client":"Admin";
-  const purpose=isClient?"only the client can confirm handover":"protects total quantities & door structure";
-  let val="",err="";
-  const overlay=h("div",{class:"modal-overlay"});overlay.onclick=()=>{showModal=null;render()};
-  const modal=h("div",{class:"modal",style:{maxWidth:"360px"}});modal.onclick=e=>e.stopPropagation();
-  const rebuild=()=>{
-    modal.innerHTML="";
-    const mh=h("div",{class:"modal-header"});
-    const ht=h("div",{style:{display:"flex",alignItems:"center",gap:"8px",fontWeight:"600",color:"var(--amber)"}});ht.appendChild(icon("key",16));ht.appendChild(document.createTextNode(` ${isNew?"Set":"Enter"} ${name} PIN`));mh.appendChild(ht);
-    const xb=h("button",{style:{background:"none",border:"none",color:"var(--text3)",cursor:"pointer"}});xb.appendChild(icon("x",20));xb.onclick=()=>{showModal=null;render()};mh.appendChild(xb);modal.appendChild(mh);
-    modal.appendChild(h("p",{style:{fontSize:"12px",color:"var(--text2)",marginBottom:"14px"}},[ isNew?`Set a ${name} PIN — ${purpose}.`:`Enter the ${name} PIN.`]));
-    const pi=h("input",{type:"password",placeholder:"PIN",value:val,style:{textAlign:"center",letterSpacing:"6px",marginBottom:"8px"}});pi.oninput=e=>{val=e.target.value;err=""};
-    pi.onkeydown=e=>{if(e.key==="Enter")go()};modal.appendChild(pi);
-    if(err)modal.appendChild(h("p",{style:{color:"#f87171",fontSize:"12px",marginBottom:"8px"}},[err]));
-    const sb=h("button",{class:"btn btn-amber",style:{width:"100%",justifyContent:"center"}},[ isNew?"Set PIN & Unlock":"Unlock"]);sb.onclick=go;modal.appendChild(sb);
-    setTimeout(()=>pi.focus(),50);
-  };
+  const isNew=isClient?!clientPin:!adminPin;
+  const name=isClient?'Client':'Admin';
+  const bg=div('modal-bg');bg.onclick=()=>{modal=null;render();};
+  const box=div('modal');box.onclick=e=>e.stopPropagation();box.style.maxWidth='360px';
+  box.innerHTML=`<div class="modal-head"><h3 style="color:#f59e0b;font-weight:600">🔑 ${isNew?'Set':'Enter'} ${name} PIN</h3><button onclick="closeModal()" style="background:none;border:none;color:#78716c;cursor:pointer;font-size:20px">✕</button></div>
+  <p style="font-size:12px;color:#a8a29e;margin-bottom:14px">${isNew?`Set a ${name} PIN to protect this section.`:`Enter the ${name} PIN to unlock.`}</p>`;
+  const pi=el('input');pi.type='password';pi.placeholder='Enter PIN (min 4 characters)';pi.style.cssText='text-align:center;letter-spacing:6px;margin-bottom:8px';
+  const errEl=div('');errEl.style.cssText='color:#f87171;font-size:12px;margin-bottom:8px;min-height:16px';
   const go=()=>{
-    if(val.trim().length<4){err="Use at least 4 characters.";rebuild();return}
+    const v=pi.value.trim();
+    if(v.length<4){errEl.textContent='Use at least 4 characters.';return;}
     if(isClient){
-      if(clientPin===null){kvSet("client_pin",val.trim());clientPin=val.trim();clientUnlocked=true;showModal=null;render()}
-      else if(val.trim()===clientPin){clientUnlocked=true;showModal=null;render()}
-      else{err="Wrong PIN.";val="";rebuild()}
-    }else{
-      if(pin===null){kvSet("admin_pin",val.trim());pin=val.trim();unlocked=true;showModal=null;render()}
-      else if(val.trim()===pin){unlocked=true;showModal=null;render()}
-      else{err="Wrong PIN.";val="";rebuild()}
+      if(!clientPin){clientPin=v;kvSet('client_pin',v);clientUnlocked=true;modal=null;render();}
+      else if(v===clientPin){clientUnlocked=true;modal=null;render();}
+      else{errEl.textContent='Wrong PIN. Try again.';pi.value='';}
+    } else {
+      if(!adminPin){adminPin=v;kvSet('admin_pin',v);adminUnlocked=true;modal=null;render();}
+      else if(v===adminPin){adminUnlocked=true;modal=null;render();}
+      else{errEl.textContent='Wrong PIN. Try again.';pi.value='';}
     }
   };
-  rebuild();overlay.appendChild(modal);return overlay;
+  pi.onkeydown=e=>{if(e.key==='Enter') go();};
+  const sb2=btn('btn btn-amber',isNew?'Set PIN & Unlock':'Unlock',go);
+  sb2.style.cssText='width:100%;justify-content:center';
+  box.append(pi,errEl,sb2);
+  setTimeout(()=>pi.focus(),50);
+  bg.appendChild(box);return bg;
 }
 
 // ── install tab ──
-let installSel=null;
-function renderInstallTab(){
-  const wrap=h("div");
-  if(!projects.length){wrap.appendChild(h("div",{class:"empty"},["Add a project first."]));return wrap}
+function renderInstall(){
+  const wrap=div('');
+  if(!projects.length){wrap.appendChild(div('empty','Add a project first.'));return wrap;}
   if(!installSel||!projects.find(p=>p.id===installSel)){
-    wrap.appendChild(h("h2",{style:{fontSize:"15px",fontWeight:"600",marginBottom:"4px"}},["Installation"]));
-    wrap.appendChild(h("p",{style:{fontSize:"12px",color:"var(--text2)",marginBottom:"16px"}},["Track frame & door fixing floor-by-floor."]));
-    const grid=h("div",{class:"grid2"});
+    wrap.innerHTML='<h2 style="font-size:15px;font-weight:600;margin-bottom:4px">Installation</h2><p style="font-size:12px;color:#a8a29e;margin-bottom:16px">Track frame & door fixing floor-by-floor.</p>';
+    const grid=div('grid2');
     projects.forEach(p=>{
-      let dt=0,di=0,fa=0;p.floors.forEach(f=>(f.doors||[]).forEach(raw=>{const c=gd(raw);dt+=c.readyQty;di+=Math.min(c.doorsInstalled,c.readyQty);fa+=c.faultyQty||0}));
+      let dt=0,di=0,fa=0;
+      p.floors.forEach(f=>f.doors.forEach(d=>{const c=normDoor(d);dt+=c.readyQty;di+=Math.min(c.doorsInstalled,c.readyQty);fa+=c.faultyQty||0;}));
       const pct=dt?Math.round(di/dt*100):0;
-      const card=h("div",{class:"card",style:{cursor:"pointer"}});card.onclick=()=>{installSel=p.id;render()};
-      card.appendChild(h("div",{style:{fontWeight:"600"}},[p.name]));card.appendChild(h("div",{style:{fontSize:"12px",color:"var(--text2)"}},[p.builder]));
-      const pb=h("div",{class:"progress",style:{marginTop:"10px"}});pb.appendChild(h("div",{class:"progress-bar",style:{width:pct+"%",background:"var(--emerald)"}}));card.appendChild(pb);
-      const info=h("div",{style:{fontSize:"12px",color:"var(--text2)",marginTop:"4px"}});info.appendChild(document.createTextNode(`${di}/${dt} doors · ${pct}%`));
-      if(fa>0){const fs=h("span",{style:{color:"var(--red)"}},[` · ⚠ ${fa} faulty`]);info.appendChild(fs)}
-      card.appendChild(info);grid.appendChild(card);
+      const card=div('card card-hover');
+      card.onclick=()=>{installSel=p.id;render();};
+      card.innerHTML=`<div style="font-weight:600">${p.name}</div><div style="font-size:12px;color:#a8a29e">${p.builder||''}</div>
+      <div class="progress"><div class="progress-fill" style="width:${pct}%;background:#10b981"></div></div>
+      <div style="font-size:12px;color:#a8a29e">${di}/${dt} doors · ${pct}%${fa>0?` <span style="color:#ef4444">· ⚠ ${fa} faulty</span>`:''}</div>`;
+      grid.appendChild(card);
     });
     wrap.appendChild(grid);return wrap;
   }
   const project=projects.find(p=>p.id===installSel);
-  const bb=h("button",{class:"btn btn-ghost btn-sm",style:{marginBottom:"12px"}});bb.appendChild(icon("chevronLeft",16));bb.appendChild(document.createTextNode(" All sites"));bb.onclick=()=>{installSel=null;render()};wrap.appendChild(bb);
-  wrap.appendChild(h("h2",{style:{fontSize:"17px",fontWeight:"700",marginBottom:"16px"}},[project.name+" — Installation"]));
+  const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{installSel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
+  wrap.innerHTML+=`<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">${project.name} — Installation</h2>`;
   project.floors.forEach(f=>{
-    let dt=0,di=0,fa=0;(f.doors||[]).forEach(raw=>{const c=gd(raw);dt+=c.readyQty;di+=Math.min(c.doorsInstalled,c.readyQty);fa+=c.faultyQty||0});
+    let dt=0,di=0,fa=0;
+    f.doors.forEach(d=>{const c=normDoor(d);dt+=c.readyQty;di+=Math.min(c.doorsInstalled,c.readyQty);fa+=c.faultyQty||0;});
     const pct=dt?Math.round(di/dt*100):0;
-    const fc=h("div",{class:"floor-card"});
-    const fh=h("div",{class:"floor-header"});fh.appendChild(h("span",{style:{fontWeight:"600",color:"var(--amber)"}},[f.name]));
-    const fs=h("span",{style:{fontSize:"12px",color:"var(--emerald)"}});fs.appendChild(document.createTextNode(`${di}/${dt} · ${pct}%`));if(fa>0)fs.appendChild(h("span",{style:{color:"var(--red)"}},[` ⚠${fa}`]));fh.appendChild(fs);fc.appendChild(fh);
-    const ordered=(f.doors||[]).map(gd).filter(d=>d.total>0);
-    if(!ordered.length)fc.appendChild(h("div",{style:{padding:"12px 16px",fontSize:"12px",color:"var(--text3)"}},["No doors ordered yet."]));
+    const fc=div('floor-card');
+    fc.innerHTML=`<div class="floor-head"><span style="font-weight:600;color:#f59e0b">${f.name}</span><span style="font-size:12px;color:#10b981">${di}/${dt} · ${pct}%${fa>0?` <span style="color:#ef4444">⚠${fa}</span>`:''}</span></div>`;
+    const ordered=f.doors.map(normDoor).filter(d=>d.total>0);
+    if(!ordered.length){fc.innerHTML+='<div style="padding:12px 16px;font-size:12px;color:#78716c">No doors ordered yet.</div>';} 
     else ordered.forEach(d=>{
       const produced=d.readyQty||0;
-      const row=h("div",{class:"door-row"});
-      if(!produced){row.appendChild(h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},[ h("span",{style:{fontSize:"13px",color:"var(--text3)"}},[d.label]),h("span",{style:{fontSize:"12px",color:"var(--text3)"}},["Not produced"])]));fc.appendChild(row);return}
-      const fInst=Math.min(d.framesInstalled,produced),dInst=Math.min(d.doorsInstalled,produced),faulty=d.faultyQty||0;
-      const complete=dInst>=produced&&(!d.frame||fInst>=produced),started=dInst>0||fInst>0;
-      const chip=complete?["var(--emerald-bg)","var(--emerald)","Installed"]:started?["var(--amber-bg)","var(--amber)","In progress"]:["var(--bg3)","var(--text2)","Not started"];
-      const top=h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"8px"}});
-      top.appendChild(h("span",{style:{fontSize:"13px",fontWeight:"500",width:"120px"}},[d.label]));
-      const cols=h("div",{style:{display:"flex",alignItems:"center",gap:"12px",flexWrap:"wrap",fontSize:"12px"}});
-      const setIF=v=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,doors:fl.doors.map(dd=>dd.id===d.id?{...gd(dd),framesInstalled:v}:dd)}:fl)}));
-      const setID=v=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,doors:fl.doors.map(dd=>dd.id===d.id?{...gd(dd),doorsInstalled:v}:dd)}:fl)}));
-      const setFQ=v=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,doors:fl.doors.map(dd=>dd.id===d.id?{...gd(dd),faultyQty:v}:dd)}:fl)}));
-      if(d.frame){const c=h("div",{style:{textAlign:"center"}});c.appendChild(h("div",{style:{color:"var(--text3)",fontSize:"11px",marginBottom:"3px"}},["Frames "+fInst+"/"+produced]));c.appendChild(makeStepper(fInst,setIF,"var(--sky)",produced));cols.appendChild(c)}
-      const dc=h("div",{style:{textAlign:"center"}});dc.appendChild(h("div",{style:{color:"var(--text3)",fontSize:"11px",marginBottom:"3px"}},["Doors "+dInst+"/"+produced]));dc.appendChild(makeStepper(dInst,setID,"var(--emerald)",produced));cols.appendChild(dc);
-      const faultc=h("div",{style:{textAlign:"center"}});faultc.appendChild(h("div",{style:{color:"var(--red)",fontSize:"11px",marginBottom:"3px"}},["Faulty"]));faultc.appendChild(makeStepper(faulty,setFQ,"var(--red)"));cols.appendChild(faultc);
-      cols.appendChild(h("span",{style:{fontSize:"11px",padding:"3px 8px",borderRadius:"6px",background:chip[0],color:chip[1]}},[chip[2]]));
+      const row=div('door-row');
+      if(!produced){row.innerHTML=`<div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:#78716c">${d.label}</span><span style="font-size:12px;color:#78716c">Not produced yet</span></div>`;fc.appendChild(row);return;}
+      const fi2=Math.min(d.framesInstalled,produced),di2=Math.min(d.doorsInstalled,produced),faulty=d.faultyQty||0;
+      const done=di2>=produced&&(!d.frame||fi2>=produced),started=di2>0||fi2>0;
+      const chip=done?['#022c22','#10b981','Installed']:started?['#451a03','#f59e0b','In progress']:['#44403c','#a8a29e','Not started'];
+      const top=div('');top.style.cssText='display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px';
+      top.innerHTML=`<span style="font-size:13px;font-weight:500;width:120px">${d.label}</span>`;
+      const cols=div('');cols.style.cssText='display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px';
+      const setF=(field,val)=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,doors:fl.doors.map(dd=>dd.id===d.id?{...normDoor(dd),[field]:val}:dd)}:fl)}));
+      if(d.frame){const c=div('');c.style.textAlign='center';c.innerHTML=`<div style="color:#78716c;font-size:11px;margin-bottom:3px">Frames ${fi2}/${produced}</div>`;c.appendChild(makeStepper(fi2,v=>setF('framesInstalled',v),'#38bdf8',produced));cols.appendChild(c);}
+      const dc=div('');dc.style.textAlign='center';dc.innerHTML=`<div style="color:#78716c;font-size:11px;margin-bottom:3px">Doors ${di2}/${produced}</div>`;dc.appendChild(makeStepper(di2,v=>setF('doorsInstalled',v),'#10b981',produced));cols.appendChild(dc);
+      const fc2=div('');fc2.style.textAlign='center';fc2.innerHTML=`<div style="color:#ef4444;font-size:11px;margin-bottom:3px">Faulty</div>`;fc2.appendChild(makeStepper(faulty,v=>setF('faultyQty',v),'#ef4444'));cols.appendChild(fc2);
+      const chipEl=div('');chipEl.style.cssText=`font-size:11px;padding:3px 8px;border-radius:6px;background:${chip[0]};color:${chip[1]}`;chipEl.textContent=chip[2];cols.appendChild(chipEl);
       top.appendChild(cols);row.appendChild(top);
       if(faulty>0){
-        const fp=h("div",{class:"faulty-panel"});
-        const sr=h("select");FAULT_REASONS.forEach(r=>{const o=h("option",{value:r},[r]);if(r===d.faultyReason)o.selected=true;sr.appendChild(o)});
-        sr.onchange=e=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,doors:fl.doors.map(dd=>dd.id===d.id?{...gd(dd),faultyReason:e.target.value}:dd)}:fl)}));
-        const nr=h("input",{type:"text",placeholder:"Faulty notes…",value:d.faultyNotes||""});
-        nr.oninput=e=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,doors:fl.doors.map(dd=>dd.id===d.id?{...gd(dd),faultyNotes:e.target.value}:dd)}:fl)}));
+        const fp=div('fault-grid');
+        const sr=el('select');sr.innerHTML='<option value="">Faulty reason…</option>'+FAULT_REASONS.map(r=>`<option value="${r}"${r===d.faultyReason?' selected':''}>${r}</option>`).join('');
+        sr.onchange=e=>setF('faultyReason',e.target.value);
+        const nr=el('input');nr.placeholder='Faulty notes…';nr.value=d.faultyNotes||'';nr.oninput=e=>setF('faultyNotes',e.target.value);
         fp.append(sr,nr);row.appendChild(fp);
       }
       fc.appendChild(row);
@@ -665,195 +741,211 @@ function renderInstallTab(){
   return wrap;
 }
 
-// ── daily log tab ──
-let dailySel=null;
-function renderDailyTab(){
-  const wrap=h("div");
-  if(!projects.length){wrap.appendChild(h("div",{class:"empty"},["Add a project first."]));return wrap}
+// ── daily log ──
+function renderDaily(){
+  const wrap=div('');
+  if(!projects.length){wrap.appendChild(div('empty','Add a project first.'));return wrap;}
   if(!dailySel||!projects.find(p=>p.id===dailySel)){
-    wrap.appendChild(h("h2",{style:{fontSize:"15px",fontWeight:"600",marginBottom:"4px"}},["Daily Site Log"]));
-    wrap.appendChild(h("p",{style:{fontSize:"12px",color:"var(--text2)",marginBottom:"16px"}},["Supervisor logs daily labour count and frames/doors installed."]));
-    const grid=h("div",{class:"grid2"});
+    wrap.innerHTML='<h2 style="font-size:15px;font-weight:600;margin-bottom:4px">Daily Site Log</h2><p style="font-size:12px;color:#a8a29e;margin-bottom:16px">Supervisor logs daily labour count and progress.</p>';
+    const grid=div('grid2');
     projects.forEach(p=>{
-      const log=p.dailyLog||[];const days=new Set(log.map(e=>e.date).filter(Boolean)).size;
-      const td=log.reduce((s,e)=>s+(e.doors||0),0);const tf=log.reduce((s,e)=>s+(e.frames||0),0);
-      const card=h("div",{class:"card",style:{cursor:"pointer"}});card.onclick=()=>{dailySel=p.id;render()};
-      card.appendChild(h("div",{style:{fontWeight:"600"}},[p.name]));card.appendChild(h("div",{style:{fontSize:"12px",color:"var(--text2)"}},[p.builder]));
-      const stats2=h("div",{style:{display:"flex",gap:"12px",marginTop:"10px",fontSize:"12px",flexWrap:"wrap"}});
-      stats2.appendChild(h("span",{style:{color:"var(--amber)"}},["📅 "+days+" days"]));stats2.appendChild(h("span",{style:{color:"var(--sky)"}},[""+tf+" frames"]));stats2.appendChild(h("span",{style:{color:"var(--emerald)"}},[""+td+" doors"]));
-      card.appendChild(stats2);grid.appendChild(card);
+      const log=p.dailyLog||[];
+      const days=new Set(log.map(e=>e.date).filter(Boolean)).size;
+      const td=log.reduce((s,e)=>s+(e.doors||0),0),tf=log.reduce((s,e)=>s+(e.frames||0),0);
+      const card=div('card card-hover');card.onclick=()=>{dailySel=p.id;render();};
+      card.innerHTML=`<div style="font-weight:600">${p.name}</div><div style="font-size:12px;color:#a8a29e">${p.builder||''}</div>
+      <div style="display:flex;gap:12px;margin-top:10px;font-size:12px">
+        <span style="color:#f59e0b">📅 ${days} days</span>
+        <span style="color:#38bdf8">${tf} frames</span>
+        <span style="color:#10b981">${td} doors</span>
+      </div>`;
+      grid.appendChild(card);
     });
     wrap.appendChild(grid);return wrap;
   }
   const project=projects.find(p=>p.id===dailySel);
   const log=project.dailyLog||[];
-  const sorted=[...log].sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-  const dates=sorted.map(e=>e.date).filter(Boolean);const distinct=[...new Set(dates)];const wdays=distinct.length;
-  const firstD=dates[0],lastD=dates[dates.length-1];
-  const span=firstD&&lastD?Math.round((new Date(lastD)-new Date(firstD))/86400000)+1:0;
+  const sorted=[...log].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const dates=sorted.map(e=>e.date).filter(Boolean);
+  const wdays=new Set(dates).size;
   const tF=log.reduce((s,e)=>s+(e.frames||0),0),tD=log.reduce((s,e)=>s+(e.doors||0),0),tL=log.reduce((s,e)=>s+(e.labour||0),0);
-  const avgD=wdays?(tD/wdays).toFixed(1):"0";
-  const bb=h("button",{class:"btn btn-ghost btn-sm",style:{marginBottom:"12px"}});bb.appendChild(icon("chevronLeft",16));bb.appendChild(document.createTextNode(" All sites"));bb.onclick=()=>{dailySel=null;render()};wrap.appendChild(bb);
-  wrap.appendChild(h("h2",{style:{fontSize:"17px",fontWeight:"700",marginBottom:"16px"}},[project.name+" — Daily Log"]));
-  const dur=h("div",{style:{background:"var(--amber-bg)",border:"1px solid #92400e",borderRadius:"12px",padding:"14px",marginBottom:"16px"}});
-  if(!wdays)dur.appendChild(h("p",{style:{fontSize:"13px",color:"var(--text2)"}},["No days logged yet."]));
-  else{const txt=h("p",{style:{fontSize:"13px",color:"var(--text)"}});txt.appendChild(h("b",{style:{fontSize:"22px",color:"var(--amber)"}},[wdays+""]));txt.appendChild(document.createTextNode(" working days"));if(span>0)txt.appendChild(h("span",{style:{color:"var(--text2)"}},[` (over ${span} calendar days: ${fmtDate(firstD)} → ${fmtDate(lastD)})`]));dur.appendChild(txt)}
+  const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{dailySel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
+  wrap.appendChild(Object.assign(div(''),{innerHTML:`<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">${project.name} — Daily Log</h2>`}));
+  const dur=div('card');dur.style.cssText='background:#451a0320;border:1px solid #92400e;margin-bottom:16px';
+  dur.innerHTML=wdays?`<span style="font-size:22px;font-weight:700;color:#f59e0b">${wdays}</span> <span style="font-size:13px;color:#a8a29e">working days logged</span>`:`<span style="font-size:13px;color:#a8a29e">No days logged yet.</span>`;
   wrap.appendChild(dur);
-  const sg=h("div",{class:"grid4"});
-  [[{icon:"panel",c:"var(--sky)",l:"Frames",v:tF},{icon:"door",c:"var(--emerald)",l:"Doors",v:tD},{icon:"users",c:"#a78bfa",l:"Labour-days",v:tL},{icon:"wrench",c:"var(--amber)",l:"Avg doors/day",v:avgD}]].flat().forEach(s=>{
-    const sb=h("div",{class:"stat-box"});sb.appendChild(icon(s.icon,16,s.c));sb.appendChild(h("div",{class:"stat-val",style:{color:s.c}},[""+s.v]));sb.appendChild(h("div",{class:"stat-lbl"},[s.l]));sg.appendChild(sb);
+  const sg=div('grid4');
+  [{icon:'🪟',c:'#38bdf8',l:'Frames',v:tF},{icon:'🚪',c:'#10b981',l:'Doors',v:tD},{icon:'👷',c:'#a78bfa',l:'Labour-days',v:tL},{icon:'⚡',c:'#f59e0b',l:'Avg doors/day',v:wdays?(tD/wdays).toFixed(1):'0'}].forEach(s=>{
+    const sb2=div('stat-box');sb2.innerHTML=`<div style="font-size:18px">${s.icon}</div><div class="stat-val" style="color:${s.c}">${s.v}</div><div class="stat-lbl">${s.l}</div>`;sg.appendChild(sb2);
   });
   wrap.appendChild(sg);
 
   // add entry
-  const ae=h("div",{class:"card",style:{marginTop:"16px",marginBottom:"8px"}});ae.appendChild(h("div",{style:{fontWeight:"600",marginBottom:"10px"}},["Add today's entry"]));
-  let eDate=todayISO(),eLabour="",eFrames="",eDoors="",eNotes="";
-  const eg=h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:"8px",marginBottom:"8px"}});
-  const mkEl=(lbl,type,placeholder,val,cb,span2=false)=>{const l=h("label",{style:span2?{gridColumn:"span 2"}:{}});l.appendChild(h("span",[],[lbl]));const i=h("input",{type,placeholder,value:val});i.oninput=e=>cb(e.target.value);l.appendChild(i);return l};
-  eg.append(mkEl("Date","date","",eDate,v=>eDate=v,true),mkEl("Labour","number","0",eLabour,v=>eLabour=v),mkEl("Frames","number","0",eFrames,v=>eFrames=v),mkEl("Doors","number","0",eDoors,v=>eDoors=v));
+  const ae=div('card');ae.style.marginTop='16px';
+  ae.innerHTML='<div style="font-weight:600;margin-bottom:10px">＋ Add today\'s entry</div>';
+  const eg=div('grid4');eg.style.marginBottom='8px';
+  let eDate=today(),eLabour='',eFrames='',eDoors='',eNotes='';
+  const dl=el('label');dl.innerHTML='<span>Date</span>';const di=el('input');di.type='date';di.value=eDate;di.onchange=e=>eDate=e.target.value;dl.appendChild(di);eg.appendChild(dl);
+  const ll=el('label');ll.innerHTML='<span>Labour</span>';const li=el('input');li.type='number';li.placeholder='0';li.oninput=e=>eLabour=e.target.value;ll.appendChild(li);eg.appendChild(ll);
+  const fl=el('label');fl.innerHTML='<span>Frames</span>';const fi=el('input');fi.type='number';fi.placeholder='0';fi.oninput=e=>eFrames=e.target.value;fl.appendChild(fi);eg.appendChild(fl);
+  const dol=el('label');dol.innerHTML='<span>Doors</span>';const doi=el('input');doi.type='number';doi.placeholder='0';doi.oninput=e=>eDoors=e.target.value;dol.appendChild(doi);eg.appendChild(dol);
   ae.appendChild(eg);
-  const ni2=h("input",{type:"text",placeholder:"Notes (optional)",value:eNotes,style:{marginBottom:"10px"}});ni2.oninput=e=>eNotes=e.target.value;ae.appendChild(ni2);
-  const addBtn=h("button",{class:"btn btn-amber",style:{width:"100%",justifyContent:"center"}},["Add Entry"]);
-  addBtn.onclick=()=>{if(!eDate)return;updateProject(project.id,p=>({...p,dailyLog:[...(p.dailyLog||[]),{id:uid(),date:eDate,labour:num(eLabour),frames:num(eFrames),doors:num(eDoors),notes:eNotes.trim()}]}))};
-  ae.appendChild(addBtn);wrap.appendChild(ae);
-  wrap.appendChild(h("h3",{style:{fontSize:"13px",fontWeight:"600",margin:"16px 0 8px"}},["Day-by-day ("+log.length+")"]));
-  if(!log.length)wrap.appendChild(h("div",{class:"empty"},["No entries yet."]));
+  const ni=el('input');ni.placeholder='Notes (optional)';ni.style.marginBottom='10px';ni.oninput=e=>eNotes=e.target.value;ae.appendChild(ni);
+  ae.appendChild(btn('btn btn-amber','Add Entry',()=>{
+    if(!eDate) return;
+    updateProject(project.id,p=>({...p,dailyLog:[...(p.dailyLog||[]),{id:uid(),date:eDate,labour:num(eLabour),frames:num(eFrames),doors:num(eDoors),notes:eNotes.trim()}]}));
+  }));
+  wrap.appendChild(ae);
+
+  wrap.appendChild(Object.assign(div(''),{innerHTML:`<h3 style="font-size:13px;font-weight:600;margin:16px 0 8px">Day-by-day (${log.length})</h3>`}));
+  if(!log.length){wrap.appendChild(div('empty','No entries yet.'));return wrap;}
   sorted.forEach((e,i)=>{
-    const row=h("div",{class:"daily-row"});
-    const rh=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}});
-    const left=h("div",{style:{display:"flex",alignItems:"center",gap:"8px"}});left.appendChild(h("span",{class:"tag tag-amber"},["Day "+(i+1)]));
-    const di=h("input",{type:"date",value:e.date||"",style:{width:"auto"}});di.onchange=ev=>updateProject(project.id,p=>({...p,dailyLog:(p.dailyLog||[]).map(x=>x.id===e.id?{...x,date:ev.target.value}:x)}));
-    left.appendChild(di);rh.appendChild(left);
-    const db2=h("button",{style:{background:"none",border:"none",color:"var(--text3)",cursor:"pointer"}});db2.appendChild(icon("trash",15));db2.onclick=()=>updateProject(project.id,p=>({...p,dailyLog:(p.dailyLog||[]).filter(x=>x.id!==e.id)}));rh.appendChild(db2);
-    row.appendChild(rh);
-    const cols=h("div",{style:{display:"flex",alignItems:"center",gap:"16px",flexWrap:"wrap",fontSize:"12px"}});
-    const mkC=(lbl,c,field,val)=>{const c2=h("div",{style:{textAlign:"center"}});c2.appendChild(h("div",{style:{color:c,fontSize:"11px",marginBottom:"3px"}},[lbl]));c2.appendChild(makeStepper(val,v=>updateProject(project.id,p=>({...p,dailyLog:(p.dailyLog||[]).map(x=>x.id===e.id?{...x,[field]:v}:x)})),c));return c2};
-    cols.append(mkC("Labour","#a78bfa","labour",e.labour||0),mkC("Frames","var(--sky)","frames",e.frames||0),mkC("Doors","var(--emerald)","doors",e.doors||0));
-    const nn=h("input",{type:"text",placeholder:"Notes…",value:e.notes||"",style:{flex:"1",minWidth:"120px"}});nn.oninput=ev=>updateProject(project.id,p=>({...p,dailyLog:(p.dailyLog||[]).map(x=>x.id===e.id?{...x,notes:ev.target.value}:x)}));
+    const row=div('card');row.style.marginBottom='8px';
+    const rh=div('');rh.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px';
+    const left=div('');left.style.cssText='display:flex;align-items:center;gap:8px';
+    const dayTag=div('tag');dayTag.style.cssText='background:#451a03;color:#f59e0b';dayTag.textContent='Day '+(i+1);left.appendChild(dayTag);
+    const di2=el('input');di2.type='date';di2.value=e.date||'';di2.style.width='auto';
+    di2.onchange=ev=>updateProject(project.id,p=>({...p,dailyLog:(p.dailyLog||[]).map(x=>x.id===e.id?{...x,date:ev.target.value}:x)}));
+    left.appendChild(di2);rh.appendChild(left);
+    const db=el('button');db.textContent='🗑';db.style.cssText='background:none;border:none;color:#78716c;cursor:pointer';
+    db.onclick=()=>updateProject(project.id,p=>({...p,dailyLog:(p.dailyLog||[]).filter(x=>x.id!==e.id)}));
+    rh.appendChild(db);row.appendChild(rh);
+    const cols=div('');cols.style.cssText='display:flex;align-items:center;gap:16px;flex-wrap:wrap';
+    const mkC=(lbl,c,field,val)=>{const c2=div('');c2.style.textAlign='center';c2.innerHTML=`<div style="color:${c};font-size:11px;margin-bottom:3px">${lbl}</div>`;c2.appendChild(makeStepper(val,v=>updateProject(project.id,p=>({...p,dailyLog:(p.dailyLog||[]).map(x=>x.id===e.id?{...x,[field]:v}:x)})),c));return c2;};
+    cols.append(mkC('Labour','#a78bfa','labour',e.labour||0),mkC('Frames','#38bdf8','frames',e.frames||0),mkC('Doors','#10b981','doors',e.doors||0));
+    const nn=el('input');nn.placeholder='Notes…';nn.value=e.notes||'';nn.style.flex='1';nn.style.minWidth='120px';
+    nn.oninput=ev=>updateProject(project.id,p=>({...p,dailyLog:(p.dailyLog||[]).map(x=>x.id===e.id?{...x,notes:ev.target.value}:x)}));
     cols.appendChild(nn);row.appendChild(cols);wrap.appendChild(row);
   });
   return wrap;
 }
 
-// ── hardware tab ──
-let hwSel=null;
-function renderHardwareTab(){
-  const wrap=h("div");
-  if(!projects.length){wrap.appendChild(h("div",{class:"empty"},["Add a project first."]));return wrap}
+// ── hardware ──
+function renderHardware(){
+  const wrap=div('');
+  if(!projects.length){wrap.appendChild(div('empty','Add a project first.'));return wrap;}
   if(!hwSel||!projects.find(p=>p.id===hwSel)){
-    wrap.appendChild(h("h2",{style:{fontSize:"15px",fontWeight:"600",marginBottom:"4px"}},["Hardware Delivered"]));
-    wrap.appendChild(h("p",{style:{fontSize:"12px",color:"var(--text2)",marginBottom:"16px"}},["Track hardware sent to each site."]));
-    const grid=h("div",{class:"grid2"});
+    wrap.innerHTML='<h2 style="font-size:15px;font-weight:600;margin-bottom:4px">Hardware Delivered</h2><p style="font-size:12px;color:#a8a29e;margin-bottom:16px">Track hardware sent to each site.</p>';
+    const grid=div('grid2');
     projects.forEach(p=>{
-      const hw=p.hardwareLog||[];const recv=hw.filter(x=>x.status==="Received").length;
-      const card=h("div",{class:"card",style:{cursor:"pointer"}});card.onclick=()=>{hwSel=p.id;render()};
-      card.appendChild(h("div",{style:{fontWeight:"600"}},[p.name]));card.appendChild(h("div",{style:{fontSize:"12px",color:"var(--text2)"}},[p.builder]));
-      const st=h("div",{style:{display:"flex",gap:"12px",marginTop:"10px",fontSize:"12px"}});
-      st.appendChild(h("span",{style:{color:"var(--text2)"}},["📦 "+hw.length+" items"]));st.appendChild(h("span",{style:{color:"var(--emerald)"}},[""+recv+" received"]));if(hw.length-recv>0)st.appendChild(h("span",{style:{color:"var(--amber)"}},[""+( hw.length-recv)+" pending"]));
-      card.appendChild(st);grid.appendChild(card);
+      const hw=p.hardwareLog||[];const recv=hw.filter(x=>x.status==='Received').length;
+      const card=div('card card-hover');card.onclick=()=>{hwSel=p.id;render();};
+      card.innerHTML=`<div style="font-weight:600">${p.name}</div><div style="font-size:12px;color:#a8a29e">${p.builder||''}</div>
+      <div style="display:flex;gap:12px;margin-top:10px;font-size:12px">
+        <span style="color:#a8a29e">📦 ${hw.length} items</span>
+        <span style="color:#10b981">${recv} received</span>
+        ${hw.length-recv>0?`<span style="color:#f59e0b">${hw.length-recv} pending</span>`:''}
+      </div>`;
+      grid.appendChild(card);
     });
     wrap.appendChild(grid);return wrap;
   }
   const project=projects.find(p=>p.id===hwSel);
   const hw=project.hardwareLog||[];
-  const received=hw.filter(x=>x.status==="Received").length,pending=hw.length-received;
-  const bb=h("button",{class:"btn btn-ghost btn-sm",style:{marginBottom:"12px"}});bb.appendChild(icon("chevronLeft",16));bb.appendChild(document.createTextNode(" All sites"));bb.onclick=()=>{hwSel=null;render()};wrap.appendChild(bb);
-  wrap.appendChild(h("h2",{style:{fontSize:"17px",fontWeight:"700",marginBottom:"16px"}},[project.name+" — Hardware"]));
-  const sg=h("div",{class:"grid3"});
-  [[{icon:"package",c:"var(--text)",l:"Items",v:hw.length},{icon:"check",c:"var(--emerald)",l:"Received",v:received},{icon:"clock",c:"var(--amber)",l:"Pending",v:pending}]].flat().forEach(s=>{const sb=h("div",{class:"stat-box"});sb.appendChild(icon(s.icon,16,s.c));sb.appendChild(h("div",{class:"stat-val",style:{color:s.c}},[""+s.v]));sb.appendChild(h("div",{class:"stat-lbl"},[s.l]));sg.appendChild(sb)});
+  const received=hw.filter(x=>x.status==='Received').length;
+  const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{hwSel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
+  wrap.appendChild(Object.assign(div(''),{innerHTML:`<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">${project.name} — Hardware</h2>`}));
+  const sg=div('grid3');sg.style.marginBottom='16px';
+  [{icon:'📦',c:'#e7e5e4',l:'Items',v:hw.length},{icon:'✅',c:'#10b981',l:'Received',v:received},{icon:'⏳',c:'#f59e0b',l:'Pending',v:hw.length-received}].forEach(s=>{
+    const sb2=div('stat-box');sb2.innerHTML=`<div style="font-size:18px">${s.icon}</div><div class="stat-val" style="color:${s.c}">${s.v}</div><div class="stat-lbl">${s.l}</div>`;sg.appendChild(sb2);
+  });
   wrap.appendChild(sg);
 
-  // add hw
-  const ae=h("div",{class:"card",style:{marginTop:"16px",marginBottom:"8px"}});ae.appendChild(h("div",{style:{fontWeight:"600",marginBottom:"10px"}},["Add hardware sent to site"]));
-  let hItem="",hQty="",hStatus="Sent",hDate=todayISO(),hNotes="";
-  const hg=h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:"8px",marginBottom:"8px"}});
-  const il=h("label");il.appendChild(h("span",[],["Item"]));
-  const ii=h("input",{type:"text",placeholder:"e.g. Hinges",list:"hw-items2"});ii.oninput=e=>hItem=e.target.value;
-  const dl=document.createElement("datalist");dl.id="hw-items2";HW_ITEMS.forEach(i=>{const o=document.createElement("option");o.value=i;dl.appendChild(o)});
-  il.appendChild(ii);il.appendChild(dl);hg.appendChild(il);
-  const ql=h("label");ql.appendChild(h("span",[],["Qty"]));const qi=h("input",{type:"number",min:"0",placeholder:"0"});qi.oninput=e=>hQty=e.target.value;ql.appendChild(qi);hg.appendChild(ql);
-  const sl2=h("label");sl2.appendChild(h("span",[],["Status"]));const ss=h("select");HW_STATUS.forEach(s=>{const o=h("option",{value:s},[s]);ss.appendChild(o)});ss.onchange=e=>hStatus=e.target.value;sl2.appendChild(ss);hg.appendChild(sl2);
-  const dl2=h("label");dl2.appendChild(h("span",[],["Date"]));const di2=h("input",{type:"date",value:hDate});di2.onchange=e=>hDate=e.target.value;dl2.appendChild(di2);hg.appendChild(dl2);
-  ae.appendChild(hg);
-  const hn=h("input",{type:"text",placeholder:"Notes (optional)",style:{marginBottom:"10px"}});hn.oninput=e=>hNotes=e.target.value;ae.appendChild(hn);
-  const ab2=h("button",{class:"btn btn-amber",style:{width:"100%",justifyContent:"center"}},["Add Hardware"]);
-  ab2.onclick=()=>{if(!hItem.trim())return;updateProject(project.id,p=>({...p,hardwareLog:[...(p.hardwareLog||[]),{id:uid(),item:hItem.trim(),qty:num(hQty),status:hStatus,sentDate:hDate,recvDate:hStatus==="Received"?hDate:"",notes:hNotes.trim()}]}))};
-  ae.appendChild(ab2);wrap.appendChild(ae);
-  wrap.appendChild(h("h3",{style:{fontSize:"13px",fontWeight:"600",margin:"16px 0 8px"}},["Hardware list ("+hw.length+")"]));
-  if(!hw.length)wrap.appendChild(h("div",{class:"empty"},["No hardware added yet."]));
-  hw.forEach(hrow=>{
-    const chipColor=hrow.status==="Received"?"var(--emerald-bg),var(--emerald)":hrow.status==="Sent"?"var(--sky-bg),var(--sky)":"var(--bg3),var(--text2)";
-    const [cbg,cfg]=chipColor.split(",");
-    const row=h("div",{class:"hw-row"});
-    const rh=h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"8px"}});
-    const ni3=h("input",{type:"text",value:hrow.item,style:{background:"transparent",border:"none",fontWeight:"600",fontSize:"14px",color:"var(--text)",flex:"1",outline:"none"}});
-    ni3.onchange=e=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===hrow.id?{...x,item:e.target.value}:x)}));
-    rh.appendChild(ni3);
-    rh.appendChild(h("span",{style:{fontSize:"11px",padding:"3px 8px",borderRadius:"6px",background:cbg,color:cfg,whiteSpace:"nowrap",marginLeft:"8px"}},[hrow.status]));
-    const db3=h("button",{style:{background:"none",border:"none",color:"var(--text3)",cursor:"pointer",marginLeft:"8px"}});db3.appendChild(icon("trash",15));db3.onclick=()=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).filter(x=>x.id!==hrow.id)}));rh.appendChild(db3);
-    row.appendChild(rh);
-    const hg2=h("div",{class:"hw-grid"});
-    const mkHL=(lbl,type,val,cb)=>{const l=h("label");l.appendChild(h("span",{style:{fontSize:"11px"}},[lbl]));const i=h("input",{type,value:""+val});i.onchange=e=>cb(e.target.value);l.appendChild(i);return l};
-    const ss2=h("label");ss2.appendChild(h("span",{style:{fontSize:"11px"}},["Status"]));const ss3=h("select");HW_STATUS.forEach(s=>{const o=h("option",{value:s},[s]);if(s===hrow.status)o.selected=true;ss3.appendChild(o)});ss3.onchange=e=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===hrow.id?{...x,status:e.target.value,recvDate:e.target.value==="Received"&&!x.recvDate?todayISO():x.recvDate}:x)}));ss2.appendChild(ss3);
-    hg2.append(mkHL("Qty","number",hrow.qty||0,v=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===hrow.id?{...x,qty:num(v)}:x)}))),ss2,mkHL("Sent","date",hrow.sentDate||"",v=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===hrow.id?{...x,sentDate:v}:x)}))),mkHL("Received","date",hrow.recvDate||"",v=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===hrow.id?{...x,recvDate:v}:x)}))));
-    row.appendChild(hg2);
-    const nn2=h("input",{type:"text",placeholder:"Notes…",value:hrow.notes||"",style:{marginTop:"6px"}});nn2.oninput=e=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===hrow.id?{...x,notes:e.target.value}:x)}));
-    row.appendChild(nn2);wrap.appendChild(row);
+  const ae=div('card');ae.innerHTML='<div style="font-weight:600;margin-bottom:10px">＋ Add hardware sent to site</div>';
+  const eg=div('grid4');eg.style.marginBottom='8px';
+  let hItem='',hQty='',hStatus='Sent',hDate=today(),hNotes='';
+  const il=el('label');il.innerHTML='<span>Item</span>';const ii=el('input');ii.placeholder='e.g. Hinges';ii.list='hw-list';ii.oninput=e=>hItem=e.target.value;
+  const dl2=el('datalist');dl2.id='hw-list';HW_ITEMS.forEach(i=>{const o=el('option');o.value=i;dl2.appendChild(o);});
+  il.append(ii,dl2);eg.appendChild(il);
+  const ql=el('label');ql.innerHTML='<span>Qty</span>';const qi=el('input');qi.type='number';qi.placeholder='0';qi.oninput=e=>hQty=e.target.value;ql.appendChild(qi);eg.appendChild(ql);
+  const sl=el('label');sl.innerHTML='<span>Status</span>';const ss=el('select');ss.innerHTML=HW_STATUS.map(s=>`<option value="${s}">${s}</option>`).join('');ss.onchange=e=>hStatus=e.target.value;sl.appendChild(ss);eg.appendChild(sl);
+  const dtl=el('label');dtl.innerHTML='<span>Date</span>';const dti=el('input');dti.type='date';dti.value=hDate;dti.onchange=e=>hDate=e.target.value;dtl.appendChild(dti);eg.appendChild(dtl);
+  ae.appendChild(eg);
+  const hn=el('input');hn.placeholder='Notes (optional)';hn.style.marginBottom='10px';hn.oninput=e=>hNotes=e.target.value;ae.appendChild(hn);
+  ae.appendChild(btn('btn btn-amber','Add Hardware',()=>{
+    if(!hItem.trim()) return;
+    updateProject(project.id,p=>({...p,hardwareLog:[...(p.hardwareLog||[]),{id:uid(),item:hItem.trim(),qty:num(hQty),status:hStatus,sentDate:hDate,recvDate:hStatus==='Received'?hDate:'',notes:hNotes.trim()}]}));
+  }));
+  wrap.appendChild(ae);
+
+  if(!hw.length){wrap.appendChild(div('empty','No hardware added yet.'));return wrap;}
+  hw.forEach(h=>{
+    const chipC=h.status==='Received'?['#022c22','#10b981']:h.status==='Sent'?['#082f49','#38bdf8']:['#44403c','#a8a29e'];
+    const row=div('hw-row');
+    const rh=div('');rh.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:8px';
+    const ni=el('input');ni.value=h.item;ni.style.cssText='background:transparent;border:none;font-weight:600;font-size:14px;color:#e7e5e4;flex:1;outline:none';
+    ni.onchange=e=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===h.id?{...x,item:e.target.value}:x)}));
+    const chipEl=div('tag');chipEl.style.cssText=`background:${chipC[0]};color:${chipC[1]};margin-left:8px;white-space:nowrap`;chipEl.textContent=h.status;
+    const db=el('button');db.textContent='🗑';db.style.cssText='background:none;border:none;color:#78716c;cursor:pointer;margin-left:8px';
+    db.onclick=()=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).filter(x=>x.id!==h.id)}));
+    rh.append(ni,chipEl,db);row.appendChild(rh);
+    const hg=div('grid4');
+    const mkHL=(lbl,type,val,cb)=>{const l=el('label');l.innerHTML=`<span style="font-size:11px">${lbl}</span>`;const i=el('input');i.type=type;i.value=val||'';i.onchange=e=>cb(e.target.value);l.appendChild(i);return l;};
+    const sl2=el('label');sl2.innerHTML='<span style="font-size:11px">Status</span>';const ss2=el('select');ss2.innerHTML=HW_STATUS.map(s=>`<option value="${s}"${s===h.status?' selected':''}>${s}</option>`).join('');
+    ss2.onchange=e=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===h.id?{...x,status:e.target.value,recvDate:e.target.value==='Received'&&!x.recvDate?today():x.recvDate}:x)}));
+    sl2.appendChild(ss2);
+    hg.append(mkHL('Qty','number',h.qty||0,v=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===h.id?{...x,qty:num(v)}:x)}))),sl2,mkHL('Sent','date',h.sentDate,v=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===h.id?{...x,sentDate:v}:x)}))),mkHL('Received','date',h.recvDate,v=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===h.id?{...x,recvDate:v}:x)}))));
+    row.appendChild(hg);
+    const nn=el('input');nn.placeholder='Notes…';nn.value=h.notes||'';nn.style.marginTop='6px';
+    nn.oninput=e=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===h.id?{...x,notes:e.target.value}:x)}));
+    row.appendChild(nn);wrap.appendChild(row);
   });
   return wrap;
 }
 
-// ── handover tab ──
-let handoverSel=null;
-function renderHandoverTab(){
-  const wrap=h("div");
-  if(!projects.length){wrap.appendChild(h("div",{class:"empty"},["Add a project first."]));return wrap}
+// ── handover ──
+function renderHandover(){
+  const wrap=div('');
+  if(!projects.length){wrap.appendChild(div('empty','Add a project first.'));return wrap;}
   if(!handoverSel||!projects.find(p=>p.id===handoverSel)){
-    wrap.appendChild(h("h2",{style:{fontSize:"15px",fontWeight:"600",marginBottom:"4px"}},["Client Handover"]));
-    wrap.appendChild(h("p",{style:{fontSize:"12px",color:"var(--text2)",marginBottom:"16px"}},["Client confirms doors taken over."]));
-    const grid=h("div",{class:"grid2"});
+    wrap.innerHTML='<h2 style="font-size:15px;font-weight:600;margin-bottom:4px">Client Handover</h2><p style="font-size:12px;color:#a8a29e;margin-bottom:16px">Client confirms doors taken over.</p>';
+    const grid=div('grid2');
     projects.forEach(p=>{
-      let dt=0,ho=0;p.floors.forEach(f=>(f.doors||[]).forEach(raw=>{const c=gd(raw);dt+=c.readyQty;ho+=Math.min(c.handoverQty,Math.min(c.doorsInstalled,c.readyQty))}));
+      let dt=0,ho=0;p.floors.forEach(f=>f.doors.forEach(d=>{const c=normDoor(d);dt+=c.readyQty;ho+=Math.min(c.handoverQty,Math.min(c.doorsInstalled,c.readyQty));}));
       const pct=dt?Math.round(ho/dt*100):0;
-      const card=h("div",{class:"card",style:{cursor:"pointer"}});card.onclick=()=>{handoverSel=p.id;render()};
-      card.appendChild(h("div",{style:{fontWeight:"600"}},[p.name]));card.appendChild(h("div",{style:{fontSize:"12px",color:"var(--text2)"}},[p.builder]));
-      const pb=h("div",{class:"progress",style:{marginTop:"10px"}});pb.appendChild(h("div",{class:"progress-bar",style:{width:pct+"%",background:"var(--violet)"}}));card.appendChild(pb);
-      card.appendChild(h("div",{style:{fontSize:"12px",color:"var(--text2)",marginTop:"4px"}},[`${ho}/${dt} handed over · ${pct}%`]));
+      const card=div('card card-hover');card.onclick=()=>{handoverSel=p.id;render();};
+      card.innerHTML=`<div style="font-weight:600">${p.name}</div><div style="font-size:12px;color:#a8a29e">${p.builder||''}</div>
+      <div class="progress"><div class="progress-fill" style="width:${pct}%;background:#8b5cf6"></div></div>
+      <div style="font-size:12px;color:#a8a29e">${ho}/${dt} handed over · ${pct}%</div>`;
       grid.appendChild(card);
     });
     wrap.appendChild(grid);return wrap;
   }
   const project=projects.find(p=>p.id===handoverSel);
-  const bb=h("button",{class:"btn btn-ghost btn-sm",style:{marginBottom:"12px"}});bb.appendChild(icon("chevronLeft",16));bb.appendChild(document.createTextNode(" All sites"));bb.onclick=()=>{handoverSel=null;render()};wrap.appendChild(bb);
-  const topbar=h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"8px",marginBottom:"8px"}});
-  topbar.appendChild(h("h2",{style:{fontSize:"17px",fontWeight:"700"}},[project.name+" — Handover"]));
-  const certBtn=h("button",{class:"btn",style:{background:"var(--violet-bg)",color:"var(--violet)"}});certBtn.appendChild(icon("file",15));certBtn.appendChild(document.createTextNode(" Certificate"));certBtn.onclick=()=>{certId=project.id;render()};topbar.appendChild(certBtn);
-  wrap.appendChild(topbar);
-  wrap.appendChild(renderLockBar(clientUnlocked,()=>{clientUnlocked=false;render()},()=>{showModal="clientPin";render()}));
+  const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{handoverSel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
+  const topbar=div('');topbar.style.cssText='display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px';
+  topbar.innerHTML=`<h2 style="font-size:17px;font-weight:700">${project.name} — Handover</h2>`;
+  const cb=btn('btn','📄 Certificate',()=>{certId=project.id;render();});cb.style.cssText='background:#2e1065;color:#8b5cf6;padding:8px 14px;border-radius:8px;font-weight:600';
+  topbar.appendChild(cb);wrap.appendChild(topbar);
+  wrap.appendChild(renderLockBar(clientUnlocked,()=>{clientUnlocked=false;render();},()=>{modal='clientPin';render();}));
   project.floors.forEach(f=>{
-    let dt=0,ho=0;(f.doors||[]).forEach(raw=>{const c=gd(raw);dt+=c.readyQty;ho+=Math.min(c.handoverQty,Math.min(c.doorsInstalled,c.readyQty))});
+    let dt=0,ho=0;f.doors.forEach(d=>{const c=normDoor(d);dt+=c.readyQty;ho+=Math.min(c.handoverQty,Math.min(c.doorsInstalled,c.readyQty));});
     const pct=dt?Math.round(ho/dt*100):0;
-    const fc=h("div",{class:"floor-card"});
-    const fhd=h("div",{class:"floor-header"});fhd.appendChild(h("span",{style:{fontWeight:"600",color:"var(--amber)"}},[f.name]));fhd.appendChild(h("span",{style:{fontSize:"12px",color:"var(--violet)"}},[""+ho+"/"+dt+" · "+pct+"%"]));fc.appendChild(fhd);
-    const mg2=h("div",{style:{padding:"10px 16px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",borderBottom:"1px solid var(--border)",opacity:clientUnlocked?1:.5,pointerEvents:clientUnlocked?"":"none"}});
-    const dl3=h("label");dl3.appendChild(h("span",[],["Handover date"]));const di3=h("input",{type:"date",value:f.handoverDate||"",disabled:!clientUnlocked});di3.onchange=e=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,handoverDate:e.target.value}:fl)}));dl3.appendChild(di3);mg2.appendChild(dl3);
-    const al=h("label");al.appendChild(h("span",[],["Accepted by"]));const ai=h("input",{type:"text",placeholder:"Client name",value:f.acceptedBy||"",disabled:!clientUnlocked});ai.oninput=e=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,acceptedBy:e.target.value}:fl)}));al.appendChild(ai);mg2.appendChild(al);
-    fc.appendChild(mg2);
-    const ordered=(f.doors||[]).map(gd).filter(d=>d.total>0);
-    if(!ordered.length)fc.appendChild(h("div",{style:{padding:"12px 16px",fontSize:"12px",color:"var(--text3)"}},["No doors yet."]));
+    const fc=div('floor-card');
+    fc.innerHTML=`<div class="floor-head"><span style="font-weight:600;color:#f59e0b">${f.name}</span><span style="font-size:12px;color:#8b5cf6">${ho}/${dt} · ${pct}%</span></div>`;
+    const mg=div('grid2');mg.style.cssText=`padding:10px 16px;border-bottom:1px solid #44403c;background:#1c191920;opacity:${clientUnlocked?1:.5};pointer-events:${clientUnlocked?'':'none'}`;
+    const dl=el('label');dl.innerHTML='<span>Handover date</span>';const di=el('input');di.type='date';di.value=f.handoverDate||'';di.disabled=!clientUnlocked;
+    di.onchange=e=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,handoverDate:e.target.value}:fl)}));dl.appendChild(di);mg.appendChild(dl);
+    const al=el('label');al.innerHTML='<span>Accepted by</span>';const ai=el('input');ai.placeholder='Client name';ai.value=f.acceptedBy||'';ai.disabled=!clientUnlocked;
+    ai.oninput=e=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,acceptedBy:e.target.value}:fl)}));al.appendChild(ai);mg.appendChild(al);
+    fc.appendChild(mg);
+    const ordered=f.doors.map(normDoor).filter(d=>d.total>0);
+    if(!ordered.length){fc.innerHTML+='<div style="padding:12px 16px;font-size:12px;color:#78716c">No doors yet.</div>';}
     else ordered.forEach(d=>{
       const produced=d.readyQty||0,inst=Math.min(d.doorsInstalled,produced),handed=Math.min(d.handoverQty,inst);
-      const row=h("div",{class:"door-row"});
-      if(!produced){row.appendChild(h("span",{style:{fontSize:"13px",color:"var(--text3)"}},[d.label+" — not produced"]));fc.appendChild(row);return}
-      if(!inst){row.appendChild(h("span",{style:{fontSize:"13px",color:"var(--text3)"}},[d.label+" — not installed"]));fc.appendChild(row);return}
-      const complete=handed>=produced,started=handed>0;
-      const chip=complete?["var(--violet-bg)","var(--violet)","Handed over"]:started?["var(--amber-bg)","var(--amber)","Partial"]:["var(--bg3)","var(--text2)","Pending"];
-      const top=h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"8px"}});
-      top.appendChild(h("span",{style:{fontSize:"13px",fontWeight:"500",width:"120px"}},[d.label]));
-      const cols=h("div",{style:{display:"flex",alignItems:"center",gap:"12px",fontSize:"12px"}});
-      const ic2=h("div",{style:{textAlign:"center"}});ic2.appendChild(h("div",{style:{color:"var(--text3)",fontSize:"11px",marginBottom:"3px"}},["Installed"]));ic2.appendChild(h("div",{style:{color:"var(--emerald)",fontWeight:"700",padding:"3px 0"}},[""+inst]));cols.appendChild(ic2);
-      const hc=h("div",{style:{textAlign:"center"}});hc.appendChild(h("div",{style:{color:"var(--text3)",fontSize:"11px",marginBottom:"3px"}},["Handed "+handed+"/"+produced]));hc.appendChild(makeStepper(handed,v=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,doors:fl.doors.map(dd=>dd.id===d.id?{...gd(dd),handoverQty:v}:dd)}:fl)})),"var(--violet)",inst,!clientUnlocked));cols.appendChild(hc);
-      cols.appendChild(h("span",{style:{fontSize:"11px",padding:"3px 8px",borderRadius:"6px",background:chip[0],color:chip[1]}},[chip[2]]));
+      const row=div('door-row');
+      if(!produced){row.innerHTML=`<span style="font-size:13px;color:#78716c">${d.label} — not produced</span>`;fc.appendChild(row);return;}
+      if(!inst){row.innerHTML=`<span style="font-size:13px;color:#78716c">${d.label} — not installed</span>`;fc.appendChild(row);return;}
+      const done=handed>=produced,started=handed>0;
+      const chip=done?['#2e1065','#8b5cf6','Handed over']:started?['#451a03','#f59e0b','Partial']:['#44403c','#a8a29e','Pending'];
+      const top=div('');top.style.cssText='display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px';
+      top.innerHTML=`<span style="font-size:13px;font-weight:500;width:120px">${d.label}</span>`;
+      const cols=div('');cols.style.cssText='display:flex;align-items:center;gap:12px;font-size:12px';
+      const ic=div('');ic.style.textAlign='center';ic.innerHTML=`<div style="color:#78716c;font-size:11px;margin-bottom:3px">Installed</div><div style="color:#10b981;font-weight:700;padding:3px 0">${inst}</div>`;cols.appendChild(ic);
+      const hc=div('');hc.style.textAlign='center';hc.innerHTML=`<div style="color:#78716c;font-size:11px;margin-bottom:3px">Handed ${handed}/${produced}</div>`;
+      hc.appendChild(makeStepper(handed,v=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,doors:fl.doors.map(dd=>dd.id===d.id?{...normDoor(dd),handoverQty:v}:dd)}:fl)})),'#8b5cf6',inst,!clientUnlocked));
+      cols.appendChild(hc);
+      const chipEl=div('');chipEl.style.cssText=`font-size:11px;padding:3px 8px;border-radius:6px;background:${chip[0]};color:${chip[1]}`;chipEl.textContent=chip[2];cols.appendChild(chipEl);
       top.appendChild(cols);row.appendChild(top);fc.appendChild(row);
     });
     wrap.appendChild(fc);
@@ -861,57 +953,69 @@ function renderHandoverTab(){
   return wrap;
 }
 
-// ── activity tab ──
-function renderActivityTab(){
-  const wrap=h("div");
-  wrap.appendChild(h("h2",{style:{fontSize:"15px",fontWeight:"600",marginBottom:"4px"}},["Team Activity"]));
-  wrap.appendChild(h("p",{style:{fontSize:"12px",color:"var(--text2)",marginBottom:"16px"}},["Recent updates by team members, synced live."]));
-  if(!activity.length){wrap.appendChild(h("div",{class:"empty"},["No activity yet."]));return wrap}
+// ── activity ──
+function renderActivity(){
+  const wrap=div('');
+  wrap.innerHTML='<h2 style="font-size:15px;font-weight:600;margin-bottom:4px">Team Activity</h2><p style="font-size:12px;color:#a8a29e;margin-bottom:16px">Recent updates by team members, synced live.</p>';
+  if(!activity.length){wrap.appendChild(div('empty','No activity yet.'));return wrap;}
   activity.forEach(a=>{
-    const row=h("div",{class:"activity-row"});
-    const av=h("div",{class:"avatar"},[(a.who||"?").charAt(0).toUpperCase()]);row.appendChild(av);
-    const info=h("div",{style:{flex:"1",minWidth:0}});
-    const p2=h("p",{style:{fontSize:"13px"}});p2.appendChild(h("b",{style:{color:"var(--amber)"}},[a.who]));p2.appendChild(document.createTextNode(" updated "));p2.appendChild(h("span",{style:{color:"var(--text)"}},[a.project]));
-    info.appendChild(p2);info.appendChild(h("p",{style:{fontSize:"12px",color:"var(--text3)"}},[a.section]));row.appendChild(info);
-    row.appendChild(h("span",{style:{fontSize:"12px",color:"var(--text3)",whiteSpace:"nowrap"}},[rel(a.ts)]));
-    wrap.appendChild(row);
+    const row=div('activity-row');
+    const av=div('avatar');av.textContent=(a.who||'?').charAt(0).toUpperCase();
+    const info=div('');info.style.flex='1';
+    info.innerHTML=`<div style="font-size:13px"><b style="color:#f59e0b">${a.who}</b> updated <span style="color:#e7e5e4">${a.project}</span></div><div style="font-size:12px;color:#78716c">${a.section}</div>`;
+    const ts=div('');ts.style.cssText='font-size:12px;color:#78716c;white-space:nowrap';ts.textContent=rel(a.ts);
+    row.append(av,info,ts);wrap.appendChild(row);
   });
   return wrap;
 }
 
 // ── dashboard ──
 function renderDashboard(){
-  const wrap=h("div");
-  if(!projects.length){wrap.appendChild(h("div",{class:"empty"},["Add a project to see the dashboard."]));return wrap}
-  let T=0,R=0,H=0,P=0,FT=0,FI=0,DT=0,DI=0,HD=0,FA=0;const per={};const reasons={};
-  projects.forEach(p=>p.floors.forEach(f=>(f.doors||[]).forEach(raw=>{
-    const c=gd(raw);const pend=Math.max(c.total-c.readyQty-c.holdQty,0);
-    if(!per[c.label])per[c.label]={label:c.label,frame:c.frame,total:0,ready:0,hold:0,pending:0};
-    per[c.label].total+=c.total;per[c.label].ready+=c.readyQty;per[c.label].hold+=c.holdQty;per[c.label].pending+=pend;
+  const wrap=div('');
+  if(!projects.length){wrap.appendChild(div('empty','Add a project to see the dashboard.'));return wrap;}
+  let T=0,R=0,H=0,P=0,FT=0,FI=0,DT=0,DI=0,HD=0,FA=0;
+  const per={},reasons={};
+  projects.forEach(p=>p.floors.forEach(f=>f.doors.forEach(raw=>{
+    const c=normDoor(raw);const pend=Math.max(c.total-c.readyQty-c.holdQty,0);
     T+=c.total;R+=c.readyQty;H+=c.holdQty;P+=pend;FA+=c.faultyQty||0;
-    if(c.holdQty>0&&c.holdReason)reasons[c.holdReason]=(reasons[c.holdReason]||0)+c.holdQty;
+    if(c.holdQty>0&&c.holdReason) reasons[c.holdReason]=(reasons[c.holdReason]||0)+c.holdQty;
     DT+=c.readyQty;DI+=Math.min(c.doorsInstalled,c.readyQty);HD+=Math.min(c.handoverQty,Math.min(c.doorsInstalled,c.readyQty));
-    if(c.frame){FT+=c.readyQty;FI+=Math.min(c.framesInstalled,c.readyQty)}
+    if(c.frame){FT+=c.readyQty;FI+=Math.min(c.framesInstalled,c.readyQty);}
+    if(!per[c.label])per[c.label]={label:c.label,total:0,ready:0,hold:0,pending:0};
+    per[c.label].total+=c.total;per[c.label].ready+=c.readyQty;per[c.label].hold+=c.holdQty;per[c.label].pending+=pend;
   })));
-  const cg=h("div",{class:"grid4"});
-  [[{l:"Total Ordered",v:T,c:"var(--text)"},{l:"Ready",v:R,c:"var(--emerald)"},{l:"On Hold",v:H,c:"var(--orange)"},{l:"Pending",v:P,c:"var(--amber)"}]].flat().forEach(s=>{const sb=h("div",{class:"stat-box"});sb.appendChild(h("div",{class:"stat-val",style:{color:s.c}},[""+s.v]));sb.appendChild(h("div",{class:"stat-lbl"},[s.l]));cg.appendChild(sb)});
-  wrap.appendChild(cg);
-  const prod=h("div",{style:{background:"var(--emerald-bg)",border:"1px solid #065f46",borderRadius:"12px",padding:"14px",margin:"16px 0"}});prod.appendChild(h("div",{style:{fontWeight:"600",color:"var(--emerald)",marginBottom:"4px"}},["✅ Cleared for production right now"]));prod.appendChild(h("div",{style:{fontSize:"28px",fontWeight:"700",color:"#6ee7b7"}},[R+" ",h("span",{style:{fontSize:"14px",fontWeight:"400",color:"var(--text2)"}},["doors"])]));wrap.appendChild(prod);
-  const pg=h("div",{class:"grid3",style:{marginBottom:"16px"}});
   const framePct=FT?Math.round(FI/FT*100):0,doorPct=DT?Math.round(DI/DT*100):0,handPct=DT?Math.round(HD/DT*100):0;
-  [[{l:"Frames fixed",v:FI+"/"+FT,pct:framePct,c:"var(--sky)"},{l:"Doors fixed",v:DI+"/"+DT,pct:doorPct,c:"var(--emerald)"},{l:"Handed over",v:HD+"/"+DT,pct:handPct,c:"var(--violet)"}]].flat().forEach(s=>{
-    const sb=h("div",{class:"stat-box"});sb.appendChild(h("div",{style:{display:"flex",justifyContent:"space-between",fontSize:"12px",marginBottom:"4px"}},[ h("span",{style:{color:s.c}},[s.l]),h("span",{style:{color:"var(--text)"}},[s.v])]));const pb=h("div",{class:"progress"});pb.appendChild(h("div",{class:"progress-bar",style:{width:s.pct+"%",background:s.c}}));sb.appendChild(pb);sb.appendChild(h("div",{style:{fontSize:"11px",color:"var(--text3)",marginTop:"4px"}},[s.pct+"%"]));pg.appendChild(sb);
+  const sg=div('grid4');sg.style.marginBottom='16px';
+  [{l:'Total Ordered',v:T,c:'#e7e5e4'},{l:'Ready',v:R,c:'#10b981'},{l:'On Hold',v:H,c:'#f97316'},{l:'Pending',v:P,c:'#f59e0b'}].forEach(s=>{
+    const sb2=div('stat-box');sb2.innerHTML=`<div class="stat-val" style="color:${s.c}">${s.v}</div><div class="stat-lbl">${s.l}</div>`;sg.appendChild(sb2);
+  });
+  wrap.appendChild(sg);
+  const prod=div('card');prod.style.cssText='background:#022c2220;border:1px solid #065f46;margin-bottom:16px';
+  prod.innerHTML=`<div style="font-weight:600;color:#10b981;margin-bottom:4px">✅ Cleared for production right now</div><div style="font-size:28px;font-weight:700;color:#6ee7b7">${R} <span style="font-size:14px;color:#a8a29e">doors</span></div>`;
+  wrap.appendChild(prod);
+  const pg=div('grid3');pg.style.marginBottom='16px';
+  [{l:'Frames fixed',v:FI+'/'+FT,pct:framePct,c:'#38bdf8'},{l:'Doors fixed',v:DI+'/'+DT,pct:doorPct,c:'#10b981'},{l:'Handed over',v:HD+'/'+DT,pct:handPct,c:'#8b5cf6'}].forEach(s=>{
+    const sb2=div('stat-box');sb2.innerHTML=`<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:${s.c}">${s.l}</span><span>${s.v}</span></div><div class="progress"><div class="progress-fill" style="width:${s.pct}%;background:${s.c}"></div></div><div style="font-size:11px;color:#78716c;margin-top:4px">${s.pct}%</div>`;
+    pg.appendChild(sb2);
   });
   wrap.appendChild(pg);
-  if(FA>0)wrap.appendChild(h("div",{style:{background:"var(--red-bg)",border:"1px solid #7f1d1d",borderRadius:"12px",padding:"12px",marginBottom:"12px",fontSize:"13px",color:"#fca5a5"}},["⚠ "+FA+" faulty materials reported — see Installation tab."]));
-  const typeList=Object.values(per).filter(s=>s.total>0).sort((a,b)=>b.total-a.total);
-  wrap.appendChild(h("h3",{style:{fontSize:"13px",fontWeight:"600",margin:"0 0 8px"}},["By Door Type"]));
-  const tbl=h("div",{style:{background:"var(--bg2)",border:"1px solid var(--border)",borderRadius:"12px",overflow:"hidden",marginBottom:"16px"}});
-  typeList.forEach(s=>{const row=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 16px",borderBottom:"1px solid var(--border)"}});row.appendChild(h("span",{style:{fontSize:"13px"}},[s.label]));const nums=h("div",{style:{display:"flex",gap:"12px",fontSize:"12px"}});nums.append(h("span",{style:{color:"var(--text2)"}},["Tot ",h("b",{style:{color:"var(--text)"}},[""+s.total])]),h("span",{style:{color:"var(--emerald)"}},["Rdy "+s.ready]),h("span",{style:{color:"var(--orange)"}},["Hold "+s.hold]),h("span",{style:{color:"var(--amber)"}},["Pend "+s.pending]));row.appendChild(nums);tbl.appendChild(row)});
+  if(FA>0) wrap.appendChild(Object.assign(div(''),{innerHTML:`<div style="background:#450a0a;border:1px solid #7f1d1d;border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:#fca5a5">⚠ ${FA} faulty materials — see Installation tab.</div>`}));
+  wrap.appendChild(Object.assign(div(''),{innerHTML:'<h3 style="font-size:13px;font-weight:600;margin-bottom:8px">By Door Type</h3>'}));
+  const tbl=div('');tbl.style.cssText='background:#292524;border:1px solid #44403c;border-radius:12px;overflow:hidden;margin-bottom:16px';
+  Object.values(per).filter(s=>s.total>0).sort((a,b)=>b.total-a.total).forEach(s=>{
+    const row=div('');row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #44403c';
+    row.innerHTML=`<span style="font-size:13px">${s.label}</span><div style="display:flex;gap:12px;font-size:12px"><span style="color:#a8a29e">Tot <b style="color:#e7e5e4">${s.total}</b></span><span style="color:#10b981">Rdy ${s.ready}</span><span style="color:#f97316">Hold ${s.hold}</span><span style="color:#f59e0b">Pend ${s.pending}</span></div>`;
+    tbl.appendChild(row);
+  });
   wrap.appendChild(tbl);
   if(Object.keys(reasons).length){
-    wrap.appendChild(h("h3",{style:{fontSize:"13px",fontWeight:"600",marginBottom:"8px"}},["Why doors are on hold"]));
-    const rg=h("div",{class:"grid2"});Object.entries(reasons).sort((a,b)=>b[1]-a[1]).forEach(([r,n])=>{const row=h("div",{style:{background:"var(--bg2)",border:"1px solid var(--border)",borderRadius:"10px",padding:"10px 14px",display:"flex",justifyContent:"space-between",fontSize:"13px"}});row.appendChild(h("span",{style:{color:"var(--text)"}},[r]));row.appendChild(h("span",{style:{color:"var(--orange)",fontWeight:"600"}},[""+n+" doors"]));rg.appendChild(row)});wrap.appendChild(rg);
+    wrap.appendChild(Object.assign(div(''),{innerHTML:'<h3 style="font-size:13px;font-weight:600;margin-bottom:8px">Why doors are on hold</h3>'}));
+    const rg=div('grid2');
+    Object.entries(reasons).sort((a,b)=>b[1]-a[1]).forEach(([r,n])=>{
+      const row=div('');row.style.cssText='background:#292524;border:1px solid #44403c;border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;font-size:13px';
+      row.innerHTML=`<span>${r}</span><span style="color:#f97316;font-weight:600">${n} doors</span>`;rg.appendChild(row);
+    });
+    wrap.appendChild(rg);
   }
   return wrap;
 }
@@ -919,64 +1023,71 @@ function renderDashboard(){
 // ── followups ──
 function getFollowups(){
   const rows=[];
-  projects.forEach(p=>p.floors.forEach(f=>(f.doors||[]).forEach(raw=>{const c=gd(raw);if(c.holdQty>0)rows.push({id:p.id+f.id+c.id,project:p.name,builder:p.builder,floor:f.name,type:c.label,qty:c.holdQty,reason:c.holdReason||"—",date:c.promisedDate,notes:c.notes})})));
-  return rows.sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999"));
+  projects.forEach(p=>p.floors.forEach(f=>f.doors.forEach(raw=>{
+    const c=normDoor(raw);if(c.holdQty>0) rows.push({id:p.id+f.id+c.id,project:p.name,builder:p.builder,floor:f.name,type:c.label,qty:c.holdQty,reason:c.holdReason||'—',date:c.promisedDate,notes:c.notes});
+  })));
+  return rows.sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
 }
 function renderFollowups(){
-  const rows=getFollowups();const wrap=h("div");
-  if(!rows.length){wrap.appendChild(h("div",{class:"empty"},["No doors on hold. Everything is clear! ✅"]));return wrap}
-  wrap.appendChild(h("p",{style:{fontSize:"13px",color:"var(--text2)",marginBottom:"12px"}},["All held doors — chase the builder to finish this work, then mark them Ready."]));
+  const rows=getFollowups();const wrap=div('');
+  if(!rows.length){wrap.appendChild(div('empty','No doors on hold. Everything is clear! ✅'));return wrap;}
+  wrap.appendChild(Object.assign(div(''),{innerHTML:'<p style="font-size:13px;color:#a8a29e;margin-bottom:12px">All held doors — chase the builder to finish this work, then mark them Ready.</p>'}));
   rows.forEach(r=>{
-    const row=h("div",{class:"followup-row"});
-    const top=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}});
-    const info=h("div");info.appendChild(h("p",{style:{fontSize:"13px",fontWeight:"600"}},[r.type," ",h("span",{style:{color:"var(--orange)"}},["×"+r.qty])]));info.appendChild(h("p",{style:{fontSize:"12px",color:"var(--text2)"}},[r.project+" · "+r.floor]));top.appendChild(info);
-    top.appendChild(h("span",{class:"tag tag-orange"},[r.reason]));row.appendChild(top);
-    if(r.date||r.notes){const bot=h("div",{style:{display:"flex",gap:"16px",marginTop:"6px",fontSize:"12px",color:"var(--text2)"}});if(r.date)bot.appendChild(h("span",{},["📅 Promised "+fmtDate(r.date)]));if(r.notes)bot.appendChild(h("em",{},['"'+r.notes+'"']));row.appendChild(bot)}
+    const row=div('followup-row');
+    row.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div><p style="font-size:13px;font-weight:600">${r.type} <span style="color:#f97316">×${r.qty}</span></p><p style="font-size:12px;color:#a8a29e">${r.project} · ${r.floor}</p></div>
+      <span class="tag" style="background:#431407;color:#fb923c">${r.reason}</span>
+    </div>
+    ${r.date||r.notes?`<div style="display:flex;gap:16px;margin-top:6px;font-size:12px;color:#78716c">${r.date?`<span>📅 Promised ${fmtDate(r.date)}</span>`:''}${r.notes?`<em>"${r.notes}"</em>`:''}</div>`:''}`;
     wrap.appendChild(row);
   });
   return wrap;
 }
 
 // ── certificate ──
-function renderCertificate(project){
+function renderCert(project){
   let gO=0,gI=0,gH=0;
-  const log=project.dailyLog||[];const wdays=new Set(log.map(e=>e.date).filter(Boolean)).size;
+  const log=project.dailyLog||[];
+  const wdays=new Set(log.map(e=>e.date).filter(Boolean)).size;
   const floorData=project.floors.map(f=>{
-    const rows=(f.doors||[]).map(gd).filter(c=>c.total>0).map(c=>{const inst=Math.min(c.doorsInstalled,c.readyQty),handed=Math.min(c.handoverQty,inst);return{label:c.label,ordered:c.total,installed:inst,handed}});
-    rows.forEach(r=>{gO+=r.ordered;gI+=r.installed;gH+=r.handed});
+    const rows=f.doors.map(normDoor).filter(c=>c.total>0).map(c=>{
+      const inst=Math.min(c.doorsInstalled,c.readyQty),handed=Math.min(c.handoverQty,inst);
+      gO+=c.total;gI+=inst;gH+=handed;
+      return{label:c.label,ordered:c.total,installed:inst,handed};
+    });
     return{name:f.name,date:f.handoverDate,acceptedBy:f.acceptedBy,rows};
   }).filter(f=>f.rows.length>0);
   const nc=normContacts(project.contacts);
-  const overlay=h("div",{class:"cert-overlay"});overlay.onclick=()=>{certId=null;render()};
-  const noprt=h("div",{class:"cert-no-print"});
-  const pb=h("button",{class:"btn",style:{background:"var(--violet-bg)",color:"var(--violet)"}});pb.appendChild(icon("printer",16));pb.appendChild(document.createTextNode(" Print / Save PDF"));pb.onclick=()=>window.print();noprt.appendChild(pb);
-  const cb=h("button",{class:"btn btn-ghost"});cb.appendChild(icon("x",16));cb.appendChild(document.createTextNode(" Close"));cb.onclick=()=>{certId=null;render()};noprt.appendChild(cb);
-  overlay.appendChild(noprt);
-  const paper=h("div",{class:"cert-paper",style:{fontFamily:"Georgia,serif"}});paper.onclick=e=>e.stopPropagation();
+  const bg=div('cert-bg');bg.onclick=()=>{certId=null;render();};
+  const actions=div('cert-actions');
+  const pb=btn('btn','🖨 Print / Save PDF',()=>window.print());pb.style.cssText='background:#2e1065;color:#8b5cf6;padding:8px 14px;border-radius:8px;font-weight:600';
+  const cb=btn('btn btn-ghost','✕ Close',()=>{certId=null;render();});
+  actions.append(pb,cb);bg.appendChild(actions);
+  const paper=div('cert-paper');paper.onclick=e=>e.stopPropagation();
   paper.innerHTML=`
     <div style="text-align:center;border-bottom:2px solid #1c1917;padding-bottom:16px;margin-bottom:20px">
-      <h1 style="font-size:22px;font-weight:700;letter-spacing:1px;color:#7c5e10">GEETANJALI WOOD CRAFT</h1>
+      <h1 style="font-size:22px;font-weight:700;color:#7c5e10">GEETANJALI WOOD CRAFT</h1>
       <p style="font-size:11px;color:#666">Doors & Interior Fit-outs · Panvel, Raigad, Maharashtra</p>
       <h2 style="font-size:17px;font-weight:600;margin-top:10px">Door Installation & Handover Certificate</h2>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:13px;margin-bottom:20px">
-      <div><b>Project:</b> ${project.name}</div><div><b>Order No:</b> ${project.orderNo||"—"}</div>
-      <div><b>Builder:</b> ${project.builder||"—"}</div><div><b>Location:</b> ${project.location||"—"}</div>
-      <div><b>Certificate date:</b> ${todayStr()}</div>${wdays?`<div><b>Work completed in:</b> ${wdays} working days</div>`:""}
-      ${nc.sitePerson.name?`<div><b>Geetanjali Site Person:</b> ${nc.sitePerson.name}${nc.sitePerson.phone?" ("+nc.sitePerson.phone+")":""}</div>`:""}
-      ${nc.site.name?`<div><b>Site Incharge:</b> ${nc.site.name}${nc.site.phone?" ("+nc.site.phone+")":""}</div>`:""}
+      <div><b>Project:</b> ${project.name}</div><div><b>Order No:</b> ${project.orderNo||'—'}</div>
+      <div><b>Builder:</b> ${project.builder||'—'}</div><div><b>Location:</b> ${project.location||'—'}</div>
+      <div><b>Date:</b> ${todayStr()}</div>${wdays?`<div><b>Working days:</b> ${wdays}</div>`:''}
+      ${nc.sitePerson.name?`<div><b>Site Person:</b> ${nc.sitePerson.name}</div>`:''}
+      ${nc.site.name?`<div><b>Site Incharge:</b> ${nc.site.name}</div>`:''}
     </div>
-    ${floorData.length?floorData.map(f=>`
+    ${floorData.map(f=>`
       <div style="margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;padding-bottom:4px;margin-bottom:4px">
           <b style="font-size:13px">${f.name}</b>
-          <span style="font-size:11px;color:#666">${f.date?`Handover: ${fmtDate(f.date)}`:""}${f.acceptedBy?` · Accepted by: ${f.acceptedBy}`:""}</span>
+          <span style="font-size:11px;color:#666">${f.date?'Handover: '+fmtDate(f.date):''}${f.acceptedBy?' · Accepted by: '+f.acceptedBy:''}</span>
         </div>
         <table style="width:100%;font-size:13px;border-collapse:collapse">
-          <thead><tr style="color:#666;font-size:11px;text-align:left"><th style="padding:3px 0">Door Type</th><th style="padding:3px 0;text-align:center">Ordered</th><th style="padding:3px 0;text-align:center">Installed</th><th style="padding:3px 0;text-align:center">Handed Over</th></tr></thead>
-          <tbody>${f.rows.map(r=>`<tr style="border-top:1px solid #e5e5e5"><td style="padding:3px 0">${r.label}</td><td style="padding:3px 0;text-align:center">${r.ordered}</td><td style="padding:3px 0;text-align:center">${r.installed}</td><td style="padding:3px 0;text-align:center;font-weight:700">${r.handed}</td></tr>`).join("")}</tbody>
+          <thead><tr style="color:#666;font-size:11px"><th style="text-align:left;padding:3px 0">Door Type</th><th style="text-align:center;padding:3px 0">Ordered</th><th style="text-align:center;padding:3px 0">Installed</th><th style="text-align:center;padding:3px 0">Handed Over</th></tr></thead>
+          <tbody>${f.rows.map(r=>`<tr style="border-top:1px solid #eee"><td style="padding:3px 0">${r.label}</td><td style="text-align:center;padding:3px 0">${r.ordered}</td><td style="text-align:center;padding:3px 0">${r.installed}</td><td style="text-align:center;padding:3px 0;font-weight:700">${r.handed}</td></tr>`).join('')}</tbody>
         </table>
-      </div>`).join(""):"<p style='font-size:13px;color:#888;font-style:italic'>No produced doors recorded yet.</p>"}
+      </div>`).join('')}
     <div style="border-top:2px solid #1c1917;padding-top:8px;display:flex;justify-content:space-between;font-size:13px;font-weight:700">
       <span>GRAND TOTAL</span><span>Ordered ${gO} · Installed ${gI} · Handed Over ${gH}</span>
     </div>
@@ -984,9 +1095,8 @@ function renderCertificate(project){
       <div><div style="border-top:1px solid #333;padding-top:4px">For Geetanjali Wood Craft</div><p style="font-size:11px;color:#666;margin-top:4px">Name & Signature / Date</p></div>
       <div><div style="border-top:1px solid #333;padding-top:4px">Client / Builder Representative</div><p style="font-size:11px;color:#666;margin-top:4px">Name & Signature / Date</p></div>
     </div>
-    <p style="font-size:10px;color:#999;margin-top:32px;text-align:center">This certificate confirms the doors listed above have been installed and handed over as recorded.</p>
   `;
-  overlay.appendChild(paper);return overlay;
+  bg.appendChild(paper);return bg;
 }
 
 // ── boot ──
