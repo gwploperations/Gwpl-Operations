@@ -389,7 +389,7 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var db = firebase.database();
 
-var LU='HPGeetanjali', LP='RPGeetanjali', PR='Hardik@1305', PX='GeetanjaliHR';
+var currentQNum='';
 var TIMEOUT=600, remain=600, stInt=null, pwdAction=null, viewId=null;
 var RATES={nf:{'30mm':145,'35mm':150,'40mm':160,'45mm':165},f:{'45mm – 60 mins (IS 3614)':325,'55mm – 120 mins (IS 3614)':425}};
 var TDESC={'30mm':'Standard lightweight','35mm':'Medium density','40mm':'Heavy duty','45mm':'Premium solid','45mm – 60 mins (IS 3614)':'Fire rated · 60 min','55mm – 120 mins (IS 3614)':'Fire rated · 120 min'};
@@ -589,6 +589,7 @@ function saveQ(){
   var gst=Math.round(sub*0.18),grand=sub+gst;
   getNextQNum(function(num){
     var qNum='QT-'+String(num).padStart(4,'0');
+    currentQNum=qNum;
     var id='q_'+Date.now();
     var data={id:id,qNum:qNum,at:new Date().toISOString(),client:c,items:QI,sub:sub,gst:gst,grand:grand};
     db.ref('quotes/'+id).set(data,function(err){
@@ -731,7 +732,7 @@ function saveRates(){
 
 function dlQ(){
   var c=getClient(),date=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-  c.qNum=g('qcnt').getAttribute('data-qnum')||'';
+  c.qNum=currentQNum;
   var sub=0,rows='';
   for(var i=0;i<QI.length;i++){
     var q=QI[i];sub+=q.tot;
