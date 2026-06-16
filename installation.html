@@ -108,10 +108,9 @@ const rel = ts => {
 };
 const emptyContacts = () => CONTACTS.reduce((a,r)=>({...a,[r.key]:{name:'',phone:''}}),{});
 const normContacts  = (c={}) => CONTACTS.reduce((a,r)=>({...a,[r.key]:{name:c?.[r.key]?.name||'',phone:c?.[r.key]?.phone||''}}),{});
-const emptyDoor = (label,frame,custom=false) => ({id:uid(),label,frame,custom,total:0,readyQty:0,holdQty:0,holdReason:'',promisedDate:'',notes:'',framesInstalled:0,doorsInstalled:0,handoverQty:0,faultyQty:0,faultyReason:'',faultyNotes:''});
+const emptyDoor = (label,frame,custom=false) => ({id:uid(),label,frame,custom,total:0,readyQty:0,holdQty:0,holdReason:'',promisedDate:'',notes:'',dispatchedQty:0,dispatchDate:'',arrivedQty:0,arrivalDate:'',noFrameNeeded:false,framesInstalled:0,doorsInstalled:0,handoverQty:0,faultyQty:0,faultyReason:'',faultyNotes:''});
 const emptyFloor = name => ({id:uid(),name,handoverDate:'',acceptedBy:'',doors:STD_DOORS.map(d=>emptyDoor(d.label,d.frame))});
 const normDoor = d => ({...emptyDoor('Door',true),...d});
-
 // ── state ──
 let session=null, loading=true, syncing=false;
 let projects=[], activity=[], adminPin=null, clientPin=null;
@@ -332,6 +331,7 @@ function renderMain(){
   const followups=getFollowups();
   const tabs=[
     {k:'projects',l:'🏗 Projects'},
+    {k:'dispatch',l:'🚚 Dispatch'},
     {k:'install',l:'🔧 Installation'},
     {k:'daily',l:'📅 Daily Log'},
     {k:'hardware',l:'📦 Hardware'},
@@ -361,6 +361,7 @@ function renderMain(){
     else { const p=projects.find(x=>x.id===activeId); if(p) content.appendChild(renderProjectDetail(p)); }
   }
   else if(tab==='install')   content.appendChild(renderInstall());
+  else if(tab==='dispatch')  content.appendChild(renderDispatch());
   else if(tab==='daily')     content.appendChild(renderDaily());
   else if(tab==='hardware')  content.appendChild(renderHardware());
   else if(tab==='handover')  content.appendChild(renderHandover());
@@ -684,6 +685,57 @@ function renderPinModal(isClient){
   bg.appendChild(box);return bg;
 }
 
+// ── dispatch tab ──
+let dispatchSel=null;
+function renderDispatch(){
+  const wrap=div('');
+  if(!projects.length){wrap.appendChild(div('empty','Add a project first.'));return wrap;}
+  if(!dispatchSel||!projects.find(p=>p.id===dispatchSel)){
+    wrap.innerHTML='<h2 style="font-size:15px;font-weight:600;margin-bottom:4px">Dispatch & Arrival</h2><p style="font-size:12px;color:#a8a29e;margin-bottom:16px">Track doors leaving the factory and arriving at site.</p>';
+    const grid=div('grid2');
+    projects.forEach(p=>{
+      let rd=0,dis=0,arr=0;
+      p.floors.forEach(f=>f.doors.forEach(raw=>{const c=normDoor(raw);rd+=c.readyQty;dis+=Math.min(c.dispatchedQty,c.readyQty);arr+=Math.min(c.arrivedQty,c.readyQty);}));
+      const pct=rd?Math.round(arr/rd*100):0;
+      const card=div('card card-hover');card.onclick=()=>{dispatchSel=p.id;render();};
+      card.innerHTML=`<div style="font-weight:600">${p.name}</div><div style="font-size:12px;color:#a8a29e">${p.builder||''}</div>
+      <div class="progress"><div class="progress-fill" style="width:${pct}%;background:#38bdf8"></div></div>
+      <div style="font-size:12px;color:#a8a29e">Dispatched ${dis}/${rd} · Arrived ${arr}/${rd}</div>`;
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);return wrap;
+  }
+  const project=projects.find(p=>p.id===dispatchSel);
+  const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{dispatchSel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
+  wrap.innerHTML+=`<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">${project.name} — Dispatch & Arrival</h2>`;
+  project.floors.forEach(f=>{
+    const fc=div('floor-card');
+    fc.innerHTML=`<div class="floor-head"><span style="font-weight:600;color:#f59e0b">${f.name}</span></div>`;
+    const ordered=f.doors.map(normDoor).filter(d=>d.total>0);
+    if(!ordered.length){fc.innerHTML+='<div style="padding:12px 16px;font-size:12px;color:#78716c">No doors ordered yet.</div>';}
+    else ordered.forEach(d=>{
+      const produced=d.readyQty||0;
+      const row=div('door-row');
+      if(!produced){row.innerHTML=`<div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:#78716c">${d.label}</span><span style="font-size:12px;color:#78716c">Not produced yet</span></div>`;fc.appendChild(row);return;}
+      const disQ=Math.min(d.dispatchedQty,produced),arrQ=Math.min(d.arrivedQty,produced);
+      const setF=(field,val)=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,doors:fl.doors.map(dd=>dd.id===d.id?{...normDoor(dd),[field]:val}:dd)}:fl)}));
+      const top=div('');top.style.cssText='display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px';
+      top.innerHTML=`<span style="font-size:13px;font-weight:500;width:120px">${d.label}</span>`;
+      const cols=div('');cols.style.cssText='display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px';
+      const dc=div('');dc.style.textAlign='center';dc.innerHTML=`<div style="color:#78716c;font-size:11px;margin-bottom:3px">Dispatched ${disQ}/${produced}</div>`;dc.appendChild(makeStepper(disQ,v=>setF('dispatchedQty',v),'#38bdf8',produced));cols.appendChild(dc);
+      const ac=div('');ac.style.textAlign='center';ac.innerHTML=`<div style="color:#78716c;font-size:11px;margin-bottom:3px">Arrived ${arrQ}/${produced}</div>`;ac.appendChild(makeStepper(arrQ,v=>setF('arrivedQty',v),'#10b981',produced));cols.appendChild(ac);
+      top.appendChild(cols);row.appendChild(top);
+      const dateRow=div('');dateRow.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px';
+      const ddl=el('label');ddl.innerHTML='<span style="font-size:11px">Dispatch date</span>';const ddi=el('input');ddi.type='date';ddi.value=d.dispatchDate||'';ddi.onchange=e=>setF('dispatchDate',e.target.value);ddl.appendChild(ddi);dateRow.appendChild(ddl);
+      const adl=el('label');adl.innerHTML='<span style="font-size:11px">Arrival date</span>';const adi=el('input');adi.type='date';adi.value=d.arrivalDate||'';adi.onchange=e=>setF('arrivalDate',e.target.value);adl.appendChild(adi);dateRow.appendChild(adl);
+      row.appendChild(dateRow);
+      fc.appendChild(row);
+    });
+    wrap.appendChild(fc);
+  });
+  return wrap;
+}
+
 // ── install tab ──
 function renderInstall(){
   const wrap=div('');
@@ -713,21 +765,32 @@ function renderInstall(){
     f.doors.forEach(d=>{const c=normDoor(d);dt+=c.readyQty;di+=Math.min(c.doorsInstalled,c.readyQty);fa+=c.faultyQty||0;});
     const pct=dt?Math.round(di/dt*100):0;
     const fc=div('floor-card');
-    fc.innerHTML=`<div class="floor-head"><span style="font-weight:600;color:#f59e0b">${f.name}</span><span style="font-size:12px;color:#10b981">${di}/${dt} · ${pct}%${fa>0?` <span style="color:#ef4444">⚠${fa}</span>`:''}</span></div>`;
-    const ordered=f.doors.map(normDoor).filter(d=>d.total>0);
+    fc.innerHTML=`<div class="floor-head"><span style="font-weight:600;color:#f59e0b">${f.name}</span><span style="font-size:12px;color:#10b981">${di}/${dt} · ${pct}%${fa>0?` <span style="color:#ef4444">⚠${fa}</span>`:''}</span></div>`;    const ordered=f.doors.map(normDoor).filter(d=>d.total>0);
     if(!ordered.length){fc.innerHTML+='<div style="padding:12px 16px;font-size:12px;color:#78716c">No doors ordered yet.</div>';} 
     else ordered.forEach(d=>{
       const produced=d.readyQty||0;
       const row=div('door-row');
       if(!produced){row.innerHTML=`<div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:#78716c">${d.label}</span><span style="font-size:12px;color:#78716c">Not produced yet</span></div>`;fc.appendChild(row);return;}
       const fi2=Math.min(d.framesInstalled,produced),di2=Math.min(d.doorsInstalled,produced),faulty=d.faultyQty||0;
-      const done=di2>=produced&&(!d.frame||fi2>=produced),started=di2>0||fi2>0;
+      const frameOK = d.noFrameNeeded || !d.frame || fi2>=produced;
+      const done=di2>=produced&&frameOK,started=di2>0||fi2>0;
       const chip=done?['#022c22','#10b981','Installed']:started?['#451a03','#f59e0b','In progress']:['#44403c','#a8a29e','Not started'];
       const top=div('');top.style.cssText='display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px';
       top.innerHTML=`<span style="font-size:13px;font-weight:500;width:120px">${d.label}</span>`;
       const cols=div('');cols.style.cssText='display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px';
       const setF=(field,val)=>updateProject(project.id,p=>({...p,floors:p.floors.map(fl=>fl.id===f.id?{...fl,doors:fl.doors.map(dd=>dd.id===d.id?{...normDoor(dd),[field]:val}:dd)}:fl)}));
-      if(d.frame){const c=div('');c.style.textAlign='center';c.innerHTML=`<div style="color:#78716c;font-size:11px;margin-bottom:3px">Frames ${fi2}/${produced}</div>`;c.appendChild(makeStepper(fi2,v=>setF('framesInstalled',v),'#38bdf8',produced));cols.appendChild(c);}
+      if(d.frame){
+        const c=div('');c.style.textAlign='center';
+        const noFrameLabel=d.noFrameNeeded?'<span style="color:#78716c">No frame needed</span>':`Frames ${fi2}/${produced}`;
+        c.innerHTML=`<div style="color:#78716c;font-size:11px;margin-bottom:3px">${noFrameLabel}</div>`;
+        if(!d.noFrameNeeded) c.appendChild(makeStepper(fi2,v=>setF('framesInstalled',v),'#38bdf8',produced));
+        cols.appendChild(c);
+        const nfWrap=div('');nfWrap.style.cssText='display:flex;align-items:center;gap:4px;font-size:11px;color:#a8a29e';
+        const nfCb=el('input');nfCb.type='checkbox';nfCb.checked=!!d.noFrameNeeded;nfCb.style.width='auto';
+        nfCb.onchange=e=>setF('noFrameNeeded',e.target.checked);
+        const nfLbl=el('label');nfLbl.style.cssText='display:flex;align-items:center;gap:4px;cursor:pointer';nfLbl.append(nfCb,document.createTextNode('No frame'));
+        cols.appendChild(nfLbl);
+      }
       const dc=div('');dc.style.textAlign='center';dc.innerHTML=`<div style="color:#78716c;font-size:11px;margin-bottom:3px">Doors ${di2}/${produced}</div>`;dc.appendChild(makeStepper(di2,v=>setF('doorsInstalled',v),'#10b981',produced));cols.appendChild(dc);
       const fc2=div('');fc2.style.textAlign='center';fc2.innerHTML=`<div style="color:#ef4444;font-size:11px;margin-bottom:3px">Faulty</div>`;fc2.appendChild(makeStepper(faulty,v=>setF('faultyQty',v),'#ef4444'));cols.appendChild(fc2);
       const chipEl=div('');chipEl.style.cssText=`font-size:11px;padding:3px 8px;border-radius:6px;background:${chip[0]};color:${chip[1]}`;chipEl.textContent=chip[2];cols.appendChild(chipEl);
@@ -1002,7 +1065,7 @@ function renderDashboard(){
     T+=c.total;R+=c.readyQty;H+=c.holdQty;P+=pend;FA+=c.faultyQty||0;
     if(c.holdQty>0&&c.holdReason) reasons[c.holdReason]=(reasons[c.holdReason]||0)+c.holdQty;
     DT+=c.readyQty;DI+=Math.min(c.doorsInstalled,c.readyQty);HD+=Math.min(c.handoverQty,Math.min(c.doorsInstalled,c.readyQty));
-    if(c.frame){FT+=c.readyQty;FI+=Math.min(c.framesInstalled,c.readyQty);}
+    if(c.frame&&!c.noFrameNeeded){FT+=c.readyQty;FI+=Math.min(c.framesInstalled,c.readyQty);}
     if(!per[c.label])per[c.label]={label:c.label,total:0,ready:0,hold:0,pending:0};
     per[c.label].total+=c.total;per[c.label].ready+=c.readyQty;per[c.label].hold+=c.holdQty;per[c.label].pending+=pend;
   })));
