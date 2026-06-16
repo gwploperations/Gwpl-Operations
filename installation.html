@@ -79,9 +79,11 @@ const sb   = createClient(URL_, KEY);
 
 // ── constants ──
 const STD_DOORS = [
-  {label:'Main Door',frame:true},{label:'Common Bedroom',frame:true},
-  {label:'Master Bedroom',frame:true},{label:'Common Bathroom',frame:false},
-  {label:'Master Bathroom',frame:false},{label:'Staircase Door',frame:true}
+  {label:'Main Door',frame:true},
+  {label:'Bedroom Door',frame:true},
+  {label:'Bathroom Door',frame:true},
+  {label:'Fire Door',frame:true},
+  {label:'Refuge Door',frame:true}
 ];
 const HOLD_REASONS = ['Gypsum incomplete','Tiling incomplete','Frame not ready','Material not given','Other'];
 const FAULT_REASONS= ['Damaged in transit','Wrong size','Manufacturing defect','Poor finish / polish','Broken on site','Warped / bent','Other'];
@@ -519,9 +521,9 @@ function renderProjectDetail(project){
       ${nc[r.key].phone?`<a href="tel:${nc[r.key].phone}" style="font-size:11px;color:#10b981;text-decoration:none">📞 Call</a>`:''}
     </div>`;
     const ni=el('input');ni.placeholder='Name';ni.value=nc[r.key].name;ni.style.marginBottom='6px';
-    ni.oninput=e=>updateProject(project.id,p=>{const cc2=normContacts(p.contacts);return{...p,contacts:{...cc2,[r.key]:{...cc2[r.key],name:e.target.value}}};});
+    ni.onblur=e=>updateProject(project.id,p=>{const cc2=normContacts(p.contacts);return{...p,contacts:{...cc2,[r.key]:{...cc2[r.key],name:e.target.value}}};});
     const pi=el('input');pi.placeholder='Mobile';pi.type='tel';pi.value=nc[r.key].phone;
-    pi.oninput=e=>updateProject(project.id,p=>{const cc2=normContacts(p.contacts);return{...p,contacts:{...cc2,[r.key]:{...cc2[r.key],phone:e.target.value}}};});
+    pi.onblur=e=>updateProject(project.id,p=>{const cc2=normContacts(p.contacts);return{...p,contacts:{...cc2,[r.key]:{...cc2[r.key],phone:e.target.value}}};});
     cd.append(ni,pi);cg.appendChild(cd);
   });
   cc.appendChild(cg);wrap.appendChild(cc);
@@ -703,6 +705,7 @@ function renderInstall(){
     wrap.appendChild(grid);return wrap;
   }
   const project=projects.find(p=>p.id===installSel);
+  if(!project){installSel=null;return renderInstall();}
   const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{installSel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
   wrap.innerHTML+=`<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">${project.name} — Installation</h2>`;
   project.floors.forEach(f=>{
@@ -733,7 +736,9 @@ function renderInstall(){
         const fp=div('fault-grid');
         const sr=el('select');sr.innerHTML='<option value="">Faulty reason…</option>'+FAULT_REASONS.map(r=>`<option value="${r}"${r===d.faultyReason?' selected':''}>${r}</option>`).join('');
         sr.onchange=e=>setF('faultyReason',e.target.value);
-        const nr=el('input');nr.placeholder='Faulty notes…';nr.value=d.faultyNotes||'';nr.oninput=e=>setF('faultyNotes',e.target.value);
+        const nr=el('input');nr.placeholder='Faulty notes…';nr.value=d.faultyNotes||'';
+        nr.onblur=e=>setF('faultyNotes',e.target.value);
+        nr.onkeydown=e=>{if(e.key==='Enter')setF('faultyNotes',e.target.value);};
         fp.append(sr,nr);row.appendChild(fp);
       }
       fc.appendChild(row);
@@ -792,7 +797,7 @@ function renderDaily(){
   const fl=el('label');fl.innerHTML='<span>Frames</span>';const fi=el('input');fi.type='number';fi.placeholder='0';fi.oninput=e=>eFrames=e.target.value;fl.appendChild(fi);eg.appendChild(fl);
   const dol=el('label');dol.innerHTML='<span>Doors</span>';const doi=el('input');doi.type='number';doi.placeholder='0';doi.oninput=e=>eDoors=e.target.value;dol.appendChild(doi);eg.appendChild(dol);
   ae.appendChild(eg);
-  const ni=el('input');ni.placeholder='Notes (optional)';ni.style.marginBottom='10px';ni.oninput=e=>eNotes=e.target.value;ae.appendChild(ni);
+  const ni=el('input');ni.placeholder='Notes (optional)';ni.style.marginBottom='10px';ni.onblur=e=>eNotes=e.target.value;ae.appendChild(ni);
   ae.appendChild(btn('btn btn-amber','Add Entry',()=>{
     if(!eDate) return;
     updateProject(project.id,p=>({...p,dailyLog:[...(p.dailyLog||[]),{id:uid(),date:eDate,labour:num(eLabour),frames:num(eFrames),doors:num(eDoors),notes:eNotes.trim()}]}));
@@ -816,7 +821,7 @@ function renderDaily(){
     const mkC=(lbl,c,field,val)=>{const c2=div('');c2.style.textAlign='center';c2.innerHTML=`<div style="color:${c};font-size:11px;margin-bottom:3px">${lbl}</div>`;c2.appendChild(makeStepper(val,v=>updateProject(project.id,p=>({...p,dailyLog:(p.dailyLog||[]).map(x=>x.id===e.id?{...x,[field]:v}:x)})),c));return c2;};
     cols.append(mkC('Labour','#a78bfa','labour',e.labour||0),mkC('Frames','#38bdf8','frames',e.frames||0),mkC('Doors','#10b981','doors',e.doors||0));
     const nn=el('input');nn.placeholder='Notes…';nn.value=e.notes||'';nn.style.flex='1';nn.style.minWidth='120px';
-    nn.oninput=ev=>updateProject(project.id,p=>({...p,dailyLog:(p.dailyLog||[]).map(x=>x.id===e.id?{...x,notes:ev.target.value}:x)}));
+    nn.onblur=ev=>updateProject(project.id,p=>({...p,dailyLog:(p.dailyLog||[]).map(x=>x.id===e.id?{...x,notes:ev.target.value}:x)}));
     cols.appendChild(nn);row.appendChild(cols);wrap.appendChild(row);
   });
   return wrap;
@@ -856,14 +861,16 @@ function renderHardware(){
   const ae=div('card');ae.innerHTML='<div style="font-weight:600;margin-bottom:10px">＋ Add hardware sent to site</div>';
   const eg=div('grid4');eg.style.marginBottom='8px';
   let hItem='',hQty='',hStatus='Sent',hDate=today(),hNotes='';
-  const il=el('label');il.innerHTML='<span>Item</span>';const ii=el('input');ii.placeholder='e.g. Hinges';ii.list='hw-list';ii.oninput=e=>hItem=e.target.value;
-  const dl2=el('datalist');dl2.id='hw-list';HW_ITEMS.forEach(i=>{const o=el('option');o.value=i;dl2.appendChild(o);});
-  il.append(ii,dl2);eg.appendChild(il);
+  const il=el('label');il.innerHTML='<span>Item</span>';
+  const ii=el('input');ii.placeholder='e.g. Hinges';ii.setAttribute('list','hw-items2');ii.oninput=e=>hItem=e.target.value;
+  il.appendChild(ii);eg.appendChild(il);
+  const dl2=el('datalist');dl2.id='hw-items2';HW_ITEMS.forEach(i=>{const o=el('option');o.value=i;dl2.appendChild(o);});
+  ae.appendChild(dl2);
   const ql=el('label');ql.innerHTML='<span>Qty</span>';const qi=el('input');qi.type='number';qi.placeholder='0';qi.oninput=e=>hQty=e.target.value;ql.appendChild(qi);eg.appendChild(ql);
   const sl=el('label');sl.innerHTML='<span>Status</span>';const ss=el('select');ss.innerHTML=HW_STATUS.map(s=>`<option value="${s}">${s}</option>`).join('');ss.onchange=e=>hStatus=e.target.value;sl.appendChild(ss);eg.appendChild(sl);
   const dtl=el('label');dtl.innerHTML='<span>Date</span>';const dti=el('input');dti.type='date';dti.value=hDate;dti.onchange=e=>hDate=e.target.value;dtl.appendChild(dti);eg.appendChild(dtl);
   ae.appendChild(eg);
-  const hn=el('input');hn.placeholder='Notes (optional)';hn.style.marginBottom='10px';hn.oninput=e=>hNotes=e.target.value;ae.appendChild(hn);
+  const hn=el('input');hn.placeholder='Notes (optional)';hn.style.marginBottom='10px';hn.onblur=e=>hNotes=e.target.value;ae.appendChild(hn);
   ae.appendChild(btn('btn btn-amber','Add Hardware',()=>{
     if(!hItem.trim()) return;
     updateProject(project.id,p=>({...p,hardwareLog:[...(p.hardwareLog||[]),{id:uid(),item:hItem.trim(),qty:num(hQty),status:hStatus,sentDate:hDate,recvDate:hStatus==='Received'?hDate:'',notes:hNotes.trim()}]}));
@@ -889,7 +896,7 @@ function renderHardware(){
     hg.append(mkHL('Qty','number',h.qty||0,v=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===h.id?{...x,qty:num(v)}:x)}))),sl2,mkHL('Sent','date',h.sentDate,v=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===h.id?{...x,sentDate:v}:x)}))),mkHL('Received','date',h.recvDate,v=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===h.id?{...x,recvDate:v}:x)}))));
     row.appendChild(hg);
     const nn=el('input');nn.placeholder='Notes…';nn.value=h.notes||'';nn.style.marginTop='6px';
-    nn.oninput=e=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===h.id?{...x,notes:e.target.value}:x)}));
+    nn.onblur=e=>updateProject(project.id,p=>({...p,hardwareLog:(p.hardwareLog||[]).map(x=>x.id===h.id?{...x,notes:e.target.value}:x)}));
     row.appendChild(nn);wrap.appendChild(row);
   });
   return wrap;
