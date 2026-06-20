@@ -185,6 +185,7 @@
   .req .av{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;color:#000;background:var(--gold)}
   .req .info{flex:1;min-width:0}.req .info b{display:block}.req .info span{color:var(--mut);font-size:12.5px}
   .req .ok{background:var(--in);color:#04240f;border:none;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer;font-size:13px}
+  .req .ok:disabled{opacity:.6;cursor:default}
   .req .tag{font-size:12px;color:var(--in);font-weight:600}.req .tag.adm{color:var(--gold)}
   footer{padding:70px 0 60px;border-top:1px solid var(--line);background:var(--bg)}
   .fgrid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;align-items:flex-end}
@@ -344,10 +345,12 @@
         <button class="mbtn mbtn-dmg" id="mDmg">⚠ Damaged</button>
         <button class="mbtn mbtn-add" id="mAdd">+ Receive</button>
       </div>
-      <div class="sect-h" style="margin-top:14px">Note — where used / damage detail (optional)</div>
-      <input class="noteinput" id="mNote" placeholder="e.g. Lodha Park Flat 1204 main door / edge chipped in transit">
-      <div class="sect-h" style="margin-top:22px">Or set exact count</div>
-      <div class="mset"><input id="mqty" type="number" min="0"><button class="save" id="msave">Set count</button></div>
+      <div class="sect-h" style="margin-top:14px">Note — where used / damage detail / where received</div>
+      <input class="noteinput" id="mNote" placeholder="e.g. Lodha Park Flat 1204 main door / edge chipped in transit / GRN-2231 from Merino">
+      <div id="setCountBlock" style="display:none">
+        <div class="sect-h" style="margin-top:22px">Admin correction · set exact count (note required)</div>
+        <div class="mset"><input id="mqty" type="number" min="0"><button class="save" id="msave">Set count</button></div>
+      </div>
     </div>
   </div>
 </div>
@@ -367,7 +370,6 @@
 const SB_URL = 'https://sfarouhatchycctrllya.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmYXJvdWhhdGNoeWNjdHJsbHlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5MzM1NTYsImV4cCI6MjA5NzUwOTU1Nn0.etjkeIzjtlst1KMSl2_00Ew73FhCQOINAG2Lhlmtxjc';
 const sb = window.supabase.createClient(SB_URL, SB_KEY);
-
 const RAW=[
 {n:"5647",t:0.8,s:"8×4",q:1},{n:"5345",t:1,s:"8×4",q:22},{n:"5753",t:1,s:"8×4",q:51},
 {n:"149995",t:1,s:"8×4",q:10},{n:"5774",t:1,s:"8×4",q:238},{n:"5049",t:1,s:"8×4",q:5},
@@ -495,19 +497,23 @@ async function route(session){
   const u=session.user;
   const nm=(u.user_metadata&&u.user_metadata.name)?u.user_metadata.name:u.email;
   try{await sb.rpc('gwpl_ensure_member',{p_name:nm,p_email:u.email});}catch(e){}
-  const {data:mem}=await sb.from('gwpl_members').select('*').eq('id',u.id).maybeSingle();
+  const {data:mem,error:memErr}=await sb.from('gwpl_members').select('*').eq('id',u.id).maybeSingle();
+  if(memErr){console.error('member fetch failed',memErr);return;} // transient: keep current screen, don't flip to gate/pending
   me=mem;myName=(mem&&mem.name)||nm;
   $('#tbName').textContent=myName;
   if(mem&&mem.is_admin){$('#adminBtn').style.display='flex';refreshRequests();}
   if(mem&&mem.approved){showScreen('app');if(!appStarted){appStarted=true;startApp();}}
-  else{
-    const rej=mem&&mem.rejected;
+  else if(mem){
+    const rej=mem.rejected;
     try{document.querySelector('.pendcard h2').textContent=rej?'Access declined':'Awaiting approval';}catch(e){}
     $('#pendText').textContent=rej?'Your access request was declined by the admin. If you think this is a mistake, please contact them.':"Your account is created. You'll be able to view and update stock once the admin approves your access.";
     showScreen('pending');
   }
+  // if mem is null (no row yet / transient), keep current screen instead of flipping to pending
 }
-sb.auth.onAuthStateChange((_e,session)=>route(session));
+// Defer route() out of the auth callback — awaiting Supabase calls directly inside
+// onAuthStateChange can deadlock on page load and leave the topbar hidden.
+sb.auth.onAuthStateChange((_e,session)=>{setTimeout(()=>route(session),0);});
 (async()=>{const {data:{session}}=await sb.auth.getSession();route(session);})();
 async function refreshRequests(){
   const {data}=await sb.from('gwpl_members').select('*').order('created_at',{ascending:false});
@@ -523,8 +529,9 @@ async function refreshRequests(){
     return `<div class="req"><span class="av" style="background:${avColor(m.name)}">${esc((m.name||'?')[0]).toUpperCase()}</span><div class="info"><b>${esc(m.name||'—')}</b><span>${esc(m.email||'')}</span></div>${right}</div>`;
   }).join('')||'<div style="color:var(--mut);font-size:13px">No accounts yet.</div>';
   $('#reqList button[data-act]').forEach(b=>b.onclick=async()=>{
-    const reject=b.dataset.act==='reject';b.textContent='…';
-    await sb.from('gwpl_members').update(reject?{rejected:true,approved:false}:{approved:true,rejected:false}).eq('id',b.dataset.id);
+    const act=b.dataset.act;const label=b.textContent;b.textContent='…';b.disabled=true;
+    const {error}=await sb.rpc('gwpl_set_member_status',{p_id:b.dataset.id,p_action:act});
+    if(error){alert('Could not '+act+': '+error.message+'\n\nIf this says "function does not exist", run the gwpl_set_member_status SQL in Supabase first.');b.disabled=false;b.textContent=label;return;}
     refreshRequests();
   });
 }
@@ -564,8 +571,8 @@ function subscribe(){
     }).subscribe();
 }
 async function applyChange(id,act,n,note){
-  if((act==='use'||act==='damage')&&String(note||'').replace(/\s/g,'').length<4){
-    alert('Please add a note with more than 3 letters describing '+(act==='damage'?'how it was damaged.':'where it was used.'));
+  if((act==='use'||act==='damage'||act==='add'||act==='set')&&String(note||'').replace(/\s/g,'').length<4){
+    alert('Please add a note (more than 3 letters) — '+(act==='damage'?'how it was damaged.':act==='add'?'where the stock came from.':act==='set'?'why you are correcting the count.':'where it was used.'));
     return false;
   }
   const d=RAW[id],from=d.q;
@@ -629,7 +636,7 @@ function renderSpot(){
         <button class="mbtn mbtn-dmg" data-act="damage">⚠ Damaged</button>
         <button class="mbtn mbtn-add" data-act="add">+ Receive</button>
       </div>
-      <input class="noteinput" id="spotNote" placeholder="Note — where used / damage detail (optional)">
+      <input class="noteinput" id="spotNote" placeholder="Note — where used / damage detail / where received">
     </div>`;
   $('#spotview').querySelectorAll('.moverow button').forEach(b=>b.onclick=()=>{const n=Math.max(1,parseInt($('#spotN').value)||1);applyChange(spotId,b.dataset.act,n,$('#spotNote').value.trim());});
 }
@@ -690,6 +697,7 @@ function openModal(id){
   const ms=$('#mst');ms.textContent=stLabel[st];ms.style.background=stSoft[st];ms.style.color=stColor[st];
   $('#mupd').innerHTML=d.ts?`Last updated <b>${ago(d.ts)}</b> by <b>${esc(d.by)}</b> · ${abst(d.ts)}${d.note?`<br>Note: “${esc(d.note)}”`:''}`:'No movements recorded yet.';
   $('#mMove').value=1;$('#mNote').value='';$('#mqty').value=d.q;
+  $('#setCountBlock').style.display=(me&&me.is_admin)?'':'none'; // set-count is an admin-only correction tool
   const sv=$('#msave');sv.textContent='Set count';sv.classList.remove('done');
   $('#ov').classList.add('show');
 }
