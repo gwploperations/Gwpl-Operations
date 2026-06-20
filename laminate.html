@@ -104,7 +104,6 @@
   .mbtn-use:hover,.mbtn-dmg:hover{filter:brightness(1.1)}.mbtn-add:hover{border-color:var(--in)!important;color:var(--in)}
   .noteinput{width:100%;margin-top:11px;background:#000;border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:11px 14px;font-size:14px;outline:none;font-family:var(--sans)}
   .noteinput:focus{border-color:var(--gold)}
-  .noteerr{color:var(--out);font-size:12.5px;margin-top:8px;display:none}
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:22px}
   .stat{position:relative;background:var(--glass);border:1px solid var(--line);border-radius:20px;padding:30px 26px;overflow:hidden}
   .stat::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 100% 0,var(--c),transparent 60%);opacity:.16}
@@ -177,7 +176,6 @@
   .mupd{font-size:13px;color:var(--mut);margin-bottom:18px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:11px;padding:11px 13px}
   .mupd b{color:var(--ink)}
   .sect-h{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin:6px 0 11px}
-  .sect-h b{color:var(--out)}
   .mset{display:flex;align-items:center;gap:12px}
   .mset input{flex:1;background:#000;border:1px solid var(--line);border-radius:13px;color:var(--ink);font-family:var(--serif);font-size:22px;padding:11px 14px;outline:none}
   .mset .save{padding:13px 22px;border:none;border-radius:13px;cursor:pointer;font-size:14px;font-weight:600;background:linear-gradient(105deg,var(--gold2),var(--gold));color:#1a1206}
@@ -187,8 +185,7 @@
   .req .av{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;color:#000;background:var(--gold)}
   .req .info{flex:1;min-width:0}.req .info b{display:block}.req .info span{color:var(--mut);font-size:12.5px}
   .req .ok{background:var(--in);color:#04240f;border:none;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer;font-size:13px}
-  .req .no{background:rgba(255,77,99,.12);color:var(--out);border:1px solid rgba(255,77,99,.3);border-radius:10px;padding:8px 14px;font-weight:600;cursor:pointer;font-size:13px}
-  .req .tag{font-size:12px;color:var(--in);font-weight:600}.req .tag.adm{color:var(--gold)}.req .tag.rej{color:var(--out)}
+  .req .tag{font-size:12px;color:var(--in);font-weight:600}.req .tag.adm{color:var(--gold)}
   footer{padding:70px 0 60px;border-top:1px solid var(--line);background:var(--bg)}
   .fgrid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;align-items:flex-end}
   .brand{font-family:var(--serif);font-size:26px}.brand b{color:var(--gold)}
@@ -223,7 +220,7 @@
   <div class="pendcard">
     <div class="dot">⏳</div>
     <h2>Awaiting approval</h2>
-    <p id="pendText">Your account is created. You'll be able to view and update stock once the admin approves your access. Please check back shortly.</p>
+    <p id="pendText">Your account is created and verified. You'll be able to view and update stock once the admin approves your access. Please check back shortly.</p>
     <button class="lnk" id="pendLogout">Log out</button>
   </div>
 </div>
@@ -347,9 +344,8 @@
         <button class="mbtn mbtn-dmg" id="mDmg">⚠ Damaged</button>
         <button class="mbtn mbtn-add" id="mAdd">+ Receive</button>
       </div>
-      <div class="sect-h" style="margin-top:14px">Note — where used / damage detail <b>(required for Use &amp; Damaged)</b></div>
+      <div class="sect-h" style="margin-top:14px">Note — where used / damage detail (optional)</div>
       <input class="noteinput" id="mNote" placeholder="e.g. Lodha Park Flat 1204 main door / edge chipped in transit">
-      <div class="noteerr" id="mNoteErr">Please add a note (more than 3 letters) describing where it was used / the damage.</div>
       <div class="sect-h" style="margin-top:22px">Or set exact count</div>
       <div class="mset"><input id="mqty" type="number" min="0"><button class="save" id="msave">Set count</button></div>
     </div>
@@ -362,7 +358,7 @@
         <div style="font-family:var(--serif);font-size:24px">Access Requests</div>
         <button class="x" style="position:static" id="adminX">×</button>
       </div>
-      <p style="color:var(--mut);font-size:13px;margin-bottom:18px">Approve or reject who can view and edit. Unapproved accounts can't see or change anything.</p>
+      <p style="color:var(--mut);font-size:13px;margin-bottom:18px">Approve who can view and edit. Unapproved accounts can't see or change anything.</p>
       <div class="reqlist" id="reqList"></div>
     </div>
   </div>
@@ -451,7 +447,6 @@ function ago(ts){if(!ts)return'never';const s=(Date.now()-ts)/1000;if(s<60)retur
 function abst(ts){return ts?new Date(ts).toLocaleString('en-IN'):'';}
 function esc(x){return String(x==null?'':x).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));}
 function avColor(name){const h=hash(name||'?');return`hsl(${h%360} 60% 60%)`;}
-function noteValid(note){return (note||'').replace(/\s+/g,'').length>3;}
 function swatch(n){
   const h=hash(n),hue=h%360,p=h%6,l=24+(h>>3)%12;
   const a=`hsl(${hue} ${28+(h>>5)%26}% ${l}%)`,b=`hsl(${hue} ${30+(h>>7)%26}% ${l+10}%)`,c=`hsl(${(hue+18)%360} ${24+(h>>9)%20}% ${Math.max(14,l-8)}%)`;
@@ -475,7 +470,7 @@ $('#rgBtn').onclick=async()=>{
   const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name}}});
   $('#rgBtn').disabled=false;$('#rgBtn').textContent='Create account';
   if(error){msg.classList.add('err');msg.textContent=error.message;return;}
-  msg.classList.add('ok');msg.textContent='Account created! You can log in now — your access will be active once the admin approves you.';
+  msg.classList.add('ok');msg.textContent='Account created! Check '+email+' for a verification link, click it, then come back and log in.';
 };
 $('#liBtn').onclick=async()=>{
   const email=$('#liEmail').value.trim(),pass=$('#liPass').value;
@@ -484,7 +479,7 @@ $('#liBtn').onclick=async()=>{
   $('#liBtn').disabled=true;$('#liBtn').textContent='Logging in…';
   const {error}=await sb.auth.signInWithPassword({email,password:pass});
   $('#liBtn').disabled=false;$('#liBtn').textContent='Log in';
-  if(error){msg.classList.add('err');msg.textContent=error.message;}
+  if(error){msg.classList.add('err');msg.textContent=error.message.includes('confirm')?'Please verify your email first (check your inbox), then log in.':error.message;}
 };
 [$('#liPass'),$('#liEmail')].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter')$('#liBtn').click();}));
 $('#rgPass').addEventListener('keydown',e=>{if(e.key==='Enter')$('#rgBtn').click();});
@@ -506,9 +501,9 @@ async function route(session){
   if(mem&&mem.is_admin){$('#adminBtn').style.display='flex';refreshRequests();}
   if(mem&&mem.approved){showScreen('app');if(!appStarted){appStarted=true;startApp();}}
   else{
-    $('#pendText').textContent=(mem&&mem.rejected)
-      ?'Your access request was declined by the admin. Please contact them if you think this is a mistake.'
-      :'Your account is created. You\u2019ll be able to view and update stock once the admin approves your access. Please check back shortly.';
+    const rej=mem&&mem.rejected;
+    try{document.querySelector('.pendcard h2').textContent=rej?'Access declined':'Awaiting approval';}catch(e){}
+    $('#pendText').textContent=rej?'Your access request was declined by the admin. If you think this is a mistake, please contact them.':"Your account is created. You'll be able to view and update stock once the admin approves your access.";
     showScreen('pending');
   }
 }
@@ -523,12 +518,15 @@ async function refreshRequests(){
   $('#reqList').innerHTML=data.map(m=>{
     let right;
     if(m.approved) right=`<span class="tag${m.is_admin?' adm':''}">${m.is_admin?'Admin':'Approved'}</span>`;
-    else if(m.rejected) right=`<span class="tag rej">Declined</span><button class="ok" data-id="${m.id}">Approve</button>`;
-    else right=`<button class="ok" data-id="${m.id}">Approve</button><button class="no" data-id="${m.id}">Reject</button>`;
-    return `<div class="req"><span class="av" style="background:${avColor(m.name)}">${esc((m.name||'?')[0]).toUpperCase()}</span><div class="info"><b>${esc(m.name||'—')}</b><span>${esc(m.email||'')}</span></div><div style="display:flex;gap:8px;align-items:center">${right}</div></div>`;
+    else if(m.rejected) right=`<span style="font-size:12px;color:var(--out);font-weight:600;margin-right:10px">Rejected</span><button class="ok" data-act="approve" data-id="${m.id}">Approve</button>`;
+    else right=`<button data-act="reject" data-id="${m.id}" style="background:transparent;color:var(--out);border:1px solid var(--out);border-radius:10px;padding:8px 14px;font-weight:600;cursor:pointer;font-size:13px;margin-right:8px">Reject</button><button class="ok" data-act="approve" data-id="${m.id}">Approve</button>`;
+    return `<div class="req"><span class="av" style="background:${avColor(m.name)}">${esc((m.name||'?')[0]).toUpperCase()}</span><div class="info"><b>${esc(m.name||'—')}</b><span>${esc(m.email||'')}</span></div>${right}</div>`;
   }).join('')||'<div style="color:var(--mut);font-size:13px">No accounts yet.</div>';
-  $$('#reqList .ok').forEach(b=>b.onclick=async()=>{b.textContent='…';await sb.from('gwpl_members').update({approved:true,rejected:false}).eq('id',b.dataset.id);refreshRequests();});
-  $$('#reqList .no').forEach(b=>b.onclick=async()=>{b.textContent='…';await sb.from('gwpl_members').update({rejected:true,approved:false}).eq('id',b.dataset.id);refreshRequests();});
+  $('#reqList button[data-act]').forEach(b=>b.onclick=async()=>{
+    const reject=b.dataset.act==='reject';b.textContent='…';
+    await sb.from('gwpl_members').update(reject?{rejected:true,approved:false}:{approved:true,rejected:false}).eq('id',b.dataset.id);
+    refreshRequests();
+  });
 }
 $('#adminBtn').onclick=()=>{refreshRequests();$('#adminOv').classList.add('show');};
 $('#adminX').onclick=()=>$('#adminOv').classList.remove('show');
@@ -566,6 +564,10 @@ function subscribe(){
     }).subscribe();
 }
 async function applyChange(id,act,n,note){
+  if((act==='use'||act==='damage')&&String(note||'').replace(/\s/g,'').length<4){
+    alert('Please add a note with more than 3 letters describing '+(act==='damage'?'how it was damaged.':'where it was used.'));
+    return false;
+  }
   const d=RAW[id],from=d.q;
   let to=act==='set'?Math.max(0,n):(act==='use'||act==='damage')?Math.max(0,d.q-n):d.q+n;
   if(to===from&&act!=='set')return true;
@@ -627,15 +629,9 @@ function renderSpot(){
         <button class="mbtn mbtn-dmg" data-act="damage">⚠ Damaged</button>
         <button class="mbtn mbtn-add" data-act="add">+ Receive</button>
       </div>
-      <input class="noteinput" id="spotNote" placeholder="Note — where used / damage detail (required for Use & Damaged)">
-      <div class="noteerr" id="spotNoteErr">Please add a note (more than 3 letters) describing where it was used / the damage.</div>
+      <input class="noteinput" id="spotNote" placeholder="Note — where used / damage detail (optional)">
     </div>`;
-  $('#spotview').querySelectorAll('.moverow button').forEach(b=>b.onclick=()=>{
-    const act=b.dataset.act,note=$('#spotNote').value.trim();
-    if((act==='use'||act==='damage')&&!noteValid(note)){$('#spotNoteErr').style.display='block';$('#spotNote').focus();return;}
-    $('#spotNoteErr').style.display='none';
-    const n=Math.max(1,parseInt($('#spotN').value)||1);applyChange(spotId,act,n,note);
-  });
+  $('#spotview').querySelectorAll('.moverow button').forEach(b=>b.onclick=()=>{const n=Math.max(1,parseInt($('#spotN').value)||1);applyChange(spotId,b.dataset.act,n,$('#spotNote').value.trim());});
 }
 $('#comboInput').addEventListener('focus',e=>renderCombo(e.target.value));
 $('#comboInput').addEventListener('input',e=>renderCombo(e.target.value));
@@ -693,19 +689,13 @@ function openModal(id){
   $('#mthk').textContent=d.t?d.t+' mm':'—';$('#msz').textContent=d.s;$('#mq').textContent=d.q+' pcs';
   const ms=$('#mst');ms.textContent=stLabel[st];ms.style.background=stSoft[st];ms.style.color=stColor[st];
   $('#mupd').innerHTML=d.ts?`Last updated <b>${ago(d.ts)}</b> by <b>${esc(d.by)}</b> · ${abst(d.ts)}${d.note?`<br>Note: “${esc(d.note)}”`:''}`:'No movements recorded yet.';
-  $('#mMove').value=1;$('#mNote').value='';$('#mNoteErr').style.display='none';$('#mqty').value=d.q;
+  $('#mMove').value=1;$('#mNote').value='';$('#mqty').value=d.q;
   const sv=$('#msave');sv.textContent='Set count';sv.classList.remove('done');
   $('#ov').classList.add('show');
 }
 function closeModal(){$('#ov').classList.remove('show');}
 $('#mx').onclick=closeModal;$('#ov').onclick=e=>{if(e.target.id==='ov')closeModal();};
-async function modalMove(act){
-  const note=$('#mNote').value.trim();
-  if((act==='use'||act==='damage')&&!noteValid(note)){$('#mNoteErr').style.display='block';$('#mNote').focus();return;}
-  $('#mNoteErr').style.display='none';
-  const n=Math.max(1,parseInt($('#mMove').value)||1);
-  if(await applyChange(curId,act,n,note))openModal(curId);
-}
+async function modalMove(act){const n=Math.max(1,parseInt($('#mMove').value)||1);if(await applyChange(curId,act,n,$('#mNote').value.trim()))openModal(curId);}
 $('#mUse').onclick=()=>modalMove('use');
 $('#mDmg').onclick=()=>modalMove('damage');
 $('#mAdd').onclick=()=>modalMove('add');
