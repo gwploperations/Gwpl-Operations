@@ -19,45 +19,37 @@
   --field:#162030;--field2:#1a2a40;
 }
 body{font-family:'Inter',-apple-system,sans-serif;font-size:13px;background:#0a1017;color:#c8d8ec;min-height:100vh;}
-
-/* AUTH */
 #gate,#pendingScreen{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:22px;background:radial-gradient(120% 90% at 70% -10%,rgba(42,127,255,.10),transparent 55%),#060e18;}
 .authcard{width:min(400px,100%);background:var(--navy);border:1px solid var(--blue3);border-radius:16px;padding:32px;box-shadow:0 30px 80px -20px rgba(0,0,0,.9);}
 .authbrand{font-size:19px;font-weight:600;text-align:center;color:var(--ink);}
 .authsub{color:var(--mut);font-size:12px;text-align:center;margin:5px 0 22px;}
 .authtabs{display:flex;gap:5px;background:#060e18;border:1px solid var(--blue3);border-radius:10px;padding:3px;margin-bottom:20px;}
-.authtabs button{flex:1;padding:9px;border:none;background:none;color:var(--mut);border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;transition:.15s;}
+.authtabs button{flex:1;padding:9px;border:none;background:none;color:var(--mut);border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;}
 .authtabs button.on{background:var(--navy3);color:var(--blue2);font-weight:600;}
 .afld{margin-bottom:13px;}
 .afld label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:6px;}
-.afld input{width:100%;background:#060e18;border:1px solid var(--blue3);border-radius:10px;color:var(--ink);padding:12px 14px;font-size:14px;outline:none;font-family:inherit;transition:.15s;}
+.afld input{width:100%;background:#060e18;border:1px solid var(--blue3);border-radius:10px;color:var(--ink);padding:12px 14px;font-size:14px;outline:none;font-family:inherit;}
 .afld input:focus{border-color:var(--blue);}
 .authbtn{width:100%;padding:13px;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;background:var(--blue);color:#fff;margin-top:5px;font-family:inherit;}
 .authbtn:disabled{opacity:.5;cursor:default;}
-.authmsg{font-size:12px;margin-top:12px;text-align:center;min-height:18px;line-height:1.45;}
+.authmsg{font-size:12px;margin-top:12px;text-align:center;min-height:18px;}
 .authmsg.err{color:#ff7070;}.authmsg.ok{color:var(--green3);}
 .pendcard{width:min(400px,100%);background:var(--navy);border:1px solid var(--blue3);border-radius:16px;padding:36px;text-align:center;}
 .pendcard h2{font-size:20px;font-weight:600;color:var(--ink);margin-bottom:10px;}
 .pendcard p{color:var(--mut);line-height:1.6;font-size:13px;}
 .pendicon{font-size:36px;margin-bottom:16px;}
 .plnk{background:none;border:none;color:var(--mut);cursor:pointer;font-size:13px;text-decoration:underline;margin-top:18px;font-family:inherit;display:block;width:100%;text-align:center;}
-
-/* TOPBAR */
 #topbar{position:fixed;top:14px;right:14px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(14,24,33,.95);backdrop-filter:blur(16px);border:1px solid var(--blue3);border-radius:28px;padding:6px 8px 6px 14px;}
 #topbar .who{font-size:12px;color:var(--mut);}#topbar .who b{color:var(--ink);}
 #topbar button{background:rgba(42,127,255,.1);border:1px solid var(--blue3);color:var(--mut);border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;}
 #topbar button:hover{color:var(--ink);border-color:var(--blue);}
 #adminBtn{display:none;color:var(--blue2)!important;border-color:rgba(42,127,255,.3)!important;}
 #adminBtn .badge{background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:10px;margin-left:4px;font-weight:700;}
-
-/* OVERLAYS */
 .ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
 .ov.show{display:flex;}
-.ovbox{background:var(--navy);border:1px solid var(--blue3);border-radius:16px;padding:24px;width:min(460px,100%);max-height:90vh;overflow:auto;}
+.ovbox{background:var(--navy);border:1px solid var(--blue3);border-radius:16px;padding:24px;width:min(500px,100%);max-height:92vh;overflow:auto;}
 .ovbox h3{font-size:18px;font-weight:600;color:var(--ink);margin-bottom:4px;}
 .ovbox p{color:var(--mut);font-size:12px;margin-bottom:16px;}
-
-/* ADMIN */
 .reqitem{display:flex;align-items:center;gap:10px;background:var(--navy2);border:1px solid var(--blue3);border-radius:12px;padding:12px 14px;margin-bottom:9px;}
 .reqav{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;color:#fff;font-size:13px;}
 .reqinfo{flex:1;min-width:0;}
@@ -67,31 +59,21 @@ body{font-family:'Inter',-apple-system,sans-serif;font-size:13px;background:#0a1
 .reqrej{background:transparent;color:var(--red);border:1px solid var(--red);border-radius:8px;padding:7px 13px;font-weight:600;cursor:pointer;font-size:12px;margin-right:5px;font-family:inherit;}
 .reqtag{font-size:11px;font-weight:600;}
 .reqtag.approved{color:var(--green3);}.reqtag.rejected{color:var(--red);}
-
-/* RATE SETTINGS */
 .rate-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--blue3);}
 .rate-row:last-child{border-bottom:none;}
 .rate-row label{font-size:13px;color:var(--ink);}
 .rate-row input{width:110px;background:var(--field);border:1px solid var(--blue3);border-radius:8px;color:var(--ink);padding:8px 10px;font-size:13px;font-family:inherit;outline:none;text-align:right;}
-.rate-row input:focus{border-color:var(--blue);}
-
-/* DELIVERY POPUP */
 .dpop{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:300;padding:20px;}
 .dpop.show{display:flex;}
 .dpopbox{background:var(--navy);border:1px solid var(--blue3);border-radius:16px;max-width:440px;width:100%;padding:24px;}
 .dpopbox h3{color:var(--ink);font-size:17px;font-weight:600;margin-bottom:4px;}
 .dpopsub{font-size:12px;color:var(--mut);margin-bottom:14px;}
-.dpopitem{padding:10px 13px;border-radius:10px;background:var(--navy2);border:1px solid var(--blue3);margin-bottom:8px;font-size:12px;color:#c8d8ec;line-height:1.55;}
+.dpopitem{padding:10px 13px;border-radius:10px;background:var(--navy2);border:1px solid var(--blue3);margin-bottom:8px;font-size:12px;line-height:1.55;}
 .dpopitem.overdue{border-color:rgba(192,57,43,.4);background:rgba(192,57,43,.08);}
 .dpopbtns{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
-
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy3);color:var(--blue2);border:1px solid var(--blue3);padding:11px 22px;border-radius:24px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;z-index:999;}
 .toast.show{opacity:1;}
-
-/* MAIN */
 .wrap{max-width:1200px;margin:0 auto;padding:20px;}
-
-/* HEADER */
 .brand{background:var(--navy);border:1px solid var(--blue3);border-radius:14px;padding:18px 24px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;}
 .brand-logo-wrap{flex:none;cursor:pointer;}
 .brand-logo{display:none;height:64px;width:auto;max-width:140px;object-fit:contain;background:#fff;border-radius:8px;padding:6px 10px;}
@@ -108,27 +90,21 @@ body{font-family:'Inter',-apple-system,sans-serif;font-size:13px;background:#0a1
 .brand-right .ci-label{color:var(--mut);font-size:11px;min-width:40px;text-align:right;}
 .brand-right .ci-val{color:var(--blue2);font-weight:500;}
 @media(max-width:700px){.brand{grid-template-columns:auto 1fr;}.brand-right{grid-column:1/-1;text-align:left;}.brand-right .ci{justify-content:flex-start;}}
-
-/* TABS */
 .tabs{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
 .tab{padding:10px 20px;border:1px solid var(--blue3);background:transparent;color:var(--mut);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:.15s;font-family:inherit;}
 .tab:hover{color:var(--blue2);border-color:var(--blue);}
 .tab.active{background:var(--navy3);color:var(--blue2);border-color:var(--blue);}
-
-/* CARDS */
+.tab.blink{animation:tabBlink 1s infinite;}
+@keyframes tabBlink{0%,100%{border-color:var(--red);color:var(--red);}50%{border-color:var(--blue3);color:var(--mut);}}
 .card{background:var(--navy);border:1px solid var(--blue3);border-radius:14px;padding:20px 22px;margin-top:14px;}
 .card h2{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--mut);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .card h2::before{content:"";width:3px;height:13px;background:var(--blue);border-radius:2px;flex:none;}
-
-/* FORM */
 .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 16px;}
 .fgrid label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);margin-bottom:5px;}
 .fgrid input,.fgrid select,.fgrid textarea{width:100%;padding:9px 11px;border:1px solid var(--blue3);border-radius:8px;font-size:13px;background:var(--field);color:var(--ink);font-family:inherit;outline:none;}
 .fgrid input:focus,.fgrid select:focus,.fgrid textarea:focus{border-color:var(--blue);background:var(--field2);}
 .fgrid input::placeholder{color:#4a6a8a;}
 textarea{resize:vertical;min-height:78px;line-height:1.6;}
-
-/* TABLE */
 .tscroll{overflow-x:auto;border:1px solid var(--blue3);border-radius:10px;}
 table.lt{border-collapse:separate;border-spacing:0;width:100%;min-width:900px;}
 table.lt th{background:var(--navy2);color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:11px 8px;text-align:left;border-bottom:1px solid var(--blue3);white-space:nowrap;font-weight:600;}
@@ -138,24 +114,18 @@ table.lt tbody tr:hover td{background:rgba(42,127,255,.04);}
 table.lt tbody tr:last-child td{border-bottom:none;}
 table.lt input,table.lt select{padding:6px 7px;font-size:12px;background:var(--field);border:1px solid var(--blue3);border-radius:6px;color:var(--ink);font-family:inherit;outline:none;width:100%;}
 table.lt input:focus,table.lt select:focus{border-color:var(--blue);}
-.w-desc{min-width:135px;}.w-hw{width:90px;}.w-sec{width:100px;}.w-num{width:55px;}.w-yn{width:75px;}
+.w-desc{min-width:135px;}.w-hw{width:80px;}.w-sec{width:110px;}.w-num{width:55px;}.w-yn{width:75px;}
 .rate-cell{font-weight:600;color:var(--green3);white-space:nowrap;}
 .del-btn{background:rgba(192,57,43,.1);color:var(--red);border:1px solid rgba(192,57,43,.2);border-radius:6px;padding:5px 8px;cursor:pointer;font-weight:600;font-size:12px;font-family:inherit;}
-.del-btn:hover{background:rgba(192,57,43,.2);}
 .empty-row{padding:22px;text-align:center;color:var(--mut);font-size:12px;}
-
-/* TOTALS */
 .totbox{border:1px solid var(--blue3);border-radius:10px;padding:14px 18px;background:var(--navy2);max-width:300px;margin-left:auto;margin-top:14px;}
 .totrow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(30,53,80,.5);font-size:13px;}
 .totrow span:first-child{color:var(--mut);}
 .totrow span:last-child{color:var(--ink);font-weight:500;}
 .totrow input{width:110px;text-align:right;background:var(--field);border:1px solid var(--blue3);border-radius:6px;color:var(--ink);padding:5px 8px;font-size:13px;font-family:inherit;outline:none;}
-.totrow input:focus{border-color:var(--blue);}
 .totnet{display:flex;justify-content:space-between;align-items:center;padding:10px 0 2px;font-size:16px;font-weight:600;}
 .totnet span:first-child{color:var(--mut);}
 .totnet span:last-child{color:var(--blue2);}
-
-/* BUTTONS */
 .btn{border:none;border-radius:9px;padding:10px 17px;font-size:13px;font-weight:500;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:7px;font-family:inherit;}
 .btn:hover{filter:brightness(1.1);}
 .btn-primary{background:var(--blue);color:#fff;}
@@ -164,13 +134,25 @@ table.lt input:focus,table.lt select:focus{border-color:var(--blue);}
 .btn-wa{background:var(--green2);color:var(--green3);border:1px solid rgba(42,157,96,.3);}
 .btn-mail{background:rgba(42,127,255,.1);color:var(--blue2);border:1px solid var(--blue3);}
 .btn-save{background:rgba(42,127,255,.12);color:var(--blue2);border:1px solid var(--blue3);}
+.btn-red{background:rgba(192,57,43,.12);color:var(--red);border:1px solid rgba(192,57,43,.3);}
 .act-row{display:flex;gap:9px;flex-wrap:wrap;}
 .saved-bar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid rgba(30,53,80,.5);}
 .saved-bar label{margin:0;font-size:11px;color:var(--mut);}
 .saved-bar select{max-width:260px;background:var(--field);border:1px solid var(--blue3);border-radius:8px;color:var(--ink);padding:8px 10px;font-size:13px;font-family:inherit;outline:none;}
 .hint{font-size:11px;color:var(--mut);margin-top:10px;line-height:1.6;}
 
-/* QUOTES / SO / APPROVALS TABS */
+/* ATTACHMENTS */
+.att-list{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+.att-item{background:var(--navy2);border:1px solid var(--blue3);border-radius:9px;padding:9px 13px;display:flex;align-items:center;gap:10px;font-size:12px;}
+.att-item a{color:var(--blue2);text-decoration:none;font-weight:500;}
+.att-item a:hover{text-decoration:underline;}
+.att-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 2px;}
+.att-upload{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.upload-btn{background:rgba(42,127,255,.1);color:var(--blue2);border:1px solid var(--blue3);border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:500;}
+.upload-btn:hover{border-color:var(--blue);}
+.upload-progress{font-size:11px;color:var(--mut);}
+
+/* DOC CARDS */
 .doc-list{display:flex;flex-direction:column;gap:10px;}
 .doc-item{background:var(--navy2);border:1px solid var(--blue3);border-radius:10px;padding:14px 16px;cursor:pointer;transition:.15s;}
 .doc-item:hover{border-color:var(--blue);background:rgba(42,127,255,.05);}
@@ -188,8 +170,31 @@ table.lt input:focus,table.lt select:focus{border-color:var(--blue);}
 .doc-del{background:rgba(192,57,43,.1);color:var(--red);border:1px solid rgba(192,57,43,.2);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:12px;font-family:inherit;}
 .filter-search{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 .filter-search input{background:var(--field);border:1px solid var(--blue3);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13px;font-family:inherit;outline:none;min-width:200px;}
-.filter-search input:focus{border-color:var(--blue);}
 .filter-search select{background:var(--field);border:1px solid var(--blue3);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13px;font-family:inherit;outline:none;max-width:240px;}
+
+/* DISPATCH TAB */
+.disp-card{background:var(--navy2);border:1px solid var(--blue3);border-radius:12px;padding:16px 18px;margin-bottom:12px;position:relative;}
+.disp-card.overdue{border-color:rgba(192,57,43,.5);animation:dispBlink 1.2s infinite;}
+@keyframes dispBlink{0%,100%{border-color:rgba(192,57,43,.5);}50%{border-color:rgba(192,57,43,.15);}}
+.disp-hdr{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.disp-title{font-weight:600;color:var(--ink);font-size:14px;}
+.disp-sub{color:var(--mut);font-size:12px;margin-top:2px;}
+.disp-status{font-size:11px;font-weight:600;padding:3px 10px;border-radius:16px;}
+.ds-Pending{color:var(--amber);border:1px solid rgba(196,154,0,.3);}
+.ds-Dispatched{color:var(--blue2);border:1px solid rgba(42,127,255,.3);}
+.ds-Delivered{color:var(--green3);border:1px solid rgba(42,157,96,.3);}
+.ds-Overdue{color:var(--red);border:1px solid rgba(192,57,43,.4);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+.disp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px 14px;}
+.disp-field label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);display:block;margin-bottom:4px;}
+.disp-field input,.disp-field select,.disp-field textarea{width:100%;padding:8px 10px;border:1px solid var(--blue3);border-radius:7px;font-size:12.5px;background:var(--field);color:var(--ink);font-family:inherit;outline:none;}
+.disp-field input:focus,.disp-field select:focus{border-color:var(--blue);}
+.pay-box{margin-top:14px;padding-top:14px;border-top:1px solid rgba(30,53,80,.6);}
+.pay-box h4{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);margin-bottom:10px;}
+.lr-box{margin-top:12px;padding-top:12px;border-top:1px solid rgba(30,53,80,.6);}
+.lr-box h4{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);margin-bottom:8px;}
+.lr-file-link{color:var(--blue2);font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+.lr-file-link:hover{text-decoration:underline;}
 
 /* DASHBOARD */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
@@ -246,42 +251,34 @@ table.dash{min-width:760px;}
 
 <div id="topbar">
   <span class="who">Signed in · <b id="tbName">—</b></span>
-  <button id="rateBtn" title="Edit rate settings">⚙ Rates</button>
+  <button id="rateBtn">⚙ Rates</button>
   <button id="adminBtn">Requests <span class="badge" id="reqBadge">0</span></button>
   <button id="logoutBtn">Log out</button>
 </div>
 
-<!-- ADMIN OVERLAY -->
+<!-- ADMIN -->
 <div class="ov" id="adminOv">
   <div class="ovbox">
-    <h3>Access Requests</h3>
-    <p>Approve who can access the quotation tool.</p>
+    <h3>Access Requests</h3><p>Approve who can access the quotation tool.</p>
     <div id="reqList"></div>
     <div style="margin-top:14px;text-align:right"><button class="btn btn-ghost" id="adminClose">Close</button></div>
   </div>
 </div>
 
-<!-- RATE SETTINGS OVERLAY -->
+<!-- RATE SETTINGS -->
 <div class="ov" id="rateOv">
-  <div class="ovbox" style="max-width:380px">
-    <h3>⚙ Rate Settings</h3>
-    <p>Enter password to edit wood rates.</p>
+  <div class="ovbox" style="max-width:360px">
+    <h3>⚙ Rate Settings</h3><p>Enter password to edit wood rates.</p>
     <div id="rateAuthSection">
-      <div class="afld"><label>Password</label><input type="password" id="ratePwd" placeholder="Enter password"></div>
-      <div style="display:flex;gap:9px;margin-top:4px">
-        <button class="btn btn-primary" id="rateUnlock">Unlock</button>
-        <button class="btn btn-ghost" id="rateCancel">Cancel</button>
-      </div>
+      <div class="afld"><label>Password</label><input type="password" id="ratePwd"></div>
+      <div style="display:flex;gap:9px"><button class="btn btn-primary" id="rateUnlock">Unlock</button><button class="btn btn-ghost" id="rateCancel">Cancel</button></div>
       <div class="authmsg err" id="ratePwdMsg"></div>
     </div>
     <div id="rateEditSection" style="display:none">
-      <div class="rate-row"><label>Red Meranti (₹ per cft)</label><input type="number" id="rateRM" value="1550"></div>
-      <div class="rate-row"><label>Teak Wood (₹ per cft)</label><input type="number" id="rateTW" value="2200"></div>
+      <div class="rate-row"><label>Red Meranti (₹/cft)</label><input type="number" id="rateRM" value="1550"></div>
+      <div class="rate-row"><label>Teak Wood (₹/cft)</label><input type="number" id="rateTW" value="2200"></div>
       <div class="rate-row"><label>Fixed Addition (₹)</label><input type="number" id="rateFA" value="300"></div>
-      <div style="display:flex;gap:9px;margin-top:16px">
-        <button class="btn btn-primary" id="rateSave">Save Rates</button>
-        <button class="btn btn-ghost" id="rateClose">Close</button>
-      </div>
+      <div style="display:flex;gap:9px;margin-top:16px"><button class="btn btn-primary" id="rateSave">Save Rates</button><button class="btn btn-ghost" id="rateClose">Close</button></div>
     </div>
   </div>
 </div>
@@ -290,11 +287,11 @@ table.dash{min-width:760px;}
 <div class="dpop" id="dpop">
   <div class="dpopbox">
     <h3>🚛 Delivery Reminders</h3>
-    <div class="dpopsub">These sales orders are due or overdue:</div>
+    <div class="dpopsub">These dispatches are overdue:</div>
     <div id="dpopBody"></div>
     <div class="dpopbtns">
       <button class="btn btn-ghost" id="dpopClose">Dismiss</button>
-      <button class="btn btn-primary" id="dpopDash">Open Dashboard</button>
+      <button class="btn btn-primary" id="dpopDash">Open Dispatch</button>
     </div>
   </div>
 </div>
@@ -317,7 +314,7 @@ table.dash{min-width:760px;}
     <div class="brand-middle">
       <h1>GEETANJALI WOODCRAFT</h1>
       <div class="tag">Where Innovation Meets Functionality</div>
-      <div class="addr">Exhibition Center: Plot 75, Sec-23, Marble Market, Phase-2, Kalamboli, Mumbai 410218<br>Factory: Panvel (Maharashtra) &amp; Kutch (Gujarat) &nbsp;·&nbsp; Phone: +91-9004604385 / 7710970070</div>
+      <div class="addr">Exhibition Center: Plot 75, Sec-23, Marble Market, Phase-2, Kalamboli, Mumbai 410218<br>Factory: Panvel (Maharashtra) &amp; Kutch (Gujarat) · Phone: +91-9004604385 / 7710970070</div>
       <div class="sync-bar"><div class="sync-dot busy" id="syncDot"></div><span id="syncMsg">Connecting…</span></div>
     </div>
     <div class="brand-right">
@@ -332,6 +329,7 @@ table.dash{min-width:760px;}
     <button class="tab" data-view="quotes">Quotes</button>
     <button class="tab" data-view="salesorders">Sales Orders</button>
     <button class="tab" data-view="approvals">Approvals</button>
+    <button class="tab" data-view="dispatch" id="dispatchTab">Dispatch</button>
     <button class="tab" data-view="dash">Dashboard</button>
   </div>
 
@@ -365,10 +363,8 @@ table.dash{min-width:760px;}
       <div class="tscroll">
         <table class="lt">
           <thead><tr>
-            <th class="w-desc">Description</th>
-            <th>Wood Type</th>
-            <th class="w-hw">Height</th>
-            <th class="w-hw">Width</th>
+            <th class="w-desc">Description</th><th>Wood Type</th>
+            <th class="w-hw">Height</th><th class="w-hw">Width</th>
             <th class="w-sec">Section (mm)</th>
             <th>Rebate</th><th>KAN</th><th>Molding</th><th>Varnish</th><th>Hardware</th>
             <th>Qty</th><th>Fitting ₹</th><th>Rate ₹</th><th>Total ₹</th><th></th>
@@ -391,16 +387,15 @@ table.dash{min-width:760px;}
       </div>
     </div>
 
-    <div class="card" id="dispatchCard" style="display:none">
-      <h2>Dispatch Details</h2>
-      <div class="fgrid">
-        <div><label>Total Tonnage (tons)</label><input id="tonnage" type="number" step="0.01" placeholder="e.g. 4.5"></div>
-        <div><label>Truck No.</label><input id="truckno" placeholder="GJ-12-AB-1234"></div>
-        <div><label>Truck / Driver Details</label><input id="truckdetails" placeholder="Transporter, driver, phone"></div>
-        <div><label>Dispatched On</label><input id="dispatchdate" type="date"></div>
-        <div><label>Expected Delivery</label><input id="deliverydate" type="date"></div>
-        <div><label>Dispatch Status</label><select id="dispatchstatus"><option>Pending</option><option>Dispatched</option><option>Delivered</option></select></div>
+    <!-- ATTACHMENTS -->
+    <div class="card">
+      <h2>Attachments (Drawings / Documents)</h2>
+      <div class="att-upload">
+        <input type="file" id="attFile" multiple accept="image/*,.pdf,.dwg,.dxf,.doc,.docx,.xls,.xlsx" style="display:none">
+        <button class="upload-btn" id="attUploadBtn">📎 Attach Files</button>
+        <span class="upload-progress" id="attProgress"></span>
       </div>
+      <div class="att-list" id="attList"></div>
     </div>
 
     <div class="card">
@@ -430,11 +425,11 @@ If the quantity of frames is less than 30 units, transportation charges will be 
     </div>
   </div>
 
-  <!-- QUOTES TAB -->
+  <!-- QUOTES -->
   <div id="view-quotes" style="display:none">
     <div class="card" style="padding:16px 20px">
       <div class="filter-search">
-        <input id="qtSearch" placeholder="Search by quote number or project…">
+        <input id="qtSearch" placeholder="Search by quote no. or project…">
         <select id="qtProjFilter"><option value="__all">All Projects</option></select>
         <button class="btn btn-ghost" id="qtRefresh" style="margin-left:auto">↻ Refresh</button>
       </div>
@@ -442,11 +437,11 @@ If the quantity of frames is less than 30 units, transportation charges will be 
     <div class="card"><h2>All Quotations</h2><div class="doc-list" id="qtList"><div class="empty-dash">Loading…</div></div></div>
   </div>
 
-  <!-- SALES ORDERS TAB -->
+  <!-- SALES ORDERS -->
   <div id="view-salesorders" style="display:none">
     <div class="card" style="padding:16px 20px">
       <div class="filter-search">
-        <input id="soSearch" placeholder="Search by order number or project…">
+        <input id="soSearch" placeholder="Search by order no. or project…">
         <select id="soProjFilter"><option value="__all">All Projects</option></select>
         <button class="btn btn-ghost" id="soRefresh" style="margin-left:auto">↻ Refresh</button>
       </div>
@@ -454,15 +449,33 @@ If the quantity of frames is less than 30 units, transportation charges will be 
     <div class="card"><h2>Sales Orders</h2><div class="doc-list" id="soList"><div class="empty-dash">Loading…</div></div></div>
   </div>
 
-  <!-- APPROVALS TAB -->
+  <!-- APPROVALS -->
   <div id="view-approvals" style="display:none">
     <div class="card" style="padding:16px 20px">
       <div class="filter-search">
-        <input id="apSearch" placeholder="Search by quote number or project…">
+        <input id="apSearch" placeholder="Search by quote no. or project…">
         <button class="btn btn-ghost" id="apRefresh" style="margin-left:auto">↻ Refresh</button>
       </div>
     </div>
     <div class="card"><h2>Pending Client Approval</h2><div class="doc-list" id="apList"><div class="empty-dash">Loading…</div></div></div>
+  </div>
+
+  <!-- DISPATCH -->
+  <div id="view-dispatch" style="display:none">
+    <div class="card" style="padding:16px 20px">
+      <div class="filter-search">
+        <input id="dispSearch" placeholder="Search by SO no. or project…">
+        <select id="dispStatusFilter">
+          <option value="__all">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Dispatched">Dispatched</option>
+          <option value="Overdue">Overdue</option>
+          <option value="Delivered">Delivered</option>
+        </select>
+        <button class="btn btn-ghost" id="dispRefresh" style="margin-left:auto">↻ Refresh</button>
+      </div>
+    </div>
+    <div class="card"><h2>Dispatch Tracker</h2><div id="dispList"><div class="empty-dash">Loading…</div></div></div>
   </div>
 
   <!-- DASHBOARD -->
@@ -485,7 +498,6 @@ If the quantity of frames is less than 30 units, transportation charges will be 
       </div>
     </div>
     <div class="card"><h2>Follow-ups Due</h2><div id="followList"></div></div>
-    <div class="card"><h2>Dispatch / Delivery Due</h2><div id="dispatchList"></div></div>
     <div class="card">
       <h2>All Documents</h2>
       <div class="tscroll">
@@ -507,11 +519,10 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const sb=window.supabase.createClient(SB_URL,SB_KEY);
 const HDR={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
 let ME=null,MY_NAME='',APP_STARTED=false;
-
-/* RATE SETTINGS — editable, default values */
 let WRATE={'Red Meranti':1550,'Teak Wood':2200};
 let FADD=300;
 
+/* SUPABASE HELPERS */
 function ss(s,m){var d=document.getElementById('syncDot'),t=document.getElementById('syncMsg');if(!d||!t)return;d.className='sync-dot '+s;t.textContent=m;}
 async function sbG(id){var r=await fetch(SB_URL+'/rest/v1/gwpl_documents?id=eq.'+encodeURIComponent(id)+'&select=*',{headers:HDR});var j=await r.json();return(j&&j[0])||null;}
 async function sbU(id,data){ss('busy','Saving…');try{var r=await fetch(SB_URL+'/rest/v1/gwpl_documents',{method:'POST',headers:{...HDR,'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({id,data,updated_at:new Date().toISOString()})});if(r.ok){ss('ok','Saved ✔');setTimeout(()=>ss('ok','Connected'),2000);return true;}ss('err','Save failed');return false;}catch(e){ss('err','Offline');return false;}}
@@ -519,6 +530,7 @@ async function sbD(id){await fetch(SB_URL+'/rest/v1/gwpl_documents?id=eq.'+encod
 async function sbL(){ss('busy','Loading…');try{var r=await fetch(SB_URL+'/rest/v1/gwpl_documents?select=*&order=updated_at.desc',{headers:HDR});var j=await r.json();ss('ok','Connected');return Array.isArray(j)?j:[];}catch(e){ss('err','Offline');return[];}}
 async function logAudit(docId,action,detail){try{await sb.from('gwpl_audit').insert({doc_id:docId,user_name:MY_NAME,action,detail});}catch(e){}}
 
+/* AUTH */
 function showScreen(w){document.getElementById('gate').style.display=w==='gate'?'flex':'none';document.getElementById('pendingScreen').style.display=w==='pending'?'flex':'none';document.getElementById('topbar').style.display=w==='app'?'flex':'none';document.getElementById('app').style.display=w==='app'?'':'none';}
 async function route(session){
   if(!session){showScreen('gate');return;}
@@ -529,11 +541,10 @@ async function route(session){
   document.getElementById('tbName').textContent=MY_NAME;
   if(mem&&mem.is_admin){document.getElementById('adminBtn').style.display='flex';refreshRequests();}
   if(mem&&mem.approved){showScreen('app');if(!APP_STARTED){APP_STARTED=true;startApp();}}
-  else if(mem){document.getElementById('pendText').textContent=mem.rejected?'Your access was declined. Please contact the admin.':'An admin will approve your access shortly.';showScreen('pending');}
+  else if(mem){document.getElementById('pendText').textContent=mem.rejected?'Your access was declined.':'An admin will approve your access shortly.';showScreen('pending');}
 }
 sb.auth.onAuthStateChange((_e,s)=>setTimeout(()=>route(s),0));
 (async()=>{var{data:{session}}=await sb.auth.getSession();route(session);})();
-
 document.getElementById('tabLogin').onclick=()=>{document.getElementById('tabLogin').classList.add('on');document.getElementById('tabReg').classList.remove('on');document.getElementById('loginForm').style.display='';document.getElementById('regForm').style.display='none';};
 document.getElementById('tabReg').onclick=()=>{document.getElementById('tabReg').classList.add('on');document.getElementById('tabLogin').classList.remove('on');document.getElementById('regForm').style.display='';document.getElementById('loginForm').style.display='none';};
 document.getElementById('rgBtn').onclick=async()=>{
@@ -547,7 +558,7 @@ document.getElementById('rgBtn').onclick=async()=>{
 };
 document.getElementById('liBtn').onclick=async()=>{
   var email=document.getElementById('liEmail').value.trim(),pass=document.getElementById('liPass').value,msg=document.getElementById('liMsg');
-  msg.className='authmsg';if(!email||!pass){msg.classList.add('err');msg.textContent='Enter your email and password.';return;}
+  msg.className='authmsg';if(!email||!pass){msg.classList.add('err');msg.textContent='Enter email and password.';return;}
   document.getElementById('liBtn').disabled=true;document.getElementById('liBtn').textContent='Logging in…';
   var{error}=await sb.auth.signInWithPassword({email,password:pass});
   document.getElementById('liBtn').disabled=false;document.getElementById('liBtn').textContent='Log in';
@@ -578,61 +589,25 @@ document.getElementById('adminClose').onclick=()=>document.getElementById('admin
 document.getElementById('adminOv').onclick=e=>{if(e.target.id==='adminOv')document.getElementById('adminOv').classList.remove('show');};
 
 /* RATE SETTINGS */
-document.getElementById('rateBtn').onclick=()=>{
-  document.getElementById('rateAuthSection').style.display='';
-  document.getElementById('rateEditSection').style.display='none';
-  document.getElementById('ratePwd').value='';
-  document.getElementById('ratePwdMsg').textContent='';
-  document.getElementById('rateOv').classList.add('show');
-};
-document.getElementById('rateUnlock').onclick=()=>{
-  if(document.getElementById('ratePwd').value==='Hardik@1305'){
-    document.getElementById('rateAuthSection').style.display='none';
-    document.getElementById('rateEditSection').style.display='';
-    document.getElementById('rateRM').value=WRATE['Red Meranti'];
-    document.getElementById('rateTW').value=WRATE['Teak Wood'];
-    document.getElementById('rateFA').value=FADD;
-  } else {
-    document.getElementById('ratePwdMsg').textContent='Incorrect password.';
-  }
-};
+document.getElementById('rateBtn').onclick=()=>{document.getElementById('rateAuthSection').style.display='';document.getElementById('rateEditSection').style.display='none';document.getElementById('ratePwd').value='';document.getElementById('ratePwdMsg').textContent='';document.getElementById('rateOv').classList.add('show');};
+document.getElementById('rateUnlock').onclick=()=>{if(document.getElementById('ratePwd').value==='Hardik@1305'){document.getElementById('rateAuthSection').style.display='none';document.getElementById('rateEditSection').style.display='';document.getElementById('rateRM').value=WRATE['Red Meranti'];document.getElementById('rateTW').value=WRATE['Teak Wood'];document.getElementById('rateFA').value=FADD;}else{document.getElementById('ratePwdMsg').textContent='Incorrect password.';}};
 document.getElementById('ratePwd').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('rateUnlock').click();});
-document.getElementById('rateSave').onclick=async()=>{
-  WRATE['Red Meranti']=+document.getElementById('rateRM').value||1550;
-  WRATE['Teak Wood']=+document.getElementById('rateTW').value||2200;
-  FADD=+document.getElementById('rateFA').value||300;
-  await sbU('__rates__',{rm:WRATE['Red Meranti'],tw:WRATE['Teak Wood'],fa:FADD});
-  document.getElementById('rateOv').classList.remove('show');
-  render();toast('Rates updated for everyone ✔');
-};
+document.getElementById('rateSave').onclick=async()=>{WRATE['Red Meranti']=+document.getElementById('rateRM').value||1550;WRATE['Teak Wood']=+document.getElementById('rateTW').value||2200;FADD=+document.getElementById('rateFA').value||300;await sbU('__rates__',{rm:WRATE['Red Meranti'],tw:WRATE['Teak Wood'],fa:FADD});document.getElementById('rateOv').classList.remove('show');render();toast('Rates updated ✔');};
 document.getElementById('rateClose').onclick=document.getElementById('rateCancel').onclick=()=>document.getElementById('rateOv').classList.remove('show');
 async function loadRates(){try{var r=await sbG('__rates__');if(r&&r.data){WRATE['Red Meranti']=r.data.rm||1550;WRATE['Teak Wood']=r.data.tw||2200;FADD=r.data.fa||300;}}catch(e){}}
 
-/* CORE RATE ENGINE */
+/* RATE ENGINE */
 const PDATA={
   'Red Meranti':{'Main Door Frame':18.5,'Bedroom Door Frame':19,'Fire Door Frame':20,'Bathroom Frame':19,'Servant Frame':19,'Other (custom)':19},
   'Teak Wood':  {'Main Door Frame':20.5,'Bedroom Door Frame':20.5,'Fire Door Frame':20,'Bathroom Frame':20.5,'Servant Frame':19,'Other (custom)':20.5}
 };
 const DESCS=['Main Door Frame','Bedroom Door Frame','Fire Door Frame','Bathroom Frame','Servant Frame','Other (custom)'];
 let lines=[],uid=1,DASH=[],PFILT='__all';
+let CUR_QNO=''; // current doc being edited — for attachments
 
 function blank(){return{id:uid++,desc:'Main Door Frame',wood:'Red Meranti',customName:'',height:'2100',width:'1000',sectionRaw:'127mm x 57mm',rebate:'None',kan:'No',molding:'No',varnish:'No',hardware:'No',qty:1,fitting:0,rate:0};}
-
-/* Section: "127mm x 57mm" → inches. Falls back to 5 x 2.25 */
-function parseSection(str){
-  if(!str||!str.trim())return{s1:5,s2:2.25};
-  var nums=String(str).replace(/mm/gi,'').split(/[xX×*,]/).map(s=>parseFloat(s.trim())).filter(n=>!isNaN(n));
-  if(nums.length>=2)return{s1:nums[0]/25.4,s2:nums[1]/25.4};
-  if(nums.length===1)return{s1:nums[0]/25.4,s2:2.25};
-  return{s1:5,s2:2.25};
-}
-function calcRate(l){
-  var rft=(PDATA[l.wood]&&PDATA[l.wood][l.desc])||18.5;
-  var{s1,s2}=parseSection(l.sectionRaw);
-  var cft=(s1*s2/144)*rft;
-  var rate=cft*(WRATE[l.wood]||0)+FADD;
-  return{rft,cft,rate};
-}
+function parseSection(str){if(!str||!str.trim())return{s1:5,s2:2.25};var nums=String(str).replace(/mm/gi,'').split(/[xX×*,]/).map(s=>parseFloat(s.trim())).filter(n=>!isNaN(n));if(nums.length>=2)return{s1:nums[0]/25.4,s2:nums[1]/25.4};if(nums.length===1)return{s1:nums[0]/25.4,s2:2.25};return{s1:5,s2:2.25};}
+function calcRate(l){var rft=(PDATA[l.wood]&&PDATA[l.wood][l.desc])||18.5;var{s1,s2}=parseSection(l.sectionRaw);var cft=(s1*s2/144)*rft;var rate=cft*(WRATE[l.wood]||0)+FADD;return{rft,cft,rate};}
 function rt(l){return((+l.rate||0)+(+l.fitting||0))*(+l.qty||0);}
 function inr(n){return'₹'+Math.round(n||0).toLocaleString('en-IN');}
 function pinr(n){return'Rs.'+Math.round(n||0).toLocaleString('en-IN');}
@@ -649,10 +624,9 @@ function render(){
     var c=calcRate(l);l.rate=c.rate;var tr=document.createElement('tr'),h='';
     h+=`<td class="w-desc"><select data-i="${i}" data-act="desc">${opt(l.desc,DESCS)}</select>`;
     if(l.desc==='Other (custom)')h+=`<input style="margin-top:4px" placeholder="name" data-i="${i}" data-k="customName" value="${l.customName||''}">`;
-    h+=`</td>`;
-    h+=`<td><select data-i="${i}" data-act="wood">${opt(l.wood,['Red Meranti','Teak Wood'])}</select></td>`;
-    h+=`<td><input class="w-hw" type="number" placeholder="e.g. 2100" data-i="${i}" data-k="height" value="${l.height}"></td>`;
-    h+=`<td><input class="w-hw" type="number" placeholder="e.g. 1000" data-i="${i}" data-k="width" value="${l.width}"></td>`;
+    h+=`</td><td><select data-i="${i}" data-act="wood">${opt(l.wood,['Red Meranti','Teak Wood'])}</select></td>`;
+    h+=`<td><input class="w-hw" type="number" placeholder="2100" data-i="${i}" data-k="height" value="${l.height}"></td>`;
+    h+=`<td><input class="w-hw" type="number" placeholder="1000" data-i="${i}" data-k="width" value="${l.width}"></td>`;
     h+=`<td><input class="w-sec" placeholder="127mm x 57mm" data-i="${i}" data-k="sectionRaw" value="${l.sectionRaw}"></td>`;
     h+=`<td><select class="w-yn" data-i="${i}" data-k="rebate">${opt(l.rebate,['None','Single','Double'])}</select></td>`;
     ['kan','molding','varnish','hardware'].forEach(k=>h+=`<td><select class="w-yn" data-i="${i}" data-k="${k}">${opt(l[k],['No','Yes'])}</select></td>`);
@@ -669,7 +643,36 @@ function upd(i,k,v){var l=lines[i];if(!l)return;l[k]=v;var c=calcRate(l);l.rate=
 function recalc(){var sub=lines.reduce((a,l)=>a+rt(l),0),trans=+document.getElementById('transport').value||0,total=sub+trans,gst=total*.18,net=total+gst;document.getElementById('subtotal').textContent=inr(sub);document.getElementById('total').textContent=inr(total);document.getElementById('gst').textContent=inr(gst);document.getElementById('nettotal').textContent=inr(net);}
 function cnet(){var sub=lines.reduce((a,l)=>a+rt(l),0),trans=+document.getElementById('transport').value||0;return(sub+trans)*1.18;}
 function hf(e){var el=e.target;if(el.dataset.i===undefined)return;var i=+el.dataset.i;if(el.dataset.act==='desc'){lines[i].desc=el.value;render();return;}if(el.dataset.act==='wood'){lines[i].wood=el.value;render();return;}if(el.dataset.k)upd(i,el.dataset.k,el.value);}
-function updDT(){var isSO=document.getElementById('docType').value==='Sales Order';document.getElementById('dispatchCard').style.display=isSO?'':'none';document.getElementById('detailsTitle').textContent=isSO?'Sales Order Details':'Quotation Details';}
+function updDT(){var isSO=document.getElementById('docType').value==='Sales Order';document.getElementById('detailsTitle').textContent=isSO?'Sales Order Details':'Quotation Details';}
+
+/* ATTACHMENTS */
+async function loadAttachments(qno){
+  if(!qno){document.getElementById('attList').innerHTML='';return;}
+  try{
+    var{data,error}=await sb.storage.from('gwpl-attachments').list(qno+'/');
+    var box=document.getElementById('attList');
+    if(error||!data||!data.length){box.innerHTML='<div style="color:var(--mut);font-size:12px">No attachments yet.</div>';return;}
+    box.innerHTML=data.map(f=>{
+      var url=sb.storage.from('gwpl-attachments').getPublicUrl(qno+'/'+f.name).data.publicUrl;
+      return`<div class="att-item">📎 <a href="${url}" target="_blank">${f.name}</a><button class="att-del" data-path="${qno+'/' +f.name}" title="Delete">✕</button></div>`;
+    }).join('');
+    box.querySelectorAll('.att-del').forEach(b=>b.addEventListener('click',async()=>{
+      if(!confirm('Delete '+b.dataset.path.split('/').pop()+'?'))return;
+      await sb.storage.from('gwpl-attachments').remove([b.dataset.path]);
+      toast('Attachment deleted');loadAttachments(qno);
+    }));
+  }catch(e){document.getElementById('attList').innerHTML='<div style="color:var(--mut);font-size:12px">Unable to load attachments.</div>';}
+}
+async function uploadAttachments(qno,files){
+  if(!qno){toast('Save the document first before attaching files');return;}
+  var prog=document.getElementById('attProgress');
+  for(var i=0;i<files.length;i++){
+    var f=files[i];prog.textContent='Uploading '+f.name+'…';
+    var{error}=await sb.storage.from('gwpl-attachments').upload(qno+'/'+f.name,f,{upsert:true});
+    if(error){toast('Upload failed: '+f.name);continue;}
+  }
+  prog.textContent='';toast('Uploaded ✔');loadAttachments(qno);
+}
 
 /* LOGO */
 var LOGO_DATA=null;
@@ -693,15 +696,16 @@ function buildPDF(){
   doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(14,32,64);
   doc.text(isSO?'SALES ORDER FOR FRAMES':'QUOTATION FOR FRAMES',W/2,y+0.5,{align:'center'});y+=8;
   var g=id=>document.getElementById(id).value||'-';
-  var metaBody=[[{content:isSO?'Sales Order No':'Quotation No',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:30}},{content:g('qno'),styles:{cellWidth:50}},{content:'Sales Person',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('sales'),styles:{cellWidth:50}},{content:'Project Name',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('project'),styles:{cellWidth:50}}],
+  var metaBody=[
+    [{content:isSO?'Sales Order No':'Quotation No',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:30}},{content:g('qno'),styles:{cellWidth:50}},{content:'Sales Person',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('sales'),styles:{cellWidth:50}},{content:'Project Name',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('project'),styles:{cellWidth:50}}],
     [{content:'Date',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:30}},{content:g('qdate'),styles:{cellWidth:50}},{content:'Place',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('place'),styles:{cellWidth:50}},{content:'Name (Owner)',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('owner'),styles:{cellWidth:50}}],
     [{content:'Owner Contact',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:30}},{content:g('ownerno'),styles:{cellWidth:50}},{content:'Site Incharge',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('incharge'),styles:{cellWidth:50}},{content:'GST No.',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('gstno'),styles:{cellWidth:50}}],
-    [{content:'Send Bill To',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:30}},{content:g('billto'),styles:{cellWidth:50}},{content:'Billing Name',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('billname'),styles:{cellWidth:50}},{content:'Site Address',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('siteaddr'),styles:{cellWidth:50}}]];
-  if(isSO)metaBody.push([{content:'Truck No',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:30}},{content:g('truckno'),styles:{cellWidth:50}},{content:'Tonnage',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:(document.getElementById('tonnage').value||'-')+' tons',styles:{cellWidth:50}},{content:'Expected Delivery',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('deliverydate'),styles:{cellWidth:50}}]);
+    [{content:'Send Bill To',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:30}},{content:g('billto'),styles:{cellWidth:50}},{content:'Billing Name',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('billname'),styles:{cellWidth:50}},{content:'Site Address',styles:{fontStyle:'bold',fillColor:[240,246,255],cellWidth:28}},{content:g('siteaddr'),styles:{cellWidth:50}}]
+  ];
   doc.autoTable({startY:y,body:metaBody,theme:'grid',styles:{fontSize:7.5,cellPadding:2,textColor:[30,30,40]},margin:{left:14,right:14}});y=doc.lastAutoTable.finalY+4;
-  var head=[['Description','Wood Type','H (mm)','W (mm)','Section','Rebate','KAN','Molding','Varnish','Hardware','Qty','Fitting','Rate','Total']];
+  var head=[['Description','Wood','H(mm)','W(mm)','Section','Rebate','KAN','Molding','Varnish','Hardware','Qty','Fitting','Rate','Total']];
   var body=lines.map(l=>{var name=l.desc==='Other (custom)'?(l.customName||'Custom'):l.desc;return[name,l.wood,l.height||'-',l.width||'-',l.sectionRaw||'-',l.rebate,l.kan,l.molding,l.varnish,l.hardware,String(l.qty),pinr(l.fitting),pinr(l.rate),pinr(rt(l))];});
-  doc.autoTable({startY:y,head,body,theme:'striped',headStyles:{fillColor:[14,24,33],textColor:[122,180,255],fontSize:7,fontStyle:'bold'},styles:{fontSize:7.5,cellPadding:2},columnStyles:{0:{cellWidth:28},1:{cellWidth:20},2:{cellWidth:14},3:{cellWidth:14},4:{cellWidth:20},5:{cellWidth:14},6:{cellWidth:10},7:{cellWidth:13},8:{cellWidth:13},9:{cellWidth:16},10:{cellWidth:8},11:{cellWidth:16},12:{cellWidth:18,fontStyle:'bold'},13:{cellWidth:20,fontStyle:'bold'}},margin:{left:14,right:14}});y=doc.lastAutoTable.finalY+4;
+  doc.autoTable({startY:y,head,body,theme:'striped',headStyles:{fillColor:[14,24,33],textColor:[122,180,255],fontSize:7,fontStyle:'bold'},styles:{fontSize:7.5,cellPadding:2},columnStyles:{0:{cellWidth:30},1:{cellWidth:20},2:{cellWidth:13},3:{cellWidth:13},4:{cellWidth:22},5:{cellWidth:14},6:{cellWidth:10},7:{cellWidth:13},8:{cellWidth:13},9:{cellWidth:16},10:{cellWidth:8},11:{cellWidth:16},12:{cellWidth:18,fontStyle:'bold'},13:{cellWidth:20,fontStyle:'bold'}},margin:{left:14,right:14}});y=doc.lastAutoTable.finalY+4;
   var sub=lines.reduce((a,l)=>a+rt(l),0),trans=+document.getElementById('transport').value||0,total=sub+trans,gst=total*.18,net=total+gst;
   doc.autoTable({startY:y,body:[['Sub Total',pinr(sub)],['Transportation',pinr(trans)],['Total',pinr(total)],['GST 18%',pinr(gst)],['NET TOTAL',pinr(net)]],theme:'plain',tableWidth:80,margin:{left:W-94},styles:{fontSize:8.5,cellPadding:2},columnStyles:{0:{halign:'right',textColor:[80,80,90]},1:{halign:'right',fontStyle:'bold',cellWidth:36,textColor:[14,24,33]}},didParseCell:d=>{if(d.row.index===4){d.cell.styles.fontSize=10;d.cell.styles.textColor=[14,32,64];}}});
   y=doc.lastAutoTable.finalY+5;if(y>H-25){doc.addPage();y=14;}
@@ -710,14 +714,14 @@ function buildPDF(){
   document.getElementById('terms').value.split('\n').forEach(t=>{if(t.trim()){doc.text('• '+t.trim(),14,y,{maxWidth:W-28});y+=3.8;}});
   return doc;
 }
-async function mkPDF(mode){if(!window.jspdf){toast('PDF loading… try again');return null;}if(!lines.length){toast('Add at least one frame first');return null;}var doc=buildPDF(),name=(document.getElementById('qno').value||'Document')+'.pdf';if(mode==='save'){doc.save(name);toast('PDF downloaded');return null;}return{blob:doc.output('blob'),name};}
+async function mkPDF(mode){if(!window.jspdf){toast('PDF loading…');return null;}if(!lines.length){toast('Add at least one frame first');return null;}var doc=buildPDF(),name=(document.getElementById('qno').value||'Document')+'.pdf';if(mode==='save'){doc.save(name);toast('PDF downloaded');return null;}return{blob:doc.output('blob'),name};}
 function sumTxt(){var isSO=document.getElementById('docType').value==='Sales Order',net=document.getElementById('nettotal').textContent,owner=document.getElementById('owner').value||'Sir/Madam',qno=document.getElementById('qno').value,proj=document.getElementById('project').value;return`Dear ${owner},\n\nPlease find the ${isSO?'sales order':'frame quotation'} from Geetanjali Woodcraft Pvt. Ltd.\n${isSO?'Sales Order No: ':'Quotation No: '}${qno}${proj?'\nProject: '+proj:''}\nNet Total: ${net}\n\nThe detailed PDF is attached.\n\nRegards,\nGeetanjali Woodcraft Pvt. Ltd.\n+91-9004604385`;}
 async function shareNative(){var r=await mkPDF('share');if(!r)return false;var file=new File([r.blob],r.name,{type:'application/pdf'});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:sumTxt(),title:'GWPL Document'});return true;}catch(e){return false;}}return false;}
 async function shareWA(){if(!lines.length){toast('Add at least one frame first');return;}if(await shareNative())return;await mkPDF('save');window.open('https://wa.me/?text='+encodeURIComponent(sumTxt()),'_blank');toast('PDF downloaded — attach it in WhatsApp');}
 async function shareMail(){if(!lines.length){toast('Add at least one frame first');return;}if(await shareNative())return;await mkPDF('save');var isSO=document.getElementById('docType').value==='Sales Order';window.location.href='mailto:?subject='+encodeURIComponent((isSO?'Sales Order ':'Frame Quotation ')+document.getElementById('qno').value+' — Geetanjali Woodcraft')+'&body='+encodeURIComponent(sumTxt());toast('PDF downloaded — attach it in your email');}
 
 /* SAVE / LOAD */
-function snap(){var ids=['docType','qno','ordno','qdate','status','followup','place','sales','project','owner','ownerno','incharge','billto','billname','billno','gstno','siteaddr','transport','terms','tonnage','truckno','truckdetails','dispatchdate','deliverydate','dispatchstatus'];var meta={};ids.forEach(id=>{var el=document.getElementById(id);meta[id]=el?el.value:'';});return{meta,lines};}
+function snap(){var ids=['docType','qno','ordno','qdate','status','followup','place','sales','project','owner','ownerno','incharge','billto','billname','billno','gstno','siteaddr','transport','terms'];var meta={};ids.forEach(id=>{var el=document.getElementById(id);meta[id]=el?el.value:'';});return{meta,lines};}
 async function nextNo(){try{var r=await sbG('__counter__'),last=(r&&r.data&&r.data.last)||0;last++;await sbU('__counter__',{last});return'QT-'+String(last).padStart(4,'0');}catch(e){return'QT-'+String(Date.now()).slice(-4);}}
 async function saveQ(){
   var qno=document.getElementById('qno').value;if(!qno){toast('Document No is empty');return;}
@@ -732,24 +736,125 @@ async function saveQ(){
   if(await sbU(qno,rec)){
     var detail=changes.length?changes.join(' | '):(prevRec?'Document saved':'New document created');
     await logAudit(qno,prevRec?'Updated':'Created',detail);
-    toast('Saved & synced ✔');refreshSaved();
+    CUR_QNO=qno;toast('Saved & synced ✔');refreshSaved();loadAttachments(qno);
   }
 }
 async function refreshSaved(){var sel=document.getElementById('savedList');sel.innerHTML='<option value="">— select —</option>';var rows=await sbL();rows.filter(r=>r.id&&r.id.startsWith('QT-')).forEach(r=>{var o=document.createElement('option');o.value=r.id;o.textContent=r.id+((r.data&&r.data.meta&&r.data.meta.project)?' — '+r.data.meta.project:'');sel.appendChild(o);});}
 async function loadByKey(key){ss('busy','Loading…');try{var r=await sbG(key);if(!r||!r.data){toast('Not found');ss('err','Load failed');return;}var data=r.data;Object.entries(data.meta).forEach(([id,v])=>{var el=document.getElementById(id);if(el)el.value=v;});if(!data.meta.docType)document.getElementById('docType').value='Quotation';updDT();
   lines=(data.lines||[]).map(l=>{l.id=uid++;
-    /* migrate old sizeStr format */
     if(!l.height&&l.sizeStr){var p=String(l.sizeStr).split(/[xX×]/);l.height=parseFloat(p[0])||'';l.width=parseFloat(p[1])||'';if(p.length>=4)l.sectionRaw=(parseFloat(p[2])*25.4).toFixed(0)+'mm x '+(parseFloat(p[3])*25.4).toFixed(0)+'mm';}
+    if(!l.sectionRaw)l.sectionRaw='127mm x 57mm';
     if(!l.rebate||l.rebate==='Yes')l.rebate='Single';if(l.rebate==='No')l.rebate='None';
     return l;});
-  if(!lines.length)lines=[blank()];render();ss('ok','Connected');toast('Loaded '+((data.meta&&data.meta.qno)||''));switchView('edit');}catch(e){toast('Load failed');ss('err','Error');}}
-async function newQ(){lines=[blank()];['ordno','place','sales','project','owner','ownerno','incharge','billto','billname','billno','gstno','siteaddr','followup','tonnage','truckno','truckdetails','dispatchdate','deliverydate'].forEach(id=>document.getElementById(id).value='');document.getElementById('docType').value='Quotation';document.getElementById('status').value='Pending';document.getElementById('dispatchstatus').value='Pending';document.getElementById('transport').value=0;document.getElementById('qdate').valueAsDate=new Date();document.getElementById('qno').value=await nextNo();updDT();render();toast('New document started');}
+  if(!lines.length)lines=[blank()];
+  CUR_QNO=key;render();loadAttachments(key);ss('ok','Connected');toast('Loaded '+((data.meta&&data.meta.qno)||''));switchView('edit');}catch(e){toast('Load failed');ss('err','Error');}}
+async function newQ(){lines=[blank()];['ordno','place','sales','project','owner','ownerno','incharge','billto','billname','billno','gstno','siteaddr','followup'].forEach(id=>document.getElementById(id).value='');document.getElementById('docType').value='Quotation';document.getElementById('status').value='Pending';document.getElementById('transport').value=0;document.getElementById('qdate').valueAsDate=new Date();document.getElementById('qno').value=await nextNo();CUR_QNO='';updDT();render();document.getElementById('attList').innerHTML='';toast('New document started');}
 
-/* DOC LIST RENDERER (shared by Quotes, Sales Orders, Approvals tabs) */
+/* DISPATCH */
+async function loadDispatch(){
+  var{data,error}=await sb.from('gwpl_dispatch').select('*').order('created_at',{ascending:false});
+  if(error||!data){document.getElementById('dispList').innerHTML='<div class="empty-dash">No dispatches yet. Create a Sales Order and add dispatch details.</div>';return;}
+  var today=new Date();today.setHours(0,0,0,0);
+  var search=(document.getElementById('dispSearch').value||'').toLowerCase();
+  var stFilter=document.getElementById('dispStatusFilter').value;
+  var hasOverdue=false;
+  var filtered=data.filter(d=>{
+    var matchS=!search||(d.doc_id||'').toLowerCase().includes(search)||(d.truck_no||'').toLowerCase().includes(search)||(d.lr_no||'').toLowerCase().includes(search);
+    var effStatus=d.status;
+    if(d.status!=='Delivered'&&d.expected_delivery){var ed=new Date(d.expected_delivery);ed.setHours(0,0,0,0);if(ed<today)effStatus='Overdue';}
+    if(stFilter!=='__all'&&effStatus!==stFilter)return false;
+    return matchS;
+  });
+  if(!filtered.length){document.getElementById('dispList').innerHTML='<div class="empty-dash">No dispatches found.</div>';return;}
+  var html=filtered.map(d=>{
+    var today2=new Date();today2.setHours(0,0,0,0);
+    var isOverdue=d.status!=='Delivered'&&d.expected_delivery&&new Date(d.expected_delivery)<today2;
+    if(isOverdue)hasOverdue=true;
+    var effStatus=isOverdue?'Overdue':d.status;
+    var lrUrl=d.lr_file_url?`<a class="lr-file-link" href="${d.lr_file_url}" target="_blank">📄 View LR Document</a>`:'<span style="color:var(--mut);font-size:12px">No LR attached</span>';
+    return`<div class="disp-card${isOverdue?' overdue':''}" data-id="${d.id}">
+      <div class="disp-hdr">
+        <div><div class="disp-title">🚛 ${d.doc_id||'—'}</div><div class="disp-sub">LR: ${d.lr_no||'—'} &nbsp;·&nbsp; Truck: ${d.truck_no||'—'} &nbsp;·&nbsp; Driver: ${d.driver||'—'}</div></div>
+        <span class="disp-status ds-${effStatus}">${effStatus}</span>
+      </div>
+      <div class="disp-grid">
+        <div class="disp-field"><label>Tonnage</label><input type="number" step="0.01" value="${d.tonnage||''}" data-id="${d.id}" data-f="tonnage" placeholder="tons"></div>
+        <div class="disp-field"><label>Truck No.</label><input type="text" value="${d.truck_no||''}" data-id="${d.id}" data-f="truck_no" placeholder="GJ-12-AB-1234"></div>
+        <div class="disp-field"><label>Driver Details</label><input type="text" value="${d.driver||''}" data-id="${d.id}" data-f="driver" placeholder="Name, phone"></div>
+        <div class="disp-field"><label>LR No.</label><input type="text" value="${d.lr_no||''}" data-id="${d.id}" data-f="lr_no" placeholder="LR number"></div>
+        <div class="disp-field"><label>Dispatched On</label><input type="date" value="${d.dispatched_on||''}" data-id="${d.id}" data-f="dispatched_on"></div>
+        <div class="disp-field"><label>Expected Delivery</label><input type="date" value="${d.expected_delivery||''}" data-id="${d.id}" data-f="expected_delivery"></div>
+        <div class="disp-field"><label>Status</label><select data-id="${d.id}" data-f="status">${opt(d.status||'Pending',['Pending','Dispatched','Delivered'])}</select></div>
+      </div>
+      <div class="pay-box">
+        <h4>💰 Payment Against LR</h4>
+        <div class="disp-grid">
+          <div class="disp-field"><label>Amount (₹)</label><input type="number" value="${d.payment_amount||''}" data-id="${d.id}" data-f="payment_amount" placeholder="0"></div>
+          <div class="disp-field"><label>Payment Date</label><input type="date" value="${d.payment_date||''}" data-id="${d.id}" data-f="payment_date"></div>
+          <div class="disp-field"><label>Payment Status</label><select data-id="${d.id}" data-f="payment_status">${opt(d.payment_status||'Pending',['Pending','Partial','Paid'])}</select></div>
+          <div class="disp-field"><label>Remarks</label><input type="text" value="${d.payment_remarks||''}" data-id="${d.id}" data-f="payment_remarks" placeholder="Notes"></div>
+        </div>
+      </div>
+      <div class="lr-box">
+        <h4>📎 LR Document</h4>
+        ${lrUrl}
+        <div style="margin-top:8px">
+          <input type="file" id="lrFile-${d.id}" accept="image/*,.pdf" style="display:none">
+          <button class="upload-btn" onclick="document.getElementById('lrFile-${d.id}').click()">Upload LR</button>
+          <span id="lrProg-${d.id}" style="font-size:11px;color:var(--mut);margin-left:8px"></span>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" style="padding:7px 14px;font-size:12px" data-save="${d.id}">Save Changes</button>
+        <button class="btn btn-red" style="padding:7px 14px;font-size:12px" data-deldis="${d.id}">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('dispList').innerHTML=html;
+  var tab=document.getElementById('dispatchTab');
+  if(hasOverdue)tab.classList.add('blink');else tab.classList.remove('blink');
+  /* bind LR uploads */
+  filtered.forEach(d=>{
+    var fi=document.getElementById('lrFile-'+d.id);
+    if(fi)fi.addEventListener('change',async e=>{
+      var f=e.target.files&&e.target.files[0];if(!f)return;
+      var prog=document.getElementById('lrProg-'+d.id);prog.textContent='Uploading…';
+      var path='lr/'+d.id+'/'+f.name;
+      var{error}=await sb.storage.from('gwpl-attachments').upload(path,f,{upsert:true});
+      if(error){prog.textContent='Failed';return;}
+      var url=sb.storage.from('gwpl-attachments').getPublicUrl(path).data.publicUrl;
+      await sb.from('gwpl_dispatch').update({lr_file_url:url,updated_by:MY_NAME,updated_at:new Date().toISOString()}).eq('id',d.id);
+      prog.textContent='';toast('LR uploaded ✔');loadDispatch();
+    });
+  });
+  /* bind save */
+  document.getElementById('dispList').querySelectorAll('[data-save]').forEach(b=>b.addEventListener('click',async()=>{
+    var id=b.dataset.save;
+    var card=b.closest('.disp-card');
+    var upd={updated_by:MY_NAME,updated_at:new Date().toISOString()};
+    card.querySelectorAll('[data-f]').forEach(el=>{upd[el.dataset.f]=el.value||null;});
+    await sb.from('gwpl_dispatch').update(upd).eq('id',id);
+    toast('Dispatch saved ✔');loadDispatch();
+  }));
+  /* bind delete */
+  document.getElementById('dispList').querySelectorAll('[data-deldis]').forEach(b=>b.addEventListener('click',async()=>{
+    if(!confirm('Delete this dispatch record?'))return;
+    await sb.from('gwpl_dispatch').delete().eq('id',b.dataset.deldis);
+    toast('Deleted');loadDispatch();
+  }));
+}
+async function createDispatch(docId){
+  var{error}=await sb.from('gwpl_dispatch').insert({doc_id:docId,status:'Pending',payment_status:'Pending',updated_by:MY_NAME});
+  if(error){toast('Could not create dispatch: '+error.message);return;}
+  toast('Dispatch record created ✔');switchView('dispatch');
+}
+
+/* DOC CARDS */
 function docCard(r,opts){
   var m=r.meta||{},st=m.status||'Pending',isSO=m.docType==='Sales Order',stcls=st==='Approved'?'approved':st==='Lost'?'lost':'pending';
   var actions='';
   if(opts.showSO&&st==='Approved'&&!isSO)actions+=`<button class="mini-btn so-mini" data-so="${r.__key}" onclick="event.stopPropagation()">→ Convert to SO</button>`;
+  if(isSO)actions+=`<button class="mini-btn" style="background:rgba(42,157,96,.1);color:var(--green3);border-color:rgba(42,157,96,.3)" data-newdisp="${r.__key}" onclick="event.stopPropagation()">🚛 Add Dispatch</button>`;
   actions+=`<button class="doc-del" data-del="${r.__key}" onclick="event.stopPropagation()">Delete</button>`;
   return`<div class="doc-item" data-key="${r.__key}">
     <div class="doc-top"><div><div class="doc-no">${m.qno||'?'}${isSO?' <span class="badge-so">SO</span>':''}</div><div class="doc-proj">${m.project||'No project'}${m.owner?' · '+m.owner:''}</div></div>
@@ -758,74 +863,48 @@ function docCard(r,opts){
     <div class="doc-actions">${actions}</div>
   </div>`;
 }
-function bindDocList(box,cards){
+function bindDocList(box){
   box.querySelectorAll('.doc-item[data-key]').forEach(el=>el.addEventListener('click',()=>loadByKey(el.dataset.key)));
   box.querySelectorAll('[data-so]').forEach(b=>b.addEventListener('click',async e=>{e.stopPropagation();await cvtSO(b.dataset.so);}));
+  box.querySelectorAll('[data-newdisp]').forEach(b=>b.addEventListener('click',async e=>{e.stopPropagation();await createDispatch(b.dataset.newdisp);}));
   box.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',async e=>{e.stopPropagation();if(!confirm('Delete '+b.dataset.del+'?'))return;await sbD(b.dataset.del);toast('Deleted');loadAllLists();refreshSaved();}));
 }
 async function loadAllLists(){
   var rows=await sbL();
   DASH=rows.filter(r=>r.id&&r.id.startsWith('QT-')).map(r=>{var d=r.data||{};d.__key=r.id;d.__updated=r.updated_at;return d;});
   renderQuotesList();renderSOList();renderApprovalsList();renderDash();
+  if(document.getElementById('view-dispatch').style.display!=='none')loadDispatch();
 }
-function filterDocs(recs,searchVal,projVal){
-  var s=(searchVal||'').toLowerCase().trim();
-  return recs.filter(r=>{
-    var m=r.meta||{};
-    var matchSearch=!s||(m.qno||'').toLowerCase().includes(s)||(m.project||'').toLowerCase().includes(s)||(m.owner||'').toLowerCase().includes(s);
-    var matchProj=projVal==='__all'||((m.project||'').trim()===projVal);
-    return matchSearch&&matchProj;
-  });
-}
-function populateProjSelect(sel,recs,currentVal){
-  var projs=[];recs.forEach(r=>{var p=((r.meta&&r.meta.project)||'').trim();if(p&&!projs.includes(p))projs.push(p);});projs.sort();
-  sel.innerHTML='<option value="__all">All Projects</option>'+projs.map(p=>`<option value="${p.replace(/"/g,'&quot;')}"${currentVal===p?' selected':''}>${p}</option>`).join('');
-}
-function renderQuotesList(){
-  var quotes=DASH.filter(r=>(r.meta&&r.meta.docType)!=='Sales Order');
-  populateProjSelect(document.getElementById('qtProjFilter'),quotes,document.getElementById('qtProjFilter').value);
-  var s=document.getElementById('qtSearch').value,p=document.getElementById('qtProjFilter').value;
-  var filtered=filterDocs(quotes,s,p);
-  var box=document.getElementById('qtList');
-  if(!filtered.length){box.innerHTML='<div class="empty-dash">No quotations found.</div>';return;}
-  box.innerHTML=filtered.map(r=>docCard(r,{showSO:true})).join('');bindDocList(box,filtered);
-}
-function renderSOList(){
-  var sos=DASH.filter(r=>r.meta&&r.meta.docType==='Sales Order');
-  populateProjSelect(document.getElementById('soProjFilter'),sos,document.getElementById('soProjFilter').value);
-  var s=document.getElementById('soSearch').value,p=document.getElementById('soProjFilter').value;
-  var filtered=filterDocs(sos,s,p);
-  var box=document.getElementById('soList');
-  if(!filtered.length){box.innerHTML='<div class="empty-dash">No sales orders found.</div>';return;}
-  box.innerHTML=filtered.map(r=>docCard(r,{showSO:false})).join('');bindDocList(box,filtered);
-}
-function renderApprovalsList(){
-  var pending=DASH.filter(r=>r.meta&&(r.meta.status||'Pending')==='Pending'&&r.meta.docType!=='Sales Order');
-  var s=document.getElementById('apSearch').value;
-  var filtered=filterDocs(pending,s,'__all');
-  var box=document.getElementById('apList');
-  if(!filtered.length){box.innerHTML='<div class="empty-dash">No quotations pending approval.</div>';return;}
-  box.innerHTML=filtered.map(r=>docCard(r,{showSO:true})).join('');bindDocList(box,filtered);
-}
+function filterDocs(recs,searchVal,projVal){var s=(searchVal||'').toLowerCase().trim();return recs.filter(r=>{var m=r.meta||{};var ms=!s||(m.qno||'').toLowerCase().includes(s)||(m.project||'').toLowerCase().includes(s)||(m.owner||'').toLowerCase().includes(s);var mp=projVal==='__all'||((m.project||'').trim()===projVal);return ms&&mp;});}
+function popProj(sel,recs){var projs=[];recs.forEach(r=>{var p=((r.meta&&r.meta.project)||'').trim();if(p&&!projs.includes(p))projs.push(p);});projs.sort();var cur=sel.value;sel.innerHTML='<option value="__all">All Projects</option>'+projs.map(p=>`<option value="${p.replace(/"/g,'&quot;')}"${cur===p?' selected':''}>${p}</option>`).join('');}
+function renderQuotesList(){var quotes=DASH.filter(r=>(r.meta&&r.meta.docType)!=='Sales Order');popProj(document.getElementById('qtProjFilter'),quotes);var filtered=filterDocs(quotes,document.getElementById('qtSearch').value,document.getElementById('qtProjFilter').value);var box=document.getElementById('qtList');if(!filtered.length){box.innerHTML='<div class="empty-dash">No quotations found.</div>';return;}box.innerHTML=filtered.map(r=>docCard(r,{showSO:true})).join('');bindDocList(box);}
+function renderSOList(){var sos=DASH.filter(r=>r.meta&&r.meta.docType==='Sales Order');popProj(document.getElementById('soProjFilter'),sos);var filtered=filterDocs(sos,document.getElementById('soSearch').value,document.getElementById('soProjFilter').value);var box=document.getElementById('soList');if(!filtered.length){box.innerHTML='<div class="empty-dash">No sales orders found.</div>';return;}box.innerHTML=filtered.map(r=>docCard(r,{showSO:false})).join('');bindDocList(box);}
+function renderApprovalsList(){var pending=DASH.filter(r=>r.meta&&(r.meta.status||'Pending')==='Pending'&&r.meta.docType!=='Sales Order');var filtered=filterDocs(pending,document.getElementById('apSearch').value,'__all');var box=document.getElementById('apList');if(!filtered.length){box.innerHTML='<div class="empty-dash">No quotations pending approval.</div>';return;}box.innerHTML=filtered.map(r=>docCard(r,{showSO:true})).join('');bindDocList(box);}
 
 /* DASHBOARD */
 function nfr(rec){if(typeof rec.net==='number')return rec.net;var sub=(rec.lines||[]).reduce((a,l)=>a+rt(l),0),trans=+((rec.meta&&rec.meta.transport)||0);return(sub+trans)*1.18;}
 function rStats(recs){var now=new Date(),ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'),value=0,month=0,pending=0,orders=0;recs.forEach(r=>{var m=r.meta||{},n=nfr(r);value+=n;if((m.qdate||'').startsWith(ym))month+=n;if((m.status||'Pending')==='Pending')pending++;if(m.docType==='Sales Order')orders++;});document.getElementById('stTotal').textContent=recs.length;document.getElementById('stValue').textContent=inr(value);document.getElementById('stMonth').textContent=inr(month);document.getElementById('stPending').textContent=pending;document.getElementById('stOrders').textContent=orders;}
 function rFollow(recs){var box=document.getElementById('followList'),today=new Date();today.setHours(0,0,0,0);var items=recs.filter(r=>r.meta&&r.meta.followup&&(r.meta.status||'Pending')==='Pending').map(r=>{var d=new Date(r.meta.followup);d.setHours(0,0,0,0);return{r,diff:Math.round((d-today)/86400000),date:d};}).sort((a,b)=>a.diff-b.diff);if(!items.length){box.innerHTML='<div class="empty-dash">No pending follow-ups.</div>';return;}box.innerHTML=items.map(it=>{var cls=it.diff<0?'overdue':it.diff<=7?'soon':'',m=it.r.meta||{};return`<div class="fu-item ${cls}"><div class="fu-meta"><b>${m.qno||'?'}</b> · ${m.project||''}${m.owner?' · '+m.owner:''}<br>Follow up: ${fd(it.date)} ${utag(it.diff)}</div><button class="mini-btn" data-open="${it.r.__key}">Open</button></div>`;}).join('');}
-function rDispatch(recs){var box=document.getElementById('dispatchList'),today=new Date();today.setHours(0,0,0,0);var items=recs.filter(r=>{var m=r.meta||{};return m.docType==='Sales Order'&&m.deliverydate&&(m.dispatchstatus||'Pending')!=='Delivered';}).map(r=>{var d=new Date(r.meta.deliverydate);d.setHours(0,0,0,0);return{r,diff:Math.round((d-today)/86400000),date:d};}).sort((a,b)=>a.diff-b.diff);if(!items.length){box.innerHTML='<div class="empty-dash">No pending deliveries.</div>';return;}box.innerHTML=items.map(it=>{var cls=it.diff<0?'overdue':it.diff<=3?'soon':'',m=it.r.meta||{},det=[];if(m.tonnage)det.push(m.tonnage+' tons');if(m.truckno)det.push('Truck '+m.truckno);return`<div class="fu-item ${cls}"><div class="fu-meta"><b>${m.qno||'?'}</b> · ${m.project||''}${det.length?'<br>'+det.join(' · '):''}<br>Delivery: ${fd(it.date)} ${utag(it.diff)}</div><button class="mini-btn" data-open="${it.r.__key}">Open</button></div>`;}).join('');}
 function rDashTable(recs){var tb=document.getElementById('dashRows');if(!recs.length){tb.innerHTML='<tr><td colspan="8" class="empty-dash">No documents.</td></tr>';return;}tb.innerHTML=recs.map(r=>{var m=r.meta||{},st=m.status||'Pending',isSO=m.docType==='Sales Order',stOpts=['Pending','Approved','Lost'].map(s=>`<option${st===s?' selected':''}>${s}</option>`).join('');return`<tr><td><b>${m.qno||'?'}</b>${isSO?'<br><span class="badge-so">SO</span>':''}</td><td>${m.qdate||'-'}</td><td>${m.project||'-'}</td><td>${m.owner||'-'}</td><td class="rate-cell">${inr(nfr(r))}</td><td><select class="status-sel st-${st}" data-key="${r.__key}" data-f="status">${stOpts}</select></td><td><input type="date" class="status-sel" style="width:130px;background:var(--field);color:var(--ink)" value="${m.followup||''}" data-key="${r.__key}" data-f="followup"></td><td><button class="mini-btn" data-open="${r.__key}">Open</button></td></tr>`;}).join('');}
-function renderDash(){var recs=PFILT==='__all'?DASH:DASH.filter(r=>((r.meta&&r.meta.project)||'').trim()===PFILT);populateProjSelect(document.getElementById('projectFilter'),DASH,PFILT);rStats(recs);rFollow(recs);rDispatch(recs);rDashTable(recs);}
+function renderDash(){var recs=PFILT==='__all'?DASH:DASH.filter(r=>((r.meta&&r.meta.project)||'').trim()===PFILT);popProj(document.getElementById('projectFilter'),DASH);rStats(recs);rFollow(recs);rDashTable(recs);}
 async function updRec(key,field,value){try{var r=await sbG(key);if(!r)return;var d=r.data||{};var old=d.meta&&d.meta[field];d.meta=d.meta||{};d.meta[field]=value;await sbU(key,d);await logAudit(key,'Field updated',field+': '+(old||'—')+' → '+value);toast('Updated ✔');loadAllLists();}catch(e){toast('Update failed');}}
-async function cvtSO(key){try{var r=await sbG(key),d=r.data||{};d.meta=d.meta||{};d.meta.docType='Sales Order';if(!d.meta.dispatchstatus)d.meta.dispatchstatus='Pending';await sbU(key,d);await logAudit(key,'Converted','Converted to Sales Order');toast('Converted to Sales Order ✔');loadAllLists();}catch(e){toast('Convert failed');}}
-function switchView(v){['edit','quotes','salesorders','approvals','dash'].forEach(n=>{document.getElementById('view-'+n).style.display=v===n?'':'none';});document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===v));if(v==='dash'||v==='quotes'||v==='salesorders'||v==='approvals')loadAllLists();}
-function showReminders(recs){var today=new Date();today.setHours(0,0,0,0);var due=recs.filter(r=>{var m=r.meta||{};if(m.docType!=='Sales Order'||!m.deliverydate||(m.dispatchstatus||'Pending')==='Delivered')return false;var d=new Date(m.deliverydate);d.setHours(0,0,0,0);return(d-today)/86400000<=0;});if(!due.length)return;document.getElementById('dpopBody').innerHTML=due.map(r=>{var m=r.meta,d=new Date(m.deliverydate);d.setHours(0,0,0,0);var diff=Math.round((d-today)/86400000),when=diff<0?`overdue by ${-diff} day${-diff>1?'s':''}`:'due today';return`<div class="dpopitem${diff<0?' overdue':''}"><b>${m.qno||'?'}</b> · ${m.project||''}<br>Delivery ${when}${m.truckno?' · Truck '+m.truckno:''}${m.tonnage?' · '+m.tonnage+' tons':''}</div>`;}).join('');document.getElementById('dpop').classList.add('show');}
+async function cvtSO(key){try{var r=await sbG(key),d=r.data||{};d.meta=d.meta||{};d.meta.docType='Sales Order';await sbU(key,d);await logAudit(key,'Converted','Converted to Sales Order');toast('Converted to Sales Order ✔');loadAllLists();}catch(e){toast('Convert failed');}}
+function showReminders(dispatches){
+  var today=new Date();today.setHours(0,0,0,0);
+  var due=dispatches.filter(d=>{if(d.status==='Delivered'||!d.expected_delivery)return false;var ed=new Date(d.expected_delivery);ed.setHours(0,0,0,0);return ed<=today;});
+  if(!due.length)return;
+  document.getElementById('dpopBody').innerHTML=due.map(d=>{var ed=new Date(d.expected_delivery);ed.setHours(0,0,0,0);var diff=Math.round((ed-today)/86400000),when=diff<0?`overdue by ${-diff} day${-diff>1?'s':''}`:'due today';return`<div class="dpopitem${diff<0?' overdue':''}"><b>${d.doc_id||'?'}</b><br>Delivery ${when} · LR: ${d.lr_no||'—'} · Truck: ${d.truck_no||'—'}</div>`;}).join('');
+  document.getElementById('dpop').classList.add('show');
+  document.getElementById('dispatchTab').classList.add('blink');
+}
+function switchView(v){['edit','quotes','salesorders','approvals','dispatch','dash'].forEach(n=>{document.getElementById('view-'+n).style.display=v===n?'':'none';});document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===v));if(v==='quotes'||v==='salesorders'||v==='approvals'||v==='dash')loadAllLists();if(v==='dispatch')loadDispatch();}
 
 async function startApp(){
   document.getElementById('qdate').valueAsDate=new Date();updDT();
   await loadLogo();await loadRates();
   document.getElementById('qno').value=await nextNo();
   lines=[blank()];render();await refreshSaved();
-  try{var rows=await sbL();var recs=rows.filter(r=>r.id&&r.id.startsWith('QT-')).map(r=>{var d=r.data||{};d.__key=r.id;return d;});showReminders(recs);}catch(e){}
+  try{var{data:dispatches}=await sb.from('gwpl_dispatch').select('*');if(dispatches)showReminders(dispatches);}catch(e){}
 }
 
 (function(){
@@ -842,11 +921,12 @@ async function startApp(){
   document.getElementById('loadBtn').addEventListener('click',()=>{var k=document.getElementById('savedList').value;if(!k){toast('Pick a document');return;}loadByKey(k);});
   document.getElementById('newBtn').addEventListener('click',newQ);
   document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',function(){switchView(this.dataset.view);}));
+  document.getElementById('attUploadBtn').addEventListener('click',()=>{if(!CUR_QNO){toast('Save the document first');return;}document.getElementById('attFile').click();});
+  document.getElementById('attFile').addEventListener('change',e=>{if(!e.target.files.length)return;uploadAttachments(CUR_QNO,e.target.files);e.target.value='';});
   var dr=document.getElementById('dashRows');
   dr.addEventListener('change',e=>{var el=e.target;if(el.dataset.key&&el.dataset.f)updRec(el.dataset.key,el.dataset.f,el.value);});
   dr.addEventListener('click',e=>{var o=e.target.closest('[data-open]');if(o)loadByKey(o.dataset.open);});
   document.getElementById('followList').addEventListener('click',e=>{var o=e.target.closest('[data-open]');if(o)loadByKey(o.dataset.open);});
-  document.getElementById('dispatchList').addEventListener('click',e=>{var o=e.target.closest('[data-open]');if(o)loadByKey(o.dataset.open);});
   document.getElementById('projectFilter').addEventListener('change',function(){PFILT=this.value;renderDash();});
   document.getElementById('refreshBtn').addEventListener('click',loadAllLists);
   document.getElementById('qtSearch').addEventListener('input',renderQuotesList);
@@ -857,8 +937,11 @@ async function startApp(){
   document.getElementById('soRefresh').addEventListener('click',loadAllLists);
   document.getElementById('apSearch').addEventListener('input',renderApprovalsList);
   document.getElementById('apRefresh').addEventListener('click',loadAllLists);
+  document.getElementById('dispSearch').addEventListener('input',loadDispatch);
+  document.getElementById('dispStatusFilter').addEventListener('change',loadDispatch);
+  document.getElementById('dispRefresh').addEventListener('click',loadDispatch);
   document.getElementById('dpopClose').addEventListener('click',()=>document.getElementById('dpop').classList.remove('show'));
-  document.getElementById('dpopDash').addEventListener('click',()=>{document.getElementById('dpop').classList.remove('show');switchView('dash');});
+  document.getElementById('dpopDash').addEventListener('click',()=>{document.getElementById('dpop').classList.remove('show');switchView('dispatch');});
 })();
 </script>
 </body>
