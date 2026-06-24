@@ -768,7 +768,7 @@ async function loadDispatch(){
   if(!filtered.length){document.getElementById('dispList').innerHTML='<div class="empty-dash">No dispatches found.</div>';return;}
   var html=filtered.map(d=>{
     var today2=new Date();today2.setHours(0,0,0,0);
-    var isOverdue=d.status!=='Delivered'&&d.expected_delivery&&new Date(d.expected_delivery)<today2;
+    var isOverdue=d.status!=='Delivered'&&d.expected_delivery&&new Date(d.expected_delivery).setHours(0,0,0,0)<=today.getTime();
     if(isOverdue)hasOverdue=true;
     var effStatus=isOverdue?'Overdue':d.status;
     var lrUrl=d.lr_file_url?`<a class="lr-file-link" href="${d.lr_file_url}" target="_blank">📄 View LR Document</a>`:'<span style="color:var(--mut);font-size:12px">No LR attached</span>';
@@ -834,7 +834,9 @@ async function loadDispatch(){
     var upd={updated_by:MY_NAME,updated_at:new Date().toISOString()};
     card.querySelectorAll('[data-f]').forEach(el=>{upd[el.dataset.f]=el.value||null;});
     await sb.from('gwpl_dispatch').update(upd).eq('id',id);
-    toast('Dispatch saved ✔');loadDispatch();
+    toast('Dispatch saved ✔');
+    window.scrollTo({top:0,behavior:'smooth'});
+    setTimeout(()=>loadDispatch(),400);
   }));
   /* bind delete */
   document.getElementById('dispList').querySelectorAll('[data-deldis]').forEach(b=>b.addEventListener('click',async()=>{
@@ -891,7 +893,7 @@ async function updRec(key,field,value){try{var r=await sbG(key);if(!r)return;var
 async function cvtSO(key){try{var r=await sbG(key),d=r.data||{};d.meta=d.meta||{};d.meta.docType='Sales Order';await sbU(key,d);await logAudit(key,'Converted','Converted to Sales Order');toast('Converted to Sales Order ✔');loadAllLists();}catch(e){toast('Convert failed');}}
 function showReminders(dispatches){
   var today=new Date();today.setHours(0,0,0,0);
-  var due=dispatches.filter(d=>{if(d.status==='Delivered'||!d.expected_delivery)return false;var ed=new Date(d.expected_delivery);ed.setHours(0,0,0,0);return ed<=today;});
+  var due=dispatches.filter(d=>{if(d.status==='Delivered'||!d.expected_delivery)return false;var ed=new Date(d.expected_delivery);ed.setHours(0,0,0,0);return ed.getTime()<=today.getTime();});
   if(!due.length)return;
   document.getElementById('dpopBody').innerHTML=due.map(d=>{var ed=new Date(d.expected_delivery);ed.setHours(0,0,0,0);var diff=Math.round((ed-today)/86400000),when=diff<0?`overdue by ${-diff} day${-diff>1?'s':''}`:'due today';return`<div class="dpopitem${diff<0?' overdue':''}"><b>${d.doc_id||'?'}</b><br>Delivery ${when} · LR: ${d.lr_no||'—'} · Truck: ${d.truck_no||'—'}</div>`;}).join('');
   document.getElementById('dpop').classList.add('show');
