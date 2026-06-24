@@ -609,26 +609,26 @@ document.getElementById('rateClose').onclick=document.getElementById('rateCancel
 async function loadRates(){try{var r=await sbG('__rates__');if(r&&r.data){WRATE['Red Meranti']=r.data.rm||1550;WRATE['Teak Wood']=r.data.tw||2200;FADD=r.data.fa||300;}}catch(e){}}
 
 /* CORE RATE ENGINE */
+const PDATA={
+  'Red Meranti':{'Main Door Frame':18.5,'Bedroom Door Frame':19,'Fire Door Frame':20,'Bathroom Frame':19,'Servant Frame':19,'Other (custom)':19},
+  'Teak Wood':  {'Main Door Frame':20.5,'Bedroom Door Frame':20.5,'Fire Door Frame':20,'Bathroom Frame':20.5,'Servant Frame':19,'Other (custom)':20.5}
+};
 const DESCS=['Main Door Frame','Bedroom Door Frame','Fire Door Frame','Bathroom Frame','Servant Frame','Other (custom)'];
 let lines=[],uid=1,DASH=[],PFILT='__all';
 
-function blank(){return{id:uid++,desc:'Main Door Frame',wood:'Red Meranti',customName:'',height:'',width:'',sectionRaw:'',rebate:'None',kan:'No',molding:'No',varnish:'No',hardware:'No',qty:1,fitting:0,rate:0};}
+function blank(){return{id:uid++,desc:'Main Door Frame',wood:'Red Meranti',customName:'',height:'2100',width:'1000',sectionRaw:'127mm x 57mm',rebate:'None',kan:'No',molding:'No',varnish:'No',hardware:'No',qty:1,fitting:0,rate:0};}
 
-/* Parse section like "127mm x 57mm" → inches */
+/* Section: "127mm x 57mm" → inches. Falls back to 5 x 2.25 */
 function parseSection(str){
-  if(!str)return{s1:5,s2:2.25};
+  if(!str||!str.trim())return{s1:5,s2:2.25};
   var nums=String(str).replace(/mm/gi,'').split(/[xX×*,]/).map(s=>parseFloat(s.trim())).filter(n=>!isNaN(n));
-  if(nums.length>=2){return{s1:nums[0]/25.4,s2:nums[1]/25.4};}
-  if(nums.length===1){return{s1:nums[0]/25.4,s2:2.25};}
+  if(nums.length>=2)return{s1:nums[0]/25.4,s2:nums[1]/25.4};
+  if(nums.length===1)return{s1:nums[0]/25.4,s2:2.25};
   return{s1:5,s2:2.25};
 }
 function calcRate(l){
+  var rft=(PDATA[l.wood]&&PDATA[l.wood][l.desc])||18.5;
   var{s1,s2}=parseSection(l.sectionRaw);
-  /* Use height and width for running feet: (H + H + W) / 304.8 as rft */
-  var h=parseFloat(l.height)||0,w=parseFloat(l.width)||0;
-  var rft_mm=h+h+w; /* perimeter approx: 2×height + width */
-  var rft=rft_mm/304.8;
-  if(rft<=0)rft=18.5; /* fallback default */
   var cft=(s1*s2/144)*rft;
   var rate=cft*(WRATE[l.wood]||0)+FADD;
   return{rft,cft,rate};
