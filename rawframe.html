@@ -739,7 +739,17 @@ var LOGO_DATA=null;
 function showLogo(url){var img=document.getElementById('logoImg'),svg=document.getElementById('logoSvg');if(url){img.src=url;img.style.display='block';if(svg)svg.style.display='none';var p=new Image();p.onload=()=>{LOGO_DATA={data:url,w:p.naturalWidth,h:p.naturalHeight};};p.src=url;}else{img.style.display='none';if(svg)svg.style.display='block';LOGO_DATA=null;}}
 document.getElementById('logoFile').addEventListener('change',async e=>{var f=e.target.files&&e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=async()=>{showLogo(rd.result);await sbU('__logo__',{logo:rd.result});toast('Logo saved for everyone');};rd.readAsDataURL(f);});
 document.getElementById('emblemBox').addEventListener('click',e=>{if(e.target&&e.target.id==='logoFile')return;document.getElementById('logoFile').click();});
-async function loadLogo(){try{var r=await sbG('__logo__');if(r&&r.data&&r.data.logo)showLogo(r.data.logo);}catch(e){}}
+async function loadLogo(){
+  try{
+    var r=await sbG('__logo__');
+    if(r&&r.data&&r.data.logo){
+      showLogo(r.data.logo);
+      /* also sync to landing */
+      var li=document.getElementById('landingLogo'),ls=document.getElementById('landingSvg');
+      if(li){li.src=r.data.logo;li.style.display='block';if(ls)ls.style.display='none';}
+    }
+  }catch(e){}
+}
 
 /* PDF */
 function dlgo(doc){if(LOGO_DATA){var r=LOGO_DATA.w/LOGO_DATA.h,dh=16,dw=dh*r;if(dw>28){dw=28;dh=dw/r;}var fmt=LOGO_DATA.data.indexOf('image/png')>-1?'PNG':'JPEG';try{doc.addImage(LOGO_DATA.data,fmt,14,8,dw,dh);return dw+4;}catch(e){}}return 4;}
@@ -1052,11 +1062,16 @@ function switchViewInner(v){
 
 async function startApp(){
   document.getElementById('qdate').valueAsDate=new Date();updDT();
+  /* show landing immediately before any async work */
+  document.getElementById('landing').classList.add('show');
+  startLandingAnim();
   await loadLogo();await loadRates();
   document.getElementById('qno').value=await nextNo();
   lines=[blank()];render();await refreshSaved();
+  /* sync logo to landing after it loads */
+  var li=document.getElementById('landingLogo'),ls=document.getElementById('landingSvg');
+  if(LOGO_DATA){li.src=LOGO_DATA.data;li.style.display='block';ls.style.display='none';}
   try{var{data:dispatches}=await sb.from('gwpl_dispatch').select('*');if(dispatches)showReminders(dispatches);}catch(e){}
-  showLanding();
 }
 
 (function(){
