@@ -321,8 +321,9 @@ function renderMain(){
   const rb=el('button','btn btn-ghost btn-sm'); rb.innerHTML='↻'; rb.title='Refresh';
   if(syncing) rb.style.animation='spin 1s linear infinite';
   rb.onclick=refresh; hr.appendChild(rb);
-  const eb=el('button','btn btn-ghost btn-sm'); eb.textContent='📥 Export'; eb.title='Export all data to Excel/CSV';
-  eb.onclick=exportToExcel; hr.appendChild(eb);
+  const eb=el('button','btn btn-ghost btn-sm'); eb.textContent='📥 Export'; eb.title='Export data';
+  eb.onclick=()=>exportToExcel(activeId||installSel||hwSel||dailySel||handoverSel||dispatchSel||null);
+  hr.appendChild(eb);
   const un=div(''); un.style.cssText='padding:6px 10px;background:#292524;border-radius:8px;font-size:12px;color:#a8a29e';
   un.textContent='👤 '+userName(); hr.appendChild(un);
   const lo=btn('btn btn-ghost btn-sm','Sign out',()=>sb.auth.signOut());
@@ -710,7 +711,7 @@ function renderDispatch(){
   const project=projects.find(p=>p.id===dispatchSel);
   if(!project){dispatchSel=null;render();return wrap;}
   const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{dispatchSel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
-  wrap.innerHTML+=`<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">${project.name} — Dispatch & Arrival</h2>`;
+  wrap.appendChild(Object.assign(div(''),{innerHTML:`<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">${project.name} — Dispatch & Arrival</h2>`}));
   project.floors.forEach(f=>{
     const fc=div('floor-card');
     fc.innerHTML=`<div class="floor-head"><span style="font-weight:600;color:#f59e0b">${f.name}</span></div>`;
@@ -739,44 +740,28 @@ function renderDispatch(){
   return wrap;
 }
 
-// ── back button safety for all tabs ──
-function safeBack(selVar, renderFn) {
-  window[selVar] = null;
-  render();
-}
-
-// ── excel export ──
-function exportToExcel() {
+function exportToExcel(projectId) {
+  const toExport = projectId ? projects.filter(p=>p.id===projectId) : projects;
   const rows = [];
-  // Header
-  rows.push(['Project', 'Floor', 'Door Type', 'Total', 'Ready', 'On Hold', 'Hold Reason', 'Promised Date', 'Frames Installed', 'Doors Installed', 'Faulty', 'Faulty Reason', 'Dispatched', 'Dispatch Date', 'Arrived', 'Arrival Date', 'Handed Over', 'Notes']);
-  projects.forEach(p => {
+  rows.push(['Project','Floor','Door Type','Total','Ready','On Hold','Hold Reason','Promised Date','Frames Installed','Doors Installed','Faulty','Faulty Reason','Dispatched','Dispatch Date','Arrived','Arrival Date','Handed Over','Notes']);
+  toExport.forEach(p => {
     p.floors.forEach(f => {
-      (f.doors || []).forEach(raw => {
-        const c = normDoor(raw);
-        rows.push([
-          p.name, f.name, c.label,
-          c.total, c.readyQty, c.holdQty, c.holdReason || '', fmtDate(c.promisedDate),
-          c.framesInstalled, c.doorsInstalled, c.faultyQty || 0, c.faultyReason || '',
-          c.dispatchedQty || 0, fmtDate(c.dispatchDate),
-          c.arrivedQty || 0, fmtDate(c.arrivalDate),
-          c.handoverQty || 0, c.notes || ''
-        ]);
+      (f.doors||[]).forEach(raw => {
+        const c=normDoor(raw);
+        rows.push([p.name,f.name,c.label,c.total,c.readyQty,c.holdQty,c.holdReason||'',fmtDate(c.promisedDate),c.framesInstalled,c.doorsInstalled,c.faultyQty||0,c.faultyReason||'',c.dispatchedQty||0,fmtDate(c.dispatchDate),c.arrivedQty||0,fmtDate(c.arrivalDate),c.handoverQty||0,c.notes||'']);
       });
     });
   });
-
-  // Build CSV-style content but save as .csv for Excel compatibility
-  const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'GWPL-Installation-Data.csv';
-  a.style.display = 'none';
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=projectId?`${toExport[0].name}-data.csv`:'GWPL-All-Projects.csv';
+  a.style.display='none';
   document.body.appendChild(a);
   a.click();
-  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},100);
 }
 function renderInstall(){
   const wrap=div('');
@@ -800,7 +785,7 @@ function renderInstall(){
   const project=projects.find(p=>p.id===installSel);
   if(!project){installSel=null;render();return wrap;}
   const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{installSel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
-  wrap.innerHTML+=`<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">${project.name} — Installation</h2>`;
+  wrap.appendChild(Object.assign(div(''),{innerHTML:`<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">${project.name} — Installation</h2>`}));
   project.floors.forEach(f=>{
     let dt=0,di=0,fa=0;
     f.doors.forEach(d=>{const c=normDoor(d);dt+=c.readyQty;di+=Math.min(c.doorsInstalled,c.readyQty);fa+=c.faultyQty||0;});
