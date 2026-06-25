@@ -528,6 +528,9 @@ If the quantity of frames is less than 30 units, transportation charges will be 
     </div>
     <div class="card">
       <h2>Overview</h2>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+        <button class="btn btn-ghost" id="exportBtn">⬇ Export All to Excel</button>
+      </div>
       <div class="stats-grid">
         <div class="stat"><div class="stat-val" id="stTotal">0</div><div class="stat-lbl">Total Documents</div></div>
         <div class="stat"><div class="stat-val" id="stValue">₹0</div><div class="stat-lbl">Combined Value</div></div>
@@ -945,6 +948,46 @@ function nfr(rec){if(typeof rec.net==='number')return rec.net;var sub=(rec.lines
 function rStats(recs){var now=new Date(),ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'),value=0,month=0,pending=0,orders=0;recs.forEach(r=>{var m=r.meta||{},n=nfr(r);value+=n;if((m.qdate||'').startsWith(ym))month+=n;if((m.status||'Pending')==='Pending')pending++;if(m.docType==='Sales Order')orders++;});document.getElementById('stTotal').textContent=recs.length;document.getElementById('stValue').textContent=inr(value);document.getElementById('stMonth').textContent=inr(month);document.getElementById('stPending').textContent=pending;document.getElementById('stOrders').textContent=orders;}
 function rFollow(recs){var box=document.getElementById('followList'),today=new Date();today.setHours(0,0,0,0);var items=recs.filter(r=>r.meta&&r.meta.followup&&(r.meta.status||'Pending')==='Pending').map(r=>{var d=new Date(r.meta.followup);d.setHours(0,0,0,0);return{r,diff:Math.round((d-today)/86400000),date:d};}).sort((a,b)=>a.diff-b.diff);if(!items.length){box.innerHTML='<div class="empty-dash">No pending follow-ups.</div>';return;}box.innerHTML=items.map(it=>{var cls=it.diff<0?'overdue':it.diff<=7?'soon':'',m=it.r.meta||{};return`<div class="fu-item ${cls}"><div class="fu-meta"><b>${m.qno||'?'}</b> · ${m.project||''}${m.owner?' · '+m.owner:''}<br>Follow up: ${fd(it.date)} ${utag(it.diff)}</div><button class="mini-btn" data-open="${it.r.__key}">Open</button></div>`;}).join('');}
 function rDashTable(recs){var tb=document.getElementById('dashRows');if(!recs.length){tb.innerHTML='<tr><td colspan="8" class="empty-dash">No documents.</td></tr>';return;}tb.innerHTML=recs.map(r=>{var m=r.meta||{},st=m.status||'Pending',isSO=m.docType==='Sales Order',stOpts=['Pending','Approved','Lost'].map(s=>`<option${st===s?' selected':''}>${s}</option>`).join('');return`<tr><td><b>${m.qno||'?'}</b>${isSO?'<br><span class="badge-so">SO</span>':''}</td><td>${m.qdate||'-'}</td><td>${m.project||'-'}</td><td>${m.owner||'-'}</td><td class="rate-cell">${inr(nfr(r))}</td><td><select class="status-sel st-${st}" data-key="${r.__key}" data-f="status">${stOpts}</select></td><td><input type="date" class="status-sel" style="width:130px;background:var(--field);color:var(--ink)" value="${m.followup||''}" data-key="${r.__key}" data-f="followup"></td><td><button class="mini-btn" data-open="${r.__key}">Open</button></td></tr>`;}).join('');}
+function exportExcel(){
+  if(!DASH.length){toast('No data to export');return;}
+  var rows=[['Quote No','Type','Date','Status','Project','Owner','Owner Contact','Site Incharge','Place','Sales Person','GST No','Site Address','Billing Name','Send Bill To','Transport (₹)','Sub Total (₹)','GST 18% (₹)','Net Total (₹)','Follow-up Date','Saved At']];
+  DASH.forEach(function(r){
+    var m=r.meta||{};
+    var sub=(r.lines||[]).reduce(function(a,l){return a+rt(l);},0);
+    var trans=+(m.transport||0);
+    var total=sub+trans;
+    var gst=total*.18;
+    var net=total+gst;
+    rows.push([
+      m.qno||'',m.docType||'Quotation',m.qdate||'',m.status||'Pending',
+      m.project||'',m.owner||'',m.ownerno||'',m.incharge||'',
+      m.place||'',m.sales||'',m.gstno||'',m.siteaddr||'',
+      m.billname||'',m.billto||'',
+      Math.round(trans),Math.round(sub),Math.round(gst),Math.round(net),
+      m.followup||'',r.__updated||''
+    ]);
+  });
+  /* Line items sheet */
+  var rows2=[['Quote No','Project','Description','Wood Type','Height','Width','Section','Rebate','KAN','Molding','Varnish','Hardware','Qty','Fitting (₹)','Rate (₹)','Total (₹)']];
+  DASH.forEach(function(r){
+    var m=r.meta||{};
+    (r.lines||[]).forEach(function(l){
+      var name=l.desc==='Other (custom)'?(l.customName||'Custom'):l.desc;
+      rows2.push([m.qno||'',m.project||'',name,l.wood||'',l.height||'',l.width||'',l.sectionRaw||'',l.rebate||'',l.kan||'',l.molding||'',l.varnish||'',l.hardware||'',l.qty||1,Math.round(l.fitting||0),Math.round(l.rate||0),Math.round(rt(l))]);
+    });
+  });
+  var csv1=rows.map(function(r){return r.map(function(c){return'"'+String(c==null?'':c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var csv2=rows2.map(function(r){return r.map(function(c){return'"'+String(c==null?'':c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var combined='QUOTATIONS SUMMARY\n'+csv1+'\n\nLINE ITEMS\n'+csv2;
+  var blob=new Blob([combined],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='GWPL_Backup_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Exported ✔ — save this file somewhere safe');
+}
 function renderDash(){var recs=PFILT==='__all'?DASH:DASH.filter(r=>((r.meta&&r.meta.project)||'').trim()===PFILT);popProj(document.getElementById('projectFilter'),DASH);rStats(recs);rFollow(recs);rDashTable(recs);}
 async function updRec(key,field,value){try{var r=await sbG(key);if(!r)return;var d=r.data||{};var old=d.meta&&d.meta[field];d.meta=d.meta||{};d.meta[field]=value;await sbU(key,d);await logAudit(key,'Field updated',field+': '+(old||'—')+' → '+value);toast('Updated ✔');loadAllLists();}catch(e){toast('Update failed');}}
 async function cvtSO(key){try{var r=await sbG(key),d=r.data||{};d.meta=d.meta||{};d.meta.docType='Sales Order';await sbU(key,d);await logAudit(key,'Converted','Converted to Sales Order');toast('Converted to Sales Order ✔');loadAllLists();}catch(e){toast('Convert failed');}}
@@ -1037,6 +1080,7 @@ async function startApp(){
   dr.addEventListener('click',e=>{var o=e.target.closest('[data-open]');if(o)loadByKey(o.dataset.open);});
   document.getElementById('followList').addEventListener('click',e=>{var o=e.target.closest('[data-open]');if(o)loadByKey(o.dataset.open);});
   document.getElementById('projectFilter').addEventListener('change',function(){PFILT=this.value;renderDash();});
+  document.getElementById('exportBtn').addEventListener('click',exportExcel);
   document.getElementById('refreshBtn').addEventListener('click',loadAllLists);
   document.getElementById('qtSearch').addEventListener('input',renderQuotesList);
   document.getElementById('qtProjFilter').addEventListener('change',renderQuotesList);
