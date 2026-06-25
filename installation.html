@@ -321,6 +321,8 @@ function renderMain(){
   const rb=el('button','btn btn-ghost btn-sm'); rb.innerHTML='↻'; rb.title='Refresh';
   if(syncing) rb.style.animation='spin 1s linear infinite';
   rb.onclick=refresh; hr.appendChild(rb);
+  const eb=el('button','btn btn-ghost btn-sm'); eb.textContent='📥 Export'; eb.title='Export all data to Excel/CSV';
+  eb.onclick=exportToExcel; hr.appendChild(eb);
   const un=div(''); un.style.cssText='padding:6px 10px;background:#292524;border-radius:8px;font-size:12px;color:#a8a29e';
   un.textContent='👤 '+userName(); hr.appendChild(un);
   const lo=btn('btn btn-ghost btn-sm','Sign out',()=>sb.auth.signOut());
@@ -706,6 +708,7 @@ function renderDispatch(){
     wrap.appendChild(grid);return wrap;
   }
   const project=projects.find(p=>p.id===dispatchSel);
+  if(!project){dispatchSel=null;render();return wrap;}
   const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{dispatchSel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
   wrap.innerHTML+=`<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">${project.name} — Dispatch & Arrival</h2>`;
   project.floors.forEach(f=>{
@@ -736,7 +739,45 @@ function renderDispatch(){
   return wrap;
 }
 
-// ── install tab ──
+// ── back button safety for all tabs ──
+function safeBack(selVar, renderFn) {
+  window[selVar] = null;
+  render();
+}
+
+// ── excel export ──
+function exportToExcel() {
+  const rows = [];
+  // Header
+  rows.push(['Project', 'Floor', 'Door Type', 'Total', 'Ready', 'On Hold', 'Hold Reason', 'Promised Date', 'Frames Installed', 'Doors Installed', 'Faulty', 'Faulty Reason', 'Dispatched', 'Dispatch Date', 'Arrived', 'Arrival Date', 'Handed Over', 'Notes']);
+  projects.forEach(p => {
+    p.floors.forEach(f => {
+      (f.doors || []).forEach(raw => {
+        const c = normDoor(raw);
+        rows.push([
+          p.name, f.name, c.label,
+          c.total, c.readyQty, c.holdQty, c.holdReason || '', fmtDate(c.promisedDate),
+          c.framesInstalled, c.doorsInstalled, c.faultyQty || 0, c.faultyReason || '',
+          c.dispatchedQty || 0, fmtDate(c.dispatchDate),
+          c.arrivedQty || 0, fmtDate(c.arrivalDate),
+          c.handoverQty || 0, c.notes || ''
+        ]);
+      });
+    });
+  });
+
+  // Build CSV-style content but save as .csv for Excel compatibility
+  const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'GWPL-Installation-Data.csv';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+}
 function renderInstall(){
   const wrap=div('');
   if(!projects.length){wrap.appendChild(div('empty','Add a project first.'));return wrap;}
@@ -757,7 +798,7 @@ function renderInstall(){
     wrap.appendChild(grid);return wrap;
   }
   const project=projects.find(p=>p.id===installSel);
-  if(!project){installSel=null;return renderInstall();}
+  if(!project){installSel=null;render();return wrap;}
   const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{installSel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
   wrap.innerHTML+=`<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">${project.name} — Installation</h2>`;
   project.floors.forEach(f=>{
@@ -834,6 +875,7 @@ function renderDaily(){
     wrap.appendChild(grid);return wrap;
   }
   const project=projects.find(p=>p.id===dailySel);
+  if(!project){dailySel=null;render();return wrap;}
   const log=project.dailyLog||[];
   const sorted=[...log].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   const dates=sorted.map(e=>e.date).filter(Boolean);
@@ -896,8 +938,7 @@ function renderHardware(){
   if(!projects.length){wrap.appendChild(div('empty','Add a project first.'));return wrap;}
   if(!hwSel||!projects.find(p=>p.id===hwSel)){
     wrap.innerHTML='<h2 style="font-size:15px;font-weight:600;margin-bottom:4px">Hardware Delivered</h2><p style="font-size:12px;color:#a8a29e;margin-bottom:16px">Track hardware sent to each site.</p>';
-    const grid=div('grid2');
-    projects.forEach(p=>{
+    const grid=div('grid2');    projects.forEach(p=>{
       const hw=p.hardwareLog||[];const recv=hw.filter(x=>x.status==='Received').length;
       const card=div('card card-hover');card.onclick=()=>{hwSel=p.id;render();};
       card.innerHTML=`<div style="font-weight:600">${p.name}</div><div style="font-size:12px;color:#a8a29e">${p.builder||''}</div>
@@ -911,6 +952,7 @@ function renderHardware(){
     wrap.appendChild(grid);return wrap;
   }
   const project=projects.find(p=>p.id===hwSel);
+  if(!project){hwSel=null;render();return wrap;}
   const hw=project.hardwareLog||[];
   const received=hw.filter(x=>x.status==='Received').length;
   const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{hwSel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
@@ -984,6 +1026,7 @@ function renderHandover(){
     wrap.appendChild(grid);return wrap;
   }
   const project=projects.find(p=>p.id===handoverSel);
+  if(!project){handoverSel=null;render();return wrap;}
   const bb=btn('btn btn-ghost btn-sm','◀ All sites',()=>{handoverSel=null;render();});bb.style.marginBottom='12px';wrap.appendChild(bb);
   const topbar=div('');topbar.style.cssText='display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px';
   topbar.innerHTML=`<h2 style="font-size:17px;font-weight:700">${project.name} — Handover</h2>`;
