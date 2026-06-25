@@ -173,7 +173,7 @@ table.lt input:focus,table.lt select:focus{border-color:var(--blue);}
 .filter-search select{background:var(--field);border:1px solid var(--blue3);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13px;font-family:inherit;outline:none;max-width:240px;}
 
 /* LANDING */
-.landing{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;background:#0a1017;overflow:hidden;}
+.landing{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;background:#0a1017;overflow:hidden;padding-top:80px;}
 .landing.show{display:flex;}
 .landing-canvas{position:absolute;inset:0;z-index:0;}
 .landing-content{position:relative;z-index:2;text-align:center;padding:20px;}
@@ -570,7 +570,14 @@ async function sbL(){ss('busy','Loading…');try{var r=await fetch(SB_URL+'/rest
 async function logAudit(docId,action,detail){try{await sb.from('gwpl_audit').insert({doc_id:docId,user_name:MY_NAME,action,detail});}catch(e){}}
 
 /* AUTH */
-function showScreen(w){document.getElementById('gate').style.display=w==='gate'?'flex':'none';document.getElementById('pendingScreen').style.display=w==='pending'?'flex':'none';document.getElementById('topbar').style.display=w==='app'?'flex':'none';document.getElementById('app').style.display=w==='app'?'':'none';}
+function showScreen(w){
+  document.getElementById('gate').style.display=w==='gate'?'flex':'none';
+  document.getElementById('pendingScreen').style.display=w==='pending'?'flex':'none';
+  document.getElementById('topbar').style.display=w==='app'?'flex':'none';
+  document.getElementById('app').style.display=w==='app'?'':'none';
+  /* hide all views when app first loads — landing will show instead */
+  if(w==='app'){['edit','quotes','salesorders','approvals','dispatch','dash'].forEach(n=>{document.getElementById('view-'+n).style.display='none';});}
+}
 async function route(session){
   if(!session){showScreen('gate');return;}
   var u=session.user,nm=(u.user_metadata&&u.user_metadata.name)?u.user_metadata.name:u.email;
