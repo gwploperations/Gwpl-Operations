@@ -172,6 +172,23 @@ table.lt input:focus,table.lt select:focus{border-color:var(--blue);}
 .filter-search input{background:var(--field);border:1px solid var(--blue3);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13px;font-family:inherit;outline:none;min-width:200px;}
 .filter-search select{background:var(--field);border:1px solid var(--blue3);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13px;font-family:inherit;outline:none;max-width:240px;}
 
+/* LANDING */
+.landing{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;background:#0a1017;overflow:hidden;}
+.landing.show{display:flex;}
+.landing-canvas{position:absolute;inset:0;z-index:0;}
+.landing-content{position:relative;z-index:2;text-align:center;padding:20px;}
+.landing-logo{height:80px;width:auto;max-width:180px;object-fit:contain;background:#fff;border-radius:12px;padding:8px 14px;margin:0 auto 20px;display:none;}
+.landing-svg{margin:0 auto 20px;display:block;}
+.landing-title{font-size:clamp(22px,5vw,38px);font-weight:700;color:var(--ink);letter-spacing:.5px;margin-bottom:6px;}
+.landing-tag{font-size:13px;color:var(--blue2);font-style:italic;margin-bottom:40px;}
+.landing-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;max-width:800px;width:100%;margin:0 auto;}
+.landing-card{background:rgba(14,24,33,.85);border:1px solid var(--blue3);border-radius:14px;padding:22px 16px;cursor:pointer;transition:all .25s;backdrop-filter:blur(10px);text-align:center;}
+.landing-card:hover{border-color:var(--blue);background:rgba(14,32,64,.9);transform:translateY(-4px);box-shadow:0 12px 30px rgba(42,127,255,.2);}
+.landing-card .lc-icon{font-size:28px;margin-bottom:10px;}
+.landing-card .lc-title{font-size:13px;font-weight:600;color:var(--ink);}
+.landing-card .lc-sub{font-size:11px;color:var(--mut);margin-top:4px;}
+.view-wrap{opacity:0;transform:translateY(16px);transition:opacity .4s ease,transform .4s ease;}
+.view-wrap.visible{opacity:1;transform:none;}
 /* DISPATCH TAB */
 .disp-card{background:var(--navy2);border:1px solid var(--blue3);border-radius:12px;padding:16px 18px;margin-bottom:12px;position:relative;}
 .disp-card.overdue{border-color:rgba(192,57,43,.5);animation:dispBlink 1.2s infinite;}
@@ -296,7 +313,29 @@ table.dash{min-width:760px;}
   </div>
 </div>
 
-<div id="app" style="display:none">
+<div id="landing" class="landing">
+  <canvas id="landingCanvas" class="landing-canvas"></canvas>
+  <div class="landing-content">
+    <img id="landingLogo" class="landing-logo" alt="logo">
+    <svg id="landingSvg" class="landing-svg" width="72" height="72" viewBox="0 0 56 56">
+      <rect x="1" y="1" width="54" height="54" rx="9" fill="none" stroke="#1e3550" stroke-width="1.5"/>
+      <rect x="13" y="15" width="30" height="3.5" rx="1.75" fill="#2a7fff"/>
+      <rect x="13" y="22" width="23" height="3.5" rx="1.75" fill="#2a7fff" opacity=".7"/>
+      <rect x="13" y="29" width="30" height="3.5" rx="1.75" fill="#2a7fff" opacity=".45"/>
+      <rect x="13" y="36" width="17" height="3.5" rx="1.75" fill="#2a7fff" opacity=".25"/>
+    </svg>
+    <div class="landing-title">GEETANJALI WOODCRAFT</div>
+    <div class="landing-tag">Where Innovation Meets Functionality</div>
+    <div class="landing-cards">
+      <div class="landing-card" data-goto="edit"><div class="lc-icon">📝</div><div class="lc-title">New / Edit</div><div class="lc-sub">Create quotation</div></div>
+      <div class="landing-card" data-goto="quotes"><div class="lc-icon">📋</div><div class="lc-title">Quotes</div><div class="lc-sub">All quotations</div></div>
+      <div class="landing-card" data-goto="salesorders"><div class="lc-icon">📦</div><div class="lc-title">Sales Orders</div><div class="lc-sub">Confirmed orders</div></div>
+      <div class="landing-card" data-goto="approvals"><div class="lc-icon">✅</div><div class="lc-title">Approvals</div><div class="lc-sub">Pending approval</div></div>
+      <div class="landing-card" data-goto="dispatch"><div class="lc-icon">🚛</div><div class="lc-title">Dispatch</div><div class="lc-sub">Track deliveries</div></div>
+      <div class="landing-card" data-goto="dash"><div class="lc-icon">📊</div><div class="lc-title">Dashboard</div><div class="lc-sub">Overview</div></div>
+    </div>
+  </div>
+</div>
 <div class="wrap">
 
   <div class="brand">
@@ -334,7 +373,7 @@ table.dash{min-width:760px;}
   </div>
 
   <!-- NEW/EDIT -->
-  <div id="view-edit">
+  <div id="view-edit" class="view-wrap">
     <div class="card">
       <h2 id="detailsTitle">Quotation Details</h2>
       <div class="fgrid">
@@ -607,7 +646,18 @@ let CUR_QNO=''; // current doc being edited — for attachments
 
 function blank(){return{id:uid++,desc:'Main Door Frame',wood:'Red Meranti',customName:'',height:'2100',width:'1000',sectionRaw:'127mm x 57mm',rebate:'None',kan:'No',molding:'No',varnish:'No',hardware:'No',qty:1,fitting:0,rate:0};}
 function parseSection(str){if(!str||!str.trim())return{s1:5,s2:2.25};var nums=String(str).replace(/mm/gi,'').split(/[xX×*,]/).map(s=>parseFloat(s.trim())).filter(n=>!isNaN(n));if(nums.length>=2)return{s1:nums[0]/25.4,s2:nums[1]/25.4};if(nums.length===1)return{s1:nums[0]/25.4,s2:2.25};return{s1:5,s2:2.25};}
-function calcRate(l){var rft=(PDATA[l.wood]&&PDATA[l.wood][l.desc])||18.5;var{s1,s2}=parseSection(l.sectionRaw);var cft=(s1*s2/144)*rft;var rate=cft*(WRATE[l.wood]||0)+FADD;return{rft,cft,rate};}
+function roundUp05(ft){return Math.ceil(ft*2)/2;}
+function calcRate(l){
+  var{s1,s2}=parseSection(l.sectionRaw);
+  var h=parseFloat(l.height)||0,w=parseFloat(l.width)||0;
+  var hFt=h>0?roundUp05(h/304.8):0;
+  var wFt=w>0?roundUp05(w/304.8)+1:0;
+  /* fallback to standard rft if no dimensions entered */
+  var rft=(hFt>0&&wFt>0)?(hFt*2+wFt):((PDATA[l.wood]&&PDATA[l.wood][l.desc])||18.5);
+  var cft=(s1*s2/144)*rft;
+  var rate=cft*(WRATE[l.wood]||0)+FADD;
+  return{rft,cft,rate};
+}
 function rt(l){return((+l.rate||0)+(+l.fitting||0))*(+l.qty||0);}
 function inr(n){return'₹'+Math.round(n||0).toLocaleString('en-IN');}
 function pinr(n){return'Rs.'+Math.round(n||0).toLocaleString('en-IN');}
@@ -901,12 +951,62 @@ function showReminders(dispatches){
 }
 function switchView(v){['edit','quotes','salesorders','approvals','dispatch','dash'].forEach(n=>{document.getElementById('view-'+n).style.display=v===n?'':'none';});document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===v));if(v==='quotes'||v==='salesorders'||v==='approvals'||v==='dash')loadAllLists();if(v==='dispatch')loadDispatch();}
 
+/* LANDING ANIMATION */
+var landingAnim=null;
+function startLandingAnim(){
+  var cv=document.getElementById('landingCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d');var W,H,particles=[];
+  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(var i=0;i<60;i++)particles.push({x:Math.random()*1000,y:Math.random()*800,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*2+.5,a:Math.random()});
+  function frame(){
+    if(!document.getElementById('landing').classList.contains('show'))return;
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.a+=.008;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(42,127,255,${(.3+Math.sin(p.a)*.2)})`;ctx.fill();
+    });
+    /* subtle grid lines */
+    ctx.strokeStyle='rgba(42,127,255,.04)';ctx.lineWidth=1;
+    for(var x=0;x<W;x+=80){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(var y=0;y<H;y+=80){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    landingAnim=requestAnimationFrame(frame);
+  }
+  frame();
+}
+function showLanding(){
+  var l=document.getElementById('landing');l.classList.add('show');
+  /* sync logo to landing */
+  var li=document.getElementById('landingLogo'),ls=document.getElementById('landingSvg');
+  if(LOGO_DATA){li.src=LOGO_DATA.data;li.style.display='block';ls.style.display='none';}
+  else{li.style.display='none';ls.style.display='block';}
+  startLandingAnim();
+}
+function hideLanding(v){
+  var l=document.getElementById('landing');l.classList.remove('show');
+  if(landingAnim){cancelAnimationFrame(landingAnim);landingAnim=null;}
+  switchViewInner(v);
+}
+function switchViewInner(v){
+  ['edit','quotes','salesorders','approvals','dispatch','dash'].forEach(n=>{
+    var el=document.getElementById('view-'+n);
+    el.style.display=v===n?'':'none';
+    if(v===n){el.classList.remove('visible');requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('visible')));}
+  });
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===v));
+  if(v==='quotes'||v==='salesorders'||v==='approvals'||v==='dash')loadAllLists();
+  if(v==='dispatch')loadDispatch();
+}
+
 async function startApp(){
   document.getElementById('qdate').valueAsDate=new Date();updDT();
   await loadLogo();await loadRates();
   document.getElementById('qno').value=await nextNo();
   lines=[blank()];render();await refreshSaved();
   try{var{data:dispatches}=await sb.from('gwpl_dispatch').select('*');if(dispatches)showReminders(dispatches);}catch(e){}
+  showLanding();
 }
 
 (function(){
