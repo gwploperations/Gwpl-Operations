@@ -1080,8 +1080,12 @@ function renderDashboard(){
   fd.innerHTML='<span style="font-size:13px;color:#a8a29e;font-weight:500">Showing:</span>';
   const sel=el('select');sel.style.cssText='flex:1;max-width:300px;font-weight:600';
   const allOpt=el('option');allOpt.value='all';allOpt.textContent='All Projects';sel.appendChild(allOpt);
-  projects.forEach(p=>{const o=el('option');o.value=p.id;o.textContent=p.name;if(dashFilter===p.id)o.selected=true;sel.appendChild(o);});
-  if(dashFilter==='all')allOpt.selected=true;
+  projects.forEach(p=>{
+    const o=el('option');o.value=p.id;o.textContent=p.name;
+    if(dashFilter===p.id)o.selected=true;
+    sel.appendChild(o);
+  });
+  if(dashFilter==='all')sel.value='all';
   sel.onchange=e=>{dashFilter=e.target.value;render();};
   fd.appendChild(sel);wrap.appendChild(fd);
 
