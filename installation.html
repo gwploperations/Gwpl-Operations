@@ -90,6 +90,7 @@ const FAULT_REASONS= ['Damaged in transit','Wrong size','Manufacturing defect','
 const HW_ITEMS = ['Hinges','Mortise Lock','Door Handle Set','Door Closer','Tower Bolt','Aldrop','Door Stopper','Magnetic Catcher','Peephole','Latch','Screws','Door Knob','Floor Spring','Concealed Hinge'];
 const HW_STATUS= ['Pending','Sent','Received'];
 const CONTACTS= [{key:'sitePerson',label:'Geetanjali Site Person'},{key:'site',label:'Site Incharge'},{key:'head',label:'Project Head'},{key:'store',label:'Store Keeper'},{key:'qc',label:'QC Incharge'}];
+const DEFAULT_DEDUCTION = 1000;
 
 // ── helpers ──
 const uid = () => Math.random().toString(36).slice(2,10);
@@ -98,6 +99,11 @@ const clamp = (v,min,max) => Math.min(Math.max(v,min), max!=null?max:9999);
 const today = () => new Date().toISOString().slice(0,10);
 const fmtDate = s => s ? s.split('-').reverse().join('/') : '';
 const todayStr = () => new Date().toLocaleDateString('en-GB');
+const fmtMoney = n => '₹'+(Number(n)||0).toLocaleString('en-IN');
+const daysBetween = (from,to) => {
+  if(!from||!to) return 0;
+  return Math.round((new Date(to+'T00:00:00') - new Date(from+'T00:00:00'))/86400000);
+};
 const rel = ts => {
   if(!ts) return '';
   const s = Math.floor((Date.now()-ts)/1000);
@@ -111,6 +117,28 @@ const normContacts  = (c={}) => CONTACTS.reduce((a,r)=>({...a,[r.key]:{name:c?.[
 const emptyDoor = (label,frame,custom=false) => ({id:uid(),label,frame,custom,total:0,readyQty:0,holdQty:0,holdReason:'',promisedDate:'',notes:'',dispatchedQty:0,dispatchDate:'',arrivedQty:0,arrivalDate:'',noFrameNeeded:false,framesInstalled:0,doorsInstalled:0,handoverQty:0,faultyQty:0,faultyReason:'',faultyNotes:''});
 const emptyFloor = name => ({id:uid(),name,handoverDate:'',acceptedBy:'',doors:STD_DOORS.map(d=>emptyDoor(d.label,d.frame))});
 const normDoor = d => ({...emptyDoor('Door',true),...d});
+
+// ── commitment / penalty ──
+// Promised date = completion date committed by the fitter / installation team.
+// Deduction runs at <rate>/day from promised date → today (while open),
+// and freezes the moment an Actual completion date is filled in.
+function computeCommitment(project){
+  const promised = project.promisedDate||'';
+  const rate = num(project.deductionRate!=null?project.deductionRate:DEFAULT_DEDUCTION);
+  const done = project.actualCompletionDate||'';
+  if(!promised) return {status:'none',promised:'',done:'',rate,overdueDays:0,remaining:0,deduction:0};
+  const endRef = done || today();
+  const overdueDays = Math.max(daysBetween(promised,endRef),0);
+  const remaining = done ? 0 : Math.max(daysBetween(today(),promised),0);
+  const deduction = overdueDays*rate;
+  let status;
+  if(done) status = daysBetween(promised,done)>0 ? 'late-done' : 'ontime-done';
+  else if(overdueDays>0) status='overdue';
+  else if(remaining<=3) status='due-soon';
+  else status='upcoming';
+  return {status,promised,done,rate,overdueDays,remaining,deduction};
+}
+
 // ── state ──
 let session=null, loading=true, syncing=false;
 let projects=[], activity=[], adminPin=null, clientPin=null;
@@ -165,6 +193,9 @@ function normalizeProjects(arr){
     dailyLog:p.dailyLog||[],
     hardwareLog:p.hardwareLog||[],
     orderNo:p.orderNo||'',
+    promisedDate:p.promisedDate||'',
+    deductionRate:p.deductionRate!=null?p.deductionRate:DEFAULT_DEDUCTION,
+    actualCompletionDate:p.actualCompletionDate||'',
     contacts:normContacts(p.contacts)
   }));
 }
@@ -414,6 +445,13 @@ function renderProjectList(){
   projects.forEach(p=>{
     let total=0,ready=0,hold=0;
     p.floors.forEach(f=>f.doors.forEach(d=>{const c=normDoor(d);total+=c.total;ready+=c.readyQty;hold+=c.holdQty;}));
+    const cm=computeCommitment(p);
+    let commitTag='';
+    if(cm.status==='overdue') commitTag=`<span class="tag" style="background:#450a0a;color:#fca5a5">⚠ ${cm.overdueDays}d late · ${fmtMoney(cm.deduction)}</span>`;
+    else if(cm.status==='due-soon') commitTag=`<span class="tag" style="background:#451a03;color:#fbbf24">⏳ ${cm.remaining}d left · ${fmtDate(cm.promised)}</span>`;
+    else if(cm.status==='upcoming') commitTag=`<span class="tag" style="background:#1c1917;border:1px solid #44403c;color:#a8a29e">🎯 ${fmtDate(cm.promised)}</span>`;
+    else if(cm.status==='late-done') commitTag=`<span class="tag" style="background:#450a0a;color:#fca5a5">Done ${cm.overdueDays}d late · ${fmtMoney(cm.deduction)}</span>`;
+    else if(cm.status==='ontime-done') commitTag=`<span class="tag" style="background:#022c22;color:#6ee7b7">✅ On time</span>`;
     const card=div('card card-hover');
     card.onclick=()=>{activeId=p.id;render();};
     card.innerHTML=`
@@ -428,6 +466,7 @@ function renderProjectList(){
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
         <span class="tag" style="background:#292524;border:1px solid #44403c;color:#a8a29e">${p.floors.length} floors</span>
         ${p.orderNo?`<span class="tag" style="background:#082f49;color:#38bdf8">${p.orderNo}</span>`:''}
+        ${commitTag}
       </div>
       <div style="display:flex;gap:12px;margin-top:10px;font-size:12px">
         <span style="color:#a8a29e">Total <b style="color:#e7e5e4">${total}</b></span>
@@ -458,10 +497,10 @@ function renderAddProjectModal(){
   let contacts=emptyContacts();
   box.innerHTML=`<div class="modal-head"><h3 style="color:#f59e0b;font-weight:600">New Project</h3><button onclick="closeModal()" style="background:none;border:none;color:#78716c;cursor:pointer;font-size:20px">✕</button></div>`;
 
-  const addField=(lbl,placeholder,id,type='text')=>{
+  const addField=(lbl,placeholder,id,type='text',val='')=>{
     const l=el('label');l.style.marginBottom='10px';l.style.display='block';
     l.innerHTML=`<span>${lbl}</span>`;
-    const i=el('input');i.type=type;i.placeholder=placeholder;i.id='np_'+id;
+    const i=el('input');i.type=type;i.placeholder=placeholder;i.id='np_'+id;if(val!=='')i.value=val;
     l.appendChild(i);box.appendChild(l);
   };
   addField('Project / Site name','e.g. Shree Heights, Kharghar','name');
@@ -469,7 +508,11 @@ function renderAddProjectModal(){
   addField('Builder name','e.g. ABC Developers','builder');
   addField('Location','e.g. Panvel','location');
 
-  const ctitle=div('');ctitle.style.cssText='font-size:12px;font-weight:600;color:#f59e0b;margin:12px 0 8px';ctitle.textContent='Site Team Contacts';box.appendChild(ctitle);
+  const ctitle=div('');ctitle.style.cssText='font-size:12px;font-weight:600;color:#f59e0b;margin:12px 0 8px';ctitle.textContent='Completion Commitment';box.appendChild(ctitle);
+  addField('Promised completion date (fitter commitment)','','promised','date');
+  addField('Deduction rate (₹ per day late)','e.g. 1000 or 500','rate','number',String(DEFAULT_DEDUCTION));
+
+  const ctitle2=div('');ctitle2.style.cssText='font-size:12px;font-weight:600;color:#f59e0b;margin:12px 0 8px';ctitle2.textContent='Site Team Contacts';box.appendChild(ctitle2);
   CONTACTS.forEach(r=>{
     const rw=div('');rw.style.marginBottom='10px';
     const lbl=div('');lbl.style.cssText='font-size:12px;color:#a8a29e;margin-bottom:4px';lbl.textContent=r.label;rw.appendChild(lbl);
@@ -484,13 +527,67 @@ function renderAddProjectModal(){
     if(!name){alert('Please enter a project name.');return;}
     const c=emptyContacts();
     CONTACTS.forEach(r=>{c[r.key]={name:document.getElementById('c_'+r.key+'_name')?.value.trim()||'',phone:document.getElementById('c_'+r.key+'_phone')?.value.trim()||''};});
-    const np={id:uid(),createdAt:Date.now(),name,orderNo:document.getElementById('np_order')?.value.trim()||'',builder:document.getElementById('np_builder')?.value.trim()||'',location:document.getElementById('np_location')?.value.trim()||'',contacts:c,floors:[],dailyLog:[],hardwareLog:[],lastUpdate:{who:userName(),ts:Date.now()}};
+    const rateRaw=document.getElementById('np_rate')?.value;
+    const np={id:uid(),createdAt:Date.now(),name,orderNo:document.getElementById('np_order')?.value.trim()||'',builder:document.getElementById('np_builder')?.value.trim()||'',location:document.getElementById('np_location')?.value.trim()||'',promisedDate:document.getElementById('np_promised')?.value||'',deductionRate:rateRaw!==''&&rateRaw!=null?num(rateRaw):DEFAULT_DEDUCTION,actualCompletionDate:'',contacts:c,floors:[],dailyLog:[],hardwareLog:[],lastUpdate:{who:userName(),ts:Date.now()}};
     projects=[np,...projects];saveProjects();pushActivity(np.name,'Project (new)');modal=null;activeId=np.id;render();
   });
   sb2.style.cssText='width:100%;justify-content:center;margin-top:16px';
   box.appendChild(sb2);bg.appendChild(box);return bg;
 }
 window.closeModal=()=>{modal=null;render();};
+
+// ── commitment / penalty card ──
+function renderCommitmentCard(project){
+  const c=computeCommitment(project);
+  const palette={
+    overdue:['#450a0a','#7f1d1d','#fca5a5'],
+    'due-soon':['#451a03','#92400e','#fbbf24'],
+    upcoming:['#1c1917','#44403c','#a8a29e'],
+    'late-done':['#450a0a','#7f1d1d','#fca5a5'],
+    'ontime-done':['#022c22','#065f46','#6ee7b7'],
+    none:['#1c1917','#44403c','#78716c']
+  };
+  const pal=palette[c.status]||palette.none;
+  const card=div('card');
+  card.style.cssText=`border:1px solid ${pal[1]};margin-bottom:12px`;
+  card.innerHTML=`<div style="font-weight:600;font-size:13px;color:#f59e0b;margin-bottom:4px">🎯 Completion Commitment & Penalty</div>
+  <div style="font-size:11px;color:#78716c;margin-bottom:10px">Promised date = date committed by the fitter. Deduction runs until you fill the Actual completion date.</div>`;
+
+  const grid=div('grid3');grid.style.gap='8px';
+  const pl=el('label');pl.innerHTML='<span>Promised date (fitter)</span>';
+  const pi=el('input');pi.type='date';pi.value=project.promisedDate||'';
+  pi.onchange=e=>updateProject(project.id,p=>({...p,promisedDate:e.target.value}));
+  pl.appendChild(pi);grid.appendChild(pl);
+
+  const rl=el('label');rl.innerHTML='<span>Deduction ₹/day late</span>';
+  const ri=el('input');ri.type='number';ri.value=project.deductionRate!=null?project.deductionRate:DEFAULT_DEDUCTION;ri.placeholder=String(DEFAULT_DEDUCTION);
+  ri.onchange=e=>updateProject(project.id,p=>({...p,deductionRate:num(e.target.value)}));
+  rl.appendChild(ri);grid.appendChild(rl);
+
+  const cl=el('label');cl.innerHTML='<span>Actual completion</span>';
+  const ci=el('input');ci.type='date';ci.value=project.actualCompletionDate||'';
+  ci.onchange=e=>updateProject(project.id,p=>({...p,actualCompletionDate:e.target.value}));
+  cl.appendChild(ci);grid.appendChild(cl);
+  card.appendChild(grid);
+
+  const strip=div('');strip.style.cssText=`margin-top:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 12px;border-radius:8px;background:${pal[0]};border:1px solid ${pal[1]}`;
+  let msg='';
+  if(c.status==='none') msg='Set a promised date to start tracking this site.';
+  else if(c.status==='upcoming') msg=`🕒 ${c.remaining} day${c.remaining===1?'':'s'} left until promised date (${fmtDate(c.promised)}).`;
+  else if(c.status==='due-soon') msg=`⏳ Due soon — ${c.remaining} day${c.remaining===1?'':'s'} left (${fmtDate(c.promised)}).`;
+  else if(c.status==='overdue') msg=`⚠ Overdue by ${c.overdueDays} day${c.overdueDays===1?'':'s'} — penalty still running.`;
+  else if(c.status==='late-done') msg=`Completed ${fmtDate(c.done)} — ${c.overdueDays} day${c.overdueDays===1?'':'s'} late.`;
+  else if(c.status==='ontime-done') msg=`✅ Completed ${fmtDate(c.done)} on time. No deduction.`;
+  const left=div('');left.style.cssText=`font-size:12px;color:${pal[2]};flex:1;min-width:160px`;left.innerHTML=msg;
+  const right=div('');right.style.cssText='text-align:right';
+  if(c.deduction>0){
+    right.innerHTML=`<div style="font-size:11px;color:#a8a29e">Deduction</div><div style="font-size:22px;font-weight:700;color:#f87171">${fmtMoney(c.deduction)}</div><div style="font-size:10px;color:#78716c">${c.overdueDays} days × ${fmtMoney(c.rate)}</div>`;
+  } else if(c.promised){
+    right.innerHTML=`<div style="font-size:11px;color:#a8a29e">Deduction</div><div style="font-size:22px;font-weight:700;color:#10b981">₹0</div>`;
+  }
+  strip.append(left,right);card.appendChild(strip);
+  return card;
+}
 
 // ── project detail ──
 function renderProjectDetail(project){
@@ -512,6 +609,9 @@ function renderProjectDetail(project){
     if(inp) inp.onchange=e=>updateProject(project.id,p=>({...p,[k==='order'?'orderNo':k]:e.target.value}));
   });
   wrap.appendChild(mc);
+
+  // commitment / penalty
+  wrap.appendChild(renderCommitmentCard(project));
 
   // contacts
   const cc=div('card');
@@ -743,12 +843,13 @@ function renderDispatch(){
 function exportToExcel(projectId) {
   const toExport = projectId ? projects.filter(p=>p.id===projectId) : projects;
   const rows = [];
-  rows.push(['Project','Floor','Door Type','Total','Ready','On Hold','Hold Reason','Promised Date','Frames Installed','Doors Installed','Faulty','Faulty Reason','Dispatched','Dispatch Date','Arrived','Arrival Date','Handed Over','Notes']);
+  rows.push(['Project','Floor','Door Type','Total','Ready','On Hold','Hold Reason','Promised Date','Frames Installed','Doors Installed','Faulty','Faulty Reason','Dispatched','Dispatch Date','Arrived','Arrival Date','Handed Over','Notes','Site Promised Date','Actual Completion','Deduction/Day','Days Late','Deduction Amount']);
   toExport.forEach(p => {
+    const cm=computeCommitment(p);
     p.floors.forEach(f => {
       (f.doors||[]).forEach(raw => {
         const c=normDoor(raw);
-        rows.push([p.name,f.name,c.label,c.total,c.readyQty,c.holdQty,c.holdReason||'',fmtDate(c.promisedDate),c.framesInstalled,c.doorsInstalled,c.faultyQty||0,c.faultyReason||'',c.dispatchedQty||0,fmtDate(c.dispatchDate),c.arrivedQty||0,fmtDate(c.arrivalDate),c.handoverQty||0,c.notes||'']);
+        rows.push([p.name,f.name,c.label,c.total,c.readyQty,c.holdQty,c.holdReason||'',fmtDate(c.promisedDate),c.framesInstalled,c.doorsInstalled,c.faultyQty||0,c.faultyReason||'',c.dispatchedQty||0,fmtDate(c.dispatchDate),c.arrivedQty||0,fmtDate(c.arrivalDate),c.handoverQty||0,c.notes||'',fmtDate(p.promisedDate),fmtDate(p.actualCompletionDate),cm.rate,cm.overdueDays,cm.deduction]);
       });
     });
   });
@@ -1090,6 +1191,39 @@ function renderDashboard(){
   fd.appendChild(sel);wrap.appendChild(fd);
 
   const filtered=dashFilter==='all'?projects:projects.filter(p=>p.id===dashFilter);
+
+  // ── commitments / penalties section ──
+  const commits=filtered.map(p=>({p,c:computeCommitment(p)})).filter(x=>x.c.promised);
+  if(commits.length){
+    const order={overdue:0,'due-soon':1,'late-done':2,upcoming:3,'ontime-done':4};
+    commits.sort((a,b)=>(order[a.c.status]-order[b.c.status]) || (b.c.deduction-a.c.deduction) || ((a.c.promised||'').localeCompare(b.c.promised||'')));
+    const totalDed=commits.reduce((s,x)=>s+x.c.deduction,0);
+    const overdueCount=commits.filter(x=>x.c.status==='overdue').length;
+    const sec=div('');
+    sec.innerHTML=`<h3 style="font-size:13px;font-weight:600;margin-bottom:8px">🎯 Site Completion Commitments${overdueCount?` <span style="color:#fca5a5">· ${overdueCount} overdue</span>`:''}</h3>`;
+    const tbl=div('');tbl.style.cssText='background:#292524;border:1px solid #44403c;border-radius:12px;overflow:hidden;margin-bottom:12px';
+    commits.forEach(({p,c})=>{
+      let label;
+      if(c.status==='overdue') label=`<span style="color:#fca5a5">⚠ ${c.overdueDays}d late</span>`;
+      else if(c.status==='due-soon') label=`<span style="color:#fbbf24">⏳ ${c.remaining}d left</span>`;
+      else if(c.status==='upcoming') label=`<span style="color:#a8a29e">${c.remaining}d left</span>`;
+      else if(c.status==='late-done') label=`<span style="color:#fca5a5">Done ${c.overdueDays}d late</span>`;
+      else label=`<span style="color:#6ee7b7">✅ On time</span>`;
+      const row=div('');row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #44403c;gap:8px;cursor:pointer';
+      row.onclick=()=>{tab='projects';activeId=p.id;render();};
+      row.innerHTML=`<div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div><div style="font-size:11px;color:#78716c">🎯 ${fmtDate(c.promised)}${c.done?' · ✅ '+fmtDate(c.done):''}${c.rate?' · '+fmtMoney(c.rate)+'/day':''}</div></div>
+      <div style="display:flex;align-items:center;gap:14px;font-size:12px;white-space:nowrap">${label}<span style="font-weight:700;color:${c.deduction>0?'#f87171':'#10b981'}">${fmtMoney(c.deduction)}</span></div>`;
+      tbl.appendChild(row);
+    });
+    sec.appendChild(tbl);
+    if(totalDed>0){
+      const tot=div('');tot.style.cssText='display:flex;justify-content:space-between;align-items:center;background:#450a0a;border:1px solid #7f1d1d;border-radius:10px;padding:12px 16px;margin-bottom:16px';
+      tot.innerHTML=`<span style="font-size:13px;color:#fca5a5;font-weight:600">Total deduction (installation team)</span><span style="font-size:20px;font-weight:700;color:#f87171">${fmtMoney(totalDed)}</span>`;
+      sec.appendChild(tot);
+    }
+    wrap.appendChild(sec);
+  }
+
   let T=0,R=0,H=0,P=0,FT=0,FI=0,DT=0,DI=0,HD=0,FA=0;
   const per={},reasons={};
   filtered.forEach(p=>p.floors.forEach(f=>f.doors.forEach(raw=>{
