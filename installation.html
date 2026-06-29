@@ -553,22 +553,36 @@ function renderCommitmentCard(project){
   card.innerHTML=`<div style="font-weight:600;font-size:13px;color:#f59e0b;margin-bottom:4px">🎯 Completion Commitment & Penalty</div>
   <div style="font-size:11px;color:#78716c;margin-bottom:10px">Promised date = date committed by the fitter. Deduction runs until you fill the Actual completion date.</div>`;
 
+  // Save quietly without a full re-render so the date field isn't destroyed mid-edit.
+  // The status strip refreshes next time the screen renders (tab switch / back).
+  const saveQuiet=(field,val)=>{
+    projects=projects.map(p=>p.id===project.id?{...p,[field]:val,lastUpdate:{who:userName(),ts:Date.now()}}:p);
+    project[field]=val;
+    pushActivity(project.name,'Commitment');
+    saveProjects();
+  };
+
   const grid=div('grid3');grid.style.gap='8px';
   const pl=el('label');pl.innerHTML='<span>Promised date (fitter)</span>';
   const pi=el('input');pi.type='date';pi.value=project.promisedDate||'';
-  pi.onchange=e=>updateProject(project.id,p=>({...p,promisedDate:e.target.value}));
+  pi.onchange=e=>saveQuiet('promisedDate',e.target.value);
   pl.appendChild(pi);grid.appendChild(pl);
 
   const rl=el('label');rl.innerHTML='<span>Deduction ₹/day late</span>';
   const ri=el('input');ri.type='number';ri.value=project.deductionRate!=null?project.deductionRate:DEFAULT_DEDUCTION;ri.placeholder=String(DEFAULT_DEDUCTION);
-  ri.onchange=e=>updateProject(project.id,p=>({...p,deductionRate:num(e.target.value)}));
+  ri.onblur=e=>saveQuiet('deductionRate',num(e.target.value));
   rl.appendChild(ri);grid.appendChild(rl);
 
   const cl=el('label');cl.innerHTML='<span>Actual completion</span>';
   const ci=el('input');ci.type='date';ci.value=project.actualCompletionDate||'';
-  ci.onchange=e=>updateProject(project.id,p=>({...p,actualCompletionDate:e.target.value}));
+  ci.onchange=e=>saveQuiet('actualCompletionDate',e.target.value);
   cl.appendChild(ci);grid.appendChild(cl);
+
+  // Manual refresh so the status strip + deduction recalculate on demand
+  const refreshBar=div('');refreshBar.style.cssText='margin-top:10px;text-align:right';
+  refreshBar.appendChild(btn('btn btn-ghost btn-sm','↻ Update status',()=>render()));
   card.appendChild(grid);
+  card.appendChild(refreshBar);
 
   const strip=div('');strip.style.cssText=`margin-top:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 12px;border-radius:8px;background:${pal[0]};border:1px solid ${pal[1]}`;
   let msg='';
