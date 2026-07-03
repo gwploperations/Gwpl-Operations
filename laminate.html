@@ -882,8 +882,7 @@ $('#addSubmit').onclick=async()=>{
     c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transform=`perspective(700px) rotateY(${x*9}deg) rotateX(${-y*9}deg) translateY(-6px) scale(1.03)`;});
     c.addEventListener('mouseleave',()=>c.style.transform='');
   }
-  LOG.unshift({id:Date.now(),code,size,act:'add',from:0,to:qty,by:myName,ts:Date.now(),note});
-  LOG=LOG.slice(0,80);renderFeed();dash();render();
+  dash();render();
   msg.style.color='var(--in)';msg.textContent='✓ Added to vault!';
   $('#addSubmit').disabled=false;$('#addSubmit').textContent='Add to Vault';
   setTimeout(()=>$('#addModal').classList.remove('show'),1200);
