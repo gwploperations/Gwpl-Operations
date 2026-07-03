@@ -776,7 +776,9 @@ $('#addLamSubmit').onclick=async()=>{
   if(!size){msg.style.color='var(--out)';msg.textContent='Please enter the sheet size.';return;}
   if(note.replace(/\s/g,'').length<4){msg.style.color='var(--out)';msg.textContent='Please add a note — where did this stock come from?';return;}
   $('#addLamSubmit').disabled=true;$('#addLamSubmit').textContent='Adding…';
-  const newId=RAW.length;
+  // Get next available ID safely
+  const existingIds=RAW.map(d=>d.id);
+  const newId=existingIds.length>0?Math.max(...existingIds)+1:0;
   const newEntry={id:newId,code,thickness:thk?parseFloat(thk):null,size,qty};
   const {error}=await sb.from('lam_laminates').insert([newEntry]);
   if(error){msg.style.color='var(--out)';msg.textContent='Error: '+error.message;$('#addLamSubmit').disabled=false;$('#addLamSubmit').textContent='Add to Vault';return;}
@@ -812,7 +814,7 @@ $('#addLamSubmit').onclick=async()=>{
     <div style="padding:24px 26px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
         <div style="font-family:var(--serif);font-size:24px">Add New Laminate</div>
-        <button class="x" style="position:static" id="addLamX">×</button>
+        <button id="addLamX" style="background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--ink);width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:grid;place-items:center;flex:none">×</button>
       </div>
       <div class="addform">
         <div class="fld"><label>Laminate Code / Number</label><input id="newCode" placeholder="e.g. SF1236, 10510, WP212" autocomplete="off"></div>
