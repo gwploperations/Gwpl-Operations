@@ -1,0 +1,14 @@
+{
+  "name": "GWPL People — Geetanjali Woodcraft HRMS",
+  "short_name": "GWPL People",
+  "start_url": "./gwpl-people.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F4F3FB",
+  "theme_color": "#7C46F1",
+  "description": "GWPL's internal HR, attendance, and field-tracking app.",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
