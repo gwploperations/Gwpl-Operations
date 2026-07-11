@@ -516,6 +516,7 @@ const RAW=[
 ];
 RAW.forEach((d,i)=>{d.id=i;d.ts=0;d.by='';d.note='';});
 let LOG=[];
+const byId=id=>RAW.find(x=>x.id===id);
 const $=s=>document.querySelector(s);
 const $$=s=>document.querySelectorAll(s);
 const LOW=10;
@@ -636,7 +637,16 @@ async function seedIfEmpty(){
 }
 async function loadLaminates(){
   const {data}=await sb.from('lam_laminates').select('*');
-  if(data)data.forEach(r=>{const d=RAW[r.id];if(d){d.q=r.qty;d.ts=r.updated_at?Date.parse(r.updated_at):0;d.by=r.updated_by||'';d.note=r.note||'';}});
+  if(!data)return;
+  data.forEach(r=>{
+    let d=RAW.find(x=>x.id===r.id);
+    if(d){
+      d.q=r.qty;d.ts=r.updated_at?Date.parse(r.updated_at):0;d.by=r.updated_by||'';d.note=r.note||'';
+    }else{
+      // Laminate added via the app - exists only in DB, add it to RAW
+      RAW.push({id:r.id,n:r.code,t:r.thickness,s:r.size,q:r.qty,ts:r.updated_at?Date.parse(r.updated_at):0,by:r.updated_by||'',note:r.note||''});
+    }
+  });
 }
 async function loadMovements(){
   const {data}=await sb.from('lam_movements').select('*').order('created_at',{ascending:false}).limit(80);
@@ -646,7 +656,7 @@ async function loadMovements(){
 function subscribe(){
   sb.channel('lam-rt')
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'lam_laminates'},p=>{
-      const r=p.new,d=RAW[r.id];if(!d)return;
+      const r=p.new,d=RAW.find(x=>x.id===r.id);if(!d)return;
       d.q=r.qty;d.ts=r.updated_at?Date.parse(r.updated_at):d.ts;d.by=r.updated_by||d.by;d.note=r.note||'';
       refreshCard(r.id);dash();if(spotId===r.id)renderSpot();
     })
@@ -662,7 +672,7 @@ async function applyChange(id,act,n,note){
     alert('Please add a note — '+(act==='damage'?'how it was damaged.':act==='add'?'where the stock came from.':act==='set'?'why you are correcting the count.':'where it was used.'));
     return false;
   }
-  const d=RAW[id],from=d.q;
+  const d=byId(id),from=d.q;
   let to=act==='set'?Math.max(0,n):(act==='use'||act==='damage')?Math.max(0,d.q-n):d.q+n;
   if(to===from&&act!=='set')return true;
   const ts=Date.now();
@@ -709,9 +719,9 @@ function renderCombo(filter){
   list.classList.add('open');
   list.querySelectorAll('.copt[data-id]').forEach(o=>o.onclick=()=>selectSpot(+o.dataset.id));
 }
-function selectSpot(id){spotId=id;$('#comboInput').value=RAW[id].n;$('#comboList').classList.remove('open');renderSpot();}
+function selectSpot(id){spotId=id;$('#comboInput').value=byId(id).n;$('#comboList').classList.remove('open');renderSpot();}
 function renderSpot(){
-  if(spotId==null)return;const d=RAW[spotId],st=status(d.q);
+  if(spotId==null)return;const d=byId(spotId),st=status(d.q);
   $('#spotview').innerHTML=`
     <div class="sv-sw" style="background:${swatch(d.n)}"></div>
     <div class="sv-body">
@@ -773,7 +783,7 @@ function render(){
   $('#shown').textContent=list.length;$('#totl').textContent=RAW.length;
 }
 function refreshCard(id){
-  const d=RAW[id],c=grid.querySelector(`.card[data-id="${id}"]`);if(!c)return;
+  const d=byId(id),c=grid.querySelector(`.card[data-id="${id}"]`);if(!c)return;
   c.querySelector('[data-q]').innerHTML=`<small>Qty</small>${d.q}`;
   c.querySelector('[data-det]').innerHTML=cardDet(d);
   const r=c.querySelector('.ring'),col=stColor[status(d.q)];
@@ -789,7 +799,7 @@ function attachTilt(){
 
 let curId=null;
 function openModal(id){
-  curId=id;const d=RAW[id],st=status(d.q);
+  curId=id;const d=byId(id),st=status(d.q);
   $('#mhead').style.background=swatch(d.n);$('#mcode').textContent=d.n;
   $('#mthk').textContent=d.t?d.t+' mm':'—';$('#msz').textContent=d.s;$('#mq').textContent=d.q+' pcs';
   const ms=$('#mst');ms.textContent=stLabel[st];ms.style.background=stSoft[st];ms.style.color=stColor[st];
