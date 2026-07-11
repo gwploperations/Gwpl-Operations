@@ -862,10 +862,9 @@ $('#addSubmit').onclick=async()=>{
   if(!size){msg.style.color='var(--out)';msg.textContent='Please enter the sheet size.';return;}
   if(note.replace(/\s/g,'').length<4){msg.style.color='var(--out)';msg.textContent='Please add a note — where did this stock come from?';return;}
   $('#addSubmit').disabled=true;$('#addSubmit').textContent='Adding…';
-  const existingIds=RAW.map(d=>d.id);
-  const newId=existingIds.length>0?Math.max(...existingIds)+1:0;
-  const {error}=await sb.from('lam_laminates').insert([{id:newId,code,thickness:thk?parseFloat(thk):null,size,qty}]);
+  const {data:inserted,error}=await sb.from('lam_laminates').insert([{code,thickness:thk?parseFloat(thk):null,size,qty}]).select().single();
   if(error){msg.style.color='var(--out)';msg.textContent='Error: '+error.message;$('#addSubmit').disabled=false;$('#addSubmit').textContent='Add to Vault';return;}
+  const newId=inserted.id;
   await sb.from('lam_movements').insert({laminate_id:newId,code,size,act:'add',qty_from:0,qty_to:qty,by_name:myName,note});
   const d={id:newId,n:code,t:thk?parseFloat(thk):null,s:size,q:qty,ts:Date.now(),by:myName,note};
   RAW.push(d);
