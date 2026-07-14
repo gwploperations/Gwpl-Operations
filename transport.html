@@ -1,0 +1,4293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GWPL Control Tower — Dispatch & Logistics</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --ink:#0B1020; --ink-2:#1F2433; --aqua:#4F46E5; --aqua-d:#4338CA; --cyan:#7C3AED;
+  --indigo:#4F46E5; --indigo-d:#4338CA; --violet:#7C3AED;
+  --mint:#FBFBFE; --mint-2:#F1F2FB; --card:#FFFFFF; --line:#E8EAF3;
+  --coral:#E5484D; --coral-bg:#FCECEC; --amber:#C98A17; --amber-bg:#FBF3E1;
+  --green:#129E6E; --green-bg:#E7F6EF; --slate:#5B6478; --slate-2:#8A93A6;
+  --violet-bg:#F1EBFA; --grid:rgba(79,70,229,.05);
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 12px 30px rgba(16,24,40,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:"Times New Roman",Times,Georgia,serif;background:
+  linear-gradient(to right, var(--grid) 1px, transparent 1px) 0 0/52px 52px,
+  linear-gradient(to bottom, var(--grid) 1px, transparent 1px) 0 0/52px 52px,var(--mint);
+  color:var(--ink);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:"Times New Roman",Times,Georgia,serif;margin:0;letter-spacing:-.01em}
+.mono{font-family:"Times New Roman",Times,Georgia,serif}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:inherit;font-size:14px}
+a{color:var(--aqua-d)}
+svg{width:1em;height:1em;flex-shrink:0}
+
+.app{display:flex;min-height:100vh}
+.side{width:236px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);color:var(--ink-2);padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
+.brand{display:flex;align-items:center;gap:11px;padding:6px 8px 20px}
+.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--indigo),var(--violet));display:grid;place-items:center;box-shadow:0 6px 16px rgba(79,70,229,.28)}
+.logo svg{width:22px;height:22px}
+.brand b{font-family:"Times New Roman",Times,Georgia,serif;color:var(--ink);font-size:16px;display:block;line-height:1.1;font-weight:800}
+.brand span{font-size:10.5px;color:var(--slate-2);letter-spacing:.12em;text-transform:uppercase}
+.nav{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:var(--slate);font-size:13.5px;font-weight:500;transition:.15s;width:100%;text-align:left}
+.nav:hover{background:var(--mint-2);color:var(--indigo)}
+.nav.on{background:var(--violet-bg);color:var(--indigo);box-shadow:inset 0 0 0 1px rgba(79,70,229,.18);font-weight:600}
+.nav svg{width:17px;height:17px;flex-shrink:0}
+.nav .badge{margin-left:auto;background:var(--coral);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 5px}
+.side-foot{margin-top:auto;font-size:11px;color:var(--slate-2);padding:10px 8px 0;line-height:1.5}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px}
+
+.main{flex:1;min-width:0;padding:26px 30px 60px;max-width:1480px}
+.top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.top h1{font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.top p{margin:5px 0 0;color:var(--slate);font-size:13.5px}
+.top .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:999px;font-size:13.5px;font-weight:600;transition:.15s;white-space:nowrap}
+.btn svg{width:15px;height:15px}
+.btn-p{background:var(--indigo);color:#fff;box-shadow:0 4px 12px rgba(79,70,229,.22)}
+.btn-p:hover{background:var(--indigo-d);transform:translateY(-1px)}
+.btn-g{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn-g:hover{box-shadow:inset 0 0 0 1px var(--indigo);color:var(--indigo)}
+.btn-sm{padding:6px 11px;font-size:12.5px}
+.btn-d{background:var(--coral-bg);color:var(--coral)}
+.btn-d:hover{background:#ffdede}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.grid{display:grid;gap:16px}
+.stat{padding:18px 20px;position:relative;overflow:hidden}
+.stat .k{font-size:11.5px;color:var(--slate);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.stat .v{font-family:"Times New Roman",Times,Georgia,serif;font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:6px;line-height:1}
+.stat .s{font-size:12px;color:var(--slate-2);margin-top:7px}
+.stat .ic{position:absolute;right:16px;top:16px;width:34px;height:34px;border-radius:10px;display:grid;place-items:center}
+.stat .ic svg{width:18px;height:18px}
+
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600}
+.chip svg{width:12px;height:12px}
+.c-hub{background:var(--amber-bg);color:#B7791F}
+.c-delivered{background:var(--green-bg);color:#0B8A66}
+.c-porter{background:#E6F1FB;color:#2b6cb0}
+.c-loaded{background:var(--mint-2);color:var(--aqua-d)}
+.c-sample{background:var(--violet-bg);color:var(--violet)}
+.c-full{background:#E6F1FB;color:#2b6cb0}
+.c-paid{background:var(--green-bg);color:#0B8A66}
+.c-unpaid{background:var(--coral-bg);color:#D64545}
+.c-pri{background:var(--ink);color:#fff}
+.c-attn{background:var(--coral);color:#fff}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:11px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate);font-weight:600;border-bottom:1px solid var(--line);white-space:nowrap;background:#F4FBF9}
+td{padding:10px 12px;border-bottom:1px solid #EDF6F4;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--mint)}
+.t-wrap{overflow-x:auto;border-radius:16px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);transition:.15s;min-width:0}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--aqua);box-shadow:0 0 0 3px rgba(79,70,229,.14)}
+.field .hint{font-size:11px;color:var(--slate-2);margin-top:5px}
+.f-row{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+.f-row-3{display:grid;gap:12px;grid-template-columns:1fr 1fr 1fr}
+.f-row-4{display:grid;gap:10px;grid-template-columns:1fr 1fr 1fr 1fr}
+.f-row>*,.f-row-3>*,.f-row-4>*{min-width:0}
+
+.overlay{position:fixed;inset:0;background:rgba(11,61,58,.42);backdrop-filter:blur(3px);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:34px 16px;overflow-y:auto}
+.modal{background:var(--mint);border-radius:20px;width:100%;max-width:720px;box-shadow:0 30px 80px rgba(11,61,58,.3);animation:pop .2s ease}
+.modal.wide{max-width:900px}
+@keyframes pop{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.modal-head{padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.modal-head h3{font-size:18px;font-weight:600}
+.modal-body{padding:20px 24px;max-height:74vh;overflow-y:auto;overflow-x:hidden}
+.modal-foot{padding:14px 24px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line);flex-wrap:wrap}
+.x{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--slate)}
+.x:hover{background:var(--mint-2)}
+
+.section-t{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--slate);font-weight:700;margin:20px 0 12px;display:flex;align-items:center;gap:8px}
+.section-t:before{content:'';width:14px;height:2px;background:var(--aqua);border-radius:2px}
+
+.alert{display:flex;gap:10px;padding:12px 15px;border-radius:12px;font-size:13px;align-items:flex-start;margin-bottom:14px}
+.alert svg{width:17px;height:17px;flex-shrink:0;margin-top:1px}
+.alert-warn{background:var(--coral-bg);color:#C23B3B}
+.alert-ok{background:var(--green-bg);color:#0B8A66}
+.alert-info{background:#E6F1FB;color:#2b6cb0}
+
+.empty{text-align:center;padding:44px 20px;color:var(--slate-2)}
+.empty svg{width:44px;height:44px;margin-bottom:12px;opacity:.5}
+.empty h4{font-size:15px;color:var(--slate);margin-bottom:5px}
+
+.tabbar{display:flex;gap:4px;background:#fff;padding:5px;border-radius:12px;box-shadow:var(--shadow);margin-bottom:20px;flex-wrap:wrap;border:1px solid rgba(207,233,228,.7)}
+.tab{padding:8px 15px;border-radius:8px;font-size:13px;font-weight:600;color:var(--slate)}
+.tab.on{background:var(--mint);color:var(--ink)}
+.tab:hover:not(.on){color:var(--ink)}
+
+.pill-toggle{display:inline-flex;background:var(--mint-2);border-radius:10px;padding:3px}
+.pill-toggle button{padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--slate)}
+.pill-toggle button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+
+.mini-x{width:28px;height:28px;border-radius:8px;color:var(--coral);display:grid;place-items:center;flex-shrink:0}
+.mini-x:hover{background:var(--coral-bg)}
+
+.kv{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;border-bottom:1px dashed #E0EFEC}
+.kv:last-child{border-bottom:none}
+.kv .lbl{color:var(--slate)}
+.kv .val{font-weight:600;font-family:"Times New Roman",Times,Georgia,serif}
+
+.search{position:relative}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--slate-2)}
+.search input{padding:9px 12px 9px 36px;border-radius:10px;border:1px solid var(--line);background:#fff}
+
+.attach-box{border:1.5px dashed var(--line);border-radius:12px;padding:16px;text-align:center;cursor:pointer;background:#fff;transition:.15s}
+.attach-box:hover{border-color:var(--aqua);background:var(--mint)}
+.attach-box svg{width:22px;height:22px;color:var(--aqua);margin-bottom:6px}
+.attach-item{display:flex;align-items:center;gap:8px;padding:8px 11px;background:#fff;border-radius:9px;border:1px solid var(--line);font-size:12.5px;margin-top:8px}
+.attach-item .grow{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:100;box-shadow:0 12px 30px rgba(0,0,0,.25);display:flex;align-items:center;gap:9px;animation:pop .2s}
+.toast svg{width:16px;height:16px;color:var(--cyan)}
+
+.seg{height:12px;border-radius:8px;overflow:hidden;display:flex;background:var(--mint-2)}
+.seg span{height:100%}
+.seg-legend{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-size:12px;color:var(--slate)}
+.seg-legend b{color:var(--ink)}
+.leg-dot{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:6px;vertical-align:middle}
+.client-pick{padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;min-width:230px;font-weight:600}
+
+.cons{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.cons-head{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap}
+.cons-title{font-family:"Times New Roman",Times,Georgia,serif;font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px}
+
+/* dispatch item rows — compact, no overflow */
+.disp-head,.disp-row{display:grid;grid-template-columns:1.6fr .9fr 1fr .9fr 1fr;gap:10px;align-items:center}
+.disp-head{font-size:10.5px;color:var(--slate);font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:0 2px 6px}
+.disp-row{padding:8px;background:var(--mint);border-radius:9px;margin-bottom:6px}
+.disp-row .mat{font-weight:600;font-size:13px}
+.disp-row .bal{font-family:"Times New Roman",Times,Georgia,serif;font-size:13px}
+.disp-row input{padding:7px 9px;font-size:13px;border-radius:8px;border:1px solid var(--line);width:100%;min-width:0}
+.disp-row .tw{font-family:"Times New Roman",Times,Georgia,serif;font-size:12.5px;color:var(--slate)}
+
+/* order item editor rows */
+.oi-head,.oi-row{display:grid;grid-template-columns:2fr 1fr 1.1fr 1fr auto;gap:8px;align-items:center}
+.oi-head{font-size:10.5px;color:var(--slate);font-weight:600;text-transform:uppercase;padding:0 2px 4px}
+.oi-row{margin-bottom:6px}
+.oi-row input{padding:7px 9px;font-size:12.5px;border-radius:8px;border:1px solid var(--line);width:100%;min-width:0}
+
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,107,107,.45)}70%{box-shadow:0 0 0 12px rgba(255,107,107,0)}100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}}
+.attn{animation:pulse 1.7s infinite}
+
+@media (max-width:900px){
+  .side{position:fixed;left:-260px;z-index:60;transition:.25s}
+  .side.open{left:0}
+  .main{padding:18px}
+  .f-row,.f-row-3,.f-row-4{grid-template-columns:1fr 1fr}
+  .disp-head{display:none}
+  .disp-row{grid-template-columns:1fr 1fr}
+  .oi-row,.oi-head{grid-template-columns:1fr 1fr}
+  .menu-btn{display:grid !important}
+}
+.menu-btn{display:none;width:38px;height:38px;border-radius:10px;background:#fff;box-shadow:var(--shadow);place-items:center;color:var(--ink)}
+
+@media print{
+  .side,.top .actions,.menu-btn,.tabbar,.no-print{display:none !important}
+  body{background:#fff}.main{padding:0;max-width:100%}
+  .card{box-shadow:none;border:1px solid #ccc}
+  .print-only{display:block !important}
+  table{font-size:10px}th,td{padding:5px 6px}
+}
+.print-only{display:none}
+.rep{border:1px solid #E4E6F2;font-size:12px;border-radius:10px;overflow:hidden}
+.rep th,.rep td{border-right:1px solid #EDEEF7;border-bottom:1px solid #EDEEF7;text-align:center;vertical-align:middle;padding:9px 10px;line-height:1.35}
+.rep th:last-child,.rep td:last-child{border-right:none}
+.rep tr:last-child td{border-bottom:none}
+.rep td.l{text-align:left}
+.rep td.manual{color:var(--slate);font-style:italic}
+.rep th{background:#F5F6FD;color:var(--ink-2);font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.rep tfoot td{background:#F5F6FD;border-bottom:none}
+@media print{@page{size:A4 landscape;margin:9mm}.rep{font-size:10.5px}.rep th,.rep td{padding:6px 7px}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>window.addEventListener("error",function(e){var r=document.getElementById("root");if(r&&!r.innerHTML.trim()){r.innerHTML="<div style="font-family:\"Times New Roman\",Times,serif;max-width:520px;margin:80px auto;background:#fff;padding:26px 30px;border-radius:16px;box-shadow:0 12px 30px rgba(16,24,40,.08);color:#0B1020"><h2>Something did not load</h2><p style="color:#5B6478;line-height:1.6">A script may have been blocked. Be online the first time you open this file, then reload.</p></div>";}});</script>
+<script>
+const {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  createContext,
+  useContext
+} = React;
+const I = {
+  tower: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M12 2v20M5 8l7-6 7 6M6 8v13h12V8M9 21v-5h6v5"
+  })),
+  grid: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("rect", {
+    x: "3",
+    y: "3",
+    width: "7",
+    height: "7",
+    rx: "1"
+  }), /*#__PURE__*/React.createElement("rect", {
+    x: "14",
+    y: "3",
+    width: "7",
+    height: "7",
+    rx: "1"
+  }), /*#__PURE__*/React.createElement("rect", {
+    x: "3",
+    y: "14",
+    width: "7",
+    height: "7",
+    rx: "1"
+  }), /*#__PURE__*/React.createElement("rect", {
+    x: "14",
+    y: "14",
+    width: "7",
+    height: "7",
+    rx: "1"
+  })),
+  building: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("rect", {
+    x: "4",
+    y: "2",
+    width: "16",
+    height: "20",
+    rx: "2"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M9 22v-4h6v4M9 6h.01M15 6h.01M9 10h.01M15 10h.01M9 14h.01M15 14h.01"
+  })),
+  truck: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M1 3h15v13H1zM16 8h4l3 3v5h-7"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "5.5",
+    cy: "18.5",
+    r: "2.5"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "18.5",
+    cy: "18.5",
+    r: "2.5"
+  })),
+  users: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "9",
+    cy: "7",
+    r: "4"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+  })),
+  printer: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+  }), /*#__PURE__*/React.createElement("rect", {
+    x: "6",
+    y: "14",
+    width: "12",
+    height: "8"
+  })),
+  cash: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("rect", {
+    x: "2",
+    y: "5",
+    width: "20",
+    height: "14",
+    rx: "2"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "12",
+    cy: "12",
+    r: "3"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M6 12h.01M18 12h.01"
+  })),
+  cog: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("circle", {
+    cx: "12",
+    cy: "12",
+    r: "3"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+  })),
+  plus: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2.2",
+    strokeLinecap: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M12 5v14M5 12h14"
+  })),
+  x: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M18 6 6 18M6 6l12 12"
+  })),
+  search: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round"
+  }, /*#__PURE__*/React.createElement("circle", {
+    cx: "11",
+    cy: "11",
+    r: "8"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "m21 21-4.3-4.3"
+  })),
+  edit: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M17 3a2.83 2.83 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5z"
+  })),
+  trash: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+  })),
+  check: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2.4",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M20 6 9 17l-5-5"
+  })),
+  warn: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M12 9v4M12 17h.01"
+  })),
+  factory: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"
+  })),
+  box: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M3.27 6.96 12 12l8.73-5.04M12 22V12"
+  })),
+  file: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M14 2v6h6"
+  })),
+  upload: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"
+  })),
+  menu: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M3 12h18M3 6h18M3 18h18"
+  })),
+  cloud: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"
+  })),
+  sample: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M9 3h6M10 3v6.5L5 18a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-8.5V3"
+  })),
+  bell: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"
+  })),
+  doc: /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M14 2v6h6M9 13h6M9 17h4"
+  }))
+};
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const num = n => Number(n) || 0;
+const fmt = n => '₹' + Math.round(num(n)).toLocaleString('en-IN');
+const fmtDate = d => d ? new Date(d).toLocaleDateString('en-IN', {
+  day: '2-digit',
+  month: 'short',
+  year: '2-digit'
+}) : '—';
+const today = () => new Date().toISOString().slice(0, 10);
+const PRIORITIES = ['1st Loading', '2nd Loading', '3rd Loading', '4th Loading', 'Last Loading'];
+const SET_TYPES = ['MAIN', 'BEDROOM', 'BATHROOM', 'STAIRCASE', 'FIRE', 'DUCT'];
+const setDoorLabel = t => (t === 'BATH' ? 'BATHROOM' : t) + ' DOOR';
+const setFrameLabel = t => (t === 'BATH' ? 'BATHROOM' : t) + ' DOOR FRAME';
+const setLabel = t => (t === 'BATH' ? 'BATHROOM' : t) + ' DOOR & FRAME';
+const SINGLE_TYPES = ['MAIN DOOR', 'BEDROOM DOOR', 'BATHROOM DOOR', 'STAIRCASE DOOR', 'FIRE DOOR', 'DUCT DOOR', 'MAIN DOOR FRAME', 'BEDROOM DOOR FRAME', 'BATHROOM DOOR FRAME', 'STAIRCASE DOOR FRAME', 'FIRE DOOR FRAME', 'DUCT DOOR FRAME', 'MOULDING PATTI 40MM', 'MOULDING PATTI 50MM', 'LEFT'];
+const titleCase = s => String(s || '').toLowerCase().replace(/\b([a-z])/g, (m, c) => c.toUpperCase()).replace(/\bMm\b/gi, 'mm');
+const LOCS = [{
+  v: 'at_hub',
+  l: 'At Panvel hub',
+  c: 'c-hub'
+}, {
+  v: 'delivered',
+  l: 'Delivered to site',
+  c: 'c-delivered'
+}, {
+  v: 'porter_site',
+  l: 'Porter to site',
+  c: 'c-porter'
+}, {
+  v: 'porter_factory',
+  l: 'Porter to Panvel Factory',
+  c: 'c-porter'
+}];
+const SEED_BANDS = [{
+  id: 'b1',
+  label: '~7 tonne',
+  min: 6,
+  max: 8.9,
+  rateMin: 5000,
+  rateMax: 5500,
+  flat: false,
+  twoSite: 4000
+}, {
+  id: 'b2',
+  label: '~10 tonne',
+  min: 9,
+  max: 11.4,
+  rateMin: 4200,
+  rateMax: 4300,
+  flat: false,
+  twoSite: 4000
+}, {
+  id: 'b3',
+  label: '~12 tonne',
+  min: 11.5,
+  max: 13.9,
+  rateMin: 4000,
+  rateMax: 4100,
+  flat: false,
+  twoSite: 4000
+}, {
+  id: 'b4',
+  label: '~18 tonne',
+  min: 14,
+  max: 19.9,
+  rateMin: 3300,
+  rateMax: 3400,
+  flat: false,
+  twoSite: 4000
+}, {
+  id: 'b5',
+  label: '28–32 tonne',
+  min: 20,
+  max: 34,
+  rateMin: 2700,
+  rateMax: 2700,
+  flat: true,
+  twoSite: 0
+}];
+const SEED_TRANSPORT = ['JP Transport', 'Astha Transport', 'Dreams Transport', 'Setul Transport'];
+function calcTransport(tonnage, twoSites, bands) {
+  const t = num(tonnage);
+  const band = bands.find(b => t >= b.min && t <= b.max);
+  if (!band) return {
+    band: null,
+    expMin: 0,
+    expMax: 0,
+    twoSiteCharge: 0
+  };
+  const tsc = twoSites && !band.flat ? band.twoSite : 0;
+  return {
+    band,
+    expMin: band.rateMin * t + tsc,
+    expMax: band.rateMax * t + tsc,
+    twoSiteCharge: tsc
+  };
+}
+function unitRates(it, component) {
+  if (it.isSet) {
+    if (it.billing === 'separate') {
+      if (component === 'frame') return {
+        oldR: num(it.priceFrame),
+        newR: num(it.newPriceFrame)
+      };
+      return {
+        oldR: num(it.priceDoor),
+        newR: num(it.newPriceDoor)
+      };
+    }
+    if (component === 'frame') return {
+      oldR: 0,
+      newR: 0
+    };
+    return {
+      oldR: num(it.priceSet),
+      newR: num(it.newPriceSet)
+    };
+  }
+  return {
+    oldR: num(it.pricePerUnit),
+    newR: num(it.newPrice)
+  };
+}
+function openingForUnit(it, component) {
+  if (!it.hasOpening) return 0;
+  if (component === 'door') return num(it.openingDoorQty);
+  if (component === 'frame') return num(it.openingFrameQty);
+  return num(it.openingQty);
+}
+function openingForKey(o, key) {
+  const itemId = key.split('|')[0];
+  const it = (o.items || []).find(x => x.id === itemId);
+  if (!it) return 0;
+  const comp = key.endsWith('|d') ? 'door' : key.endsWith('|f') ? 'frame' : 'single';
+  return openingForUnit(it, comp);
+}
+function itemValue(it, orderId, state) {
+  const units = trackUnits({
+    id: orderId,
+    items: [it]
+  });
+  const revised = !!it.rateRevised,
+    eff = it.rateEffDate;
+  let total = 0;
+  units.forEach(u => {
+    const {
+      oldR,
+      newR
+    } = unitRates(it, u.component);
+    if (!revised || !eff || !state) {
+      total += u.qty * oldR;
+      return;
+    }
+    let disp = 0;
+    const op = openingForUnit(it, u.component);
+    if (op > 0) {
+      disp += op;
+      total += op * ((it.openingDate || '') >= eff ? newR : oldR);
+    }
+    state.trips.forEach(t => (t.consignments || []).forEach(c => {
+      if (c.orderId !== orderId) return;
+      const q = num((c.dispatch || {})[u.key]);
+      if (!q) return;
+      disp += q;
+      total += q * (t.date >= eff ? newR : oldR);
+    }));
+    const remaining = Math.max(0, u.qty - disp);
+    total += remaining * (today() >= eff ? newR : oldR);
+  });
+  return total;
+}
+const orderSubtotal = (o, state) => (o.items || []).reduce((n, it) => n + itemValue(it, o.id, state), 0);
+const orderGstPct = o => o.gstPercent == null ? 18 : num(o.gstPercent);
+const orderGst = (o, state) => orderSubtotal(o, state) * orderGstPct(o) / 100;
+const orderVal = (o, state) => orderSubtotal(o, state) + orderGst(o, state);
+function trackUnits(o) {
+  const out = [];
+  (o.items || []).forEach(it => {
+    if (it.isSet) {
+      out.push({
+        key: it.id + '|d',
+        itemId: it.id,
+        component: 'door',
+        label: setDoorLabel(it.setType),
+        qty: num(it.totalQty),
+        weight: num(it.doorWeight)
+      });
+      out.push({
+        key: it.id + '|f',
+        itemId: it.id,
+        component: 'frame',
+        label: setFrameLabel(it.setType),
+        qty: num(it.totalQty),
+        weight: num(it.frameWeight)
+      });
+    } else {
+      out.push({
+        key: it.id,
+        itemId: it.id,
+        component: 'single',
+        label: it.type,
+        qty: num(it.totalQty),
+        weight: num(it.weightPerDoor)
+      });
+    }
+  });
+  return out;
+}
+const orderTotalQty = o => trackUnits(o).reduce((n, u) => n + u.qty, 0);
+function dispatchedForKey(orderId, key, state, excludeConsId) {
+  let s = 0;
+  state.trips.forEach(t => (t.consignments || []).forEach(c => {
+    if (c.orderId !== orderId) return;
+    if (excludeConsId && c.id === excludeConsId) return;
+    s += num((c.dispatch || {})[key]);
+  }));
+  return s;
+}
+function orderDispatchedTotal(o, state) {
+  return trackUnits(o).reduce((n, u) => n + dispatchedForKey(o.id, u.key, state) + openingForKey(o, u.key), 0);
+}
+const consQty = c => c.manual ? (c.manualLines || []).reduce((n, l) => n + num(l.qty), 0) : Object.values(c.dispatch || {}).reduce((n, v) => n + num(v), 0);
+function tripWeightKg(t) {
+  let kg = 0;
+  (t.consignments || []).forEach(c => {
+    if (c.manual) {
+      (c.manualLines || []).forEach(l => {
+        kg += num(l.qty) * num(l.weight);
+      });
+    } else {
+      Object.keys(c.dispatch || {}).forEach(k => {
+        kg += num((c.dispatch || {})[k]) * num((c.weights || {})[k]);
+      });
+    }
+  });
+  return kg;
+}
+const tripAutoTonne = t => Math.round(tripWeightKg(t) / 1000 * 100) / 100;
+const tripTonne = t => t.autoTonne === false ? num(t.tonnage) : tripAutoTonne(t);
+function tripDropClients(t, state) {
+  const set = new Set();
+  (t.consignments || []).forEach(c => {
+    if (!(c.location === 'delivered' || c.location === 'porter_site')) return;
+    let nm = c.manual ? c.manualClient || '' : (() => {
+      const o = state.orders.find(x => x.id === c.orderId);
+      return state.clients.find(x => x.id === o?.clientId)?.name || '';
+    })();
+    if (nm) set.add(nm);
+  });
+  return set.size;
+}
+function tripExpected(t, state, bands) {
+  return calcTransport(tripTonne(t), tripDropClients(t, state) > 1, bands);
+}
+function tripPayAmount(t, state, bands) {
+  const p = t.pay || {};
+  if (p.actual != null && p.actual !== '') return num(p.actual) + num(p.extra);
+  const e = tripExpected(t, state, bands);
+  return Math.round((e.expMin + e.expMax) / 2) + num(p.extra);
+}
+function clientSummary(clientId, state) {
+  const c = state.clients.find(x => x.id === clientId);
+  const orders = state.orders.filter(o => o.clientId === clientId);
+  let orderValue = 0,
+    received = 0,
+    delivered = 0,
+    atHub = 0,
+    notMade = 0,
+    sampleOrders = 0,
+    fullOrders = 0,
+    lastDeliv = '';
+  orders.forEach(o => {
+    orderValue += orderVal(o, state);
+    received += num(o.received);
+    if (o.orderType === 'sample') sampleOrders++;else fullOrders++;
+    trackUnits(o).forEach(un => {
+      const op = openingForKey(o, un.key);
+      notMade += Math.max(0, un.qty - dispatchedForKey(o.id, un.key, state) - op);
+      delivered += op;
+    });
+  });
+  const orderIds = new Set(orders.map(o => o.id));
+  state.trips.forEach(t => (t.consignments || []).forEach(cn => {
+    if (!orderIds.has(cn.orderId)) return;
+    const q = consQty(cn);
+    if (cn.location === 'delivered' || cn.location === 'porter_site') {
+      delivered += q;
+      if (t.date > lastDeliv) lastDeliv = t.date;
+    } else atHub += q;
+  }));
+  const shiftingPaid = state.labour.filter(x => x.clientId === clientId && x.type === 'shifting' && x.paid).reduce((n, x) => n + num(x.amount), 0);
+  const shiftingPending = state.labour.filter(x => x.clientId === clientId && x.type === 'shifting' && !x.paid).reduce((n, x) => n + num(x.amount), 0);
+  const balanceDue = orderValue - received;
+  const attention = balanceDue > 0 && lastDeliv && (!c?.ackDate || c.ackDate < lastDeliv);
+  return {
+    c,
+    orders,
+    orderValue,
+    received,
+    balanceDue,
+    delivered,
+    atHub,
+    notMade,
+    sampleOrders,
+    fullOrders,
+    shiftingPaid,
+    shiftingPending,
+    lastDeliv,
+    attention
+  };
+}
+const LS = 'gwpl_ctower_v4';
+let SB = null;
+function loadLocal() {
+  try {
+    return JSON.parse(localStorage.getItem(LS)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+function saveLocal(s) {
+  try {
+    localStorage.setItem(LS, JSON.stringify(s));
+  } catch (e) {}
+}
+const ToastCtx = createContext();
+function ToastHost({
+  children
+}) {
+  const [m, setM] = useState(null);
+  const show = x => {
+    setM(x);
+    clearTimeout(window.__tt);
+    window.__tt = setTimeout(() => setM(null), 2500);
+  };
+  return /*#__PURE__*/React.createElement(ToastCtx.Provider, {
+    value: show
+  }, children, m && /*#__PURE__*/React.createElement("div", {
+    className: "toast"
+  }, I.check, m));
+}
+const useToast = () => useContext(ToastCtx);
+function Modal({
+  title,
+  onClose,
+  children,
+  foot,
+  wide
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "overlay",
+    onClick: onClose
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal" + (wide ? " wide" : ""),
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-head"
+  }, /*#__PURE__*/React.createElement("h3", null, title), /*#__PURE__*/React.createElement("button", {
+    className: "x",
+    onClick: onClose
+  }, I.x)), /*#__PURE__*/React.createElement("div", {
+    className: "modal-body"
+  }, children), foot && /*#__PURE__*/React.createElement("div", {
+    className: "modal-foot"
+  }, foot)));
+}
+function Field({
+  label,
+  hint,
+  children
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "field"
+  }, /*#__PURE__*/React.createElement("label", null, label), children, hint && /*#__PURE__*/React.createElement("div", {
+    className: "hint"
+  }, hint));
+}
+function LocChip({
+  loc
+}) {
+  const s = LOCS.find(x => x.v === loc) || LOCS[0];
+  return /*#__PURE__*/React.createElement("span", {
+    className: "chip " + s.c
+  }, s.l);
+}
+function TypeChip({
+  t
+}) {
+  return t === 'sample' ? /*#__PURE__*/React.createElement("span", {
+    className: "chip c-sample"
+  }, I.sample, "Sample") : /*#__PURE__*/React.createElement("span", {
+    className: "chip c-full"
+  }, "Full order");
+}
+function Empty({
+  icon,
+  title,
+  sub
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "empty"
+  }, icon, /*#__PURE__*/React.createElement("h4", null, title), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13
+    }
+  }, sub));
+}
+function readFile(f) {
+  return new Promise(r => {
+    const rd = new FileReader();
+    rd.onload = () => r({
+      name: f.name,
+      data: rd.result
+    });
+    rd.readAsDataURL(f);
+  });
+}
+function Attach({
+  items,
+  onChange,
+  label
+}) {
+  const ref = useRef();
+  const add = async e => {
+    const fs = [...e.target.files];
+    const rd = await Promise.all(fs.map(readFile));
+    onChange([...(items || []), ...rd]);
+    e.target.value = '';
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "attach-box",
+    onClick: () => ref.current.click()
+  }, I.upload, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12.5,
+      fontWeight: 600
+    }
+  }, label || 'Attach LR / bill'), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: 'var(--slate-2)',
+      marginTop: 3
+    }
+  }, "Image or PDF")), /*#__PURE__*/React.createElement("input", {
+    ref: ref,
+    type: "file",
+    accept: "image/*,application/pdf",
+    multiple: true,
+    style: {
+      display: 'none'
+    },
+    onChange: add
+  }), (items || []).map((f, i) => /*#__PURE__*/React.createElement("div", {
+    className: "attach-item",
+    key: i
+  }, I.file, /*#__PURE__*/React.createElement("a", {
+    className: "grow",
+    href: f.data,
+    download: f.name,
+    target: "_blank"
+  }, f.name), /*#__PURE__*/React.createElement("button", {
+    className: "mini-x",
+    onClick: () => onChange(items.filter((_, j) => j !== i))
+  }, I.x))));
+}
+function SegBar({
+  delivered,
+  atHub,
+  notMade
+}) {
+  const total = delivered + atHub + notMade || 1;
+  const p = n => (n / total * 100).toFixed(1) + '%';
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "seg"
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: p(delivered),
+      background: 'var(--green)'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: p(atHub),
+      background: 'var(--amber)'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: p(notMade),
+      background: 'var(--coral)'
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "seg-legend"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "leg-dot",
+    style: {
+      background: 'var(--green)'
+    }
+  }), "Delivered ", /*#__PURE__*/React.createElement("b", null, delivered)), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "leg-dot",
+    style: {
+      background: 'var(--amber)'
+    }
+  }), "At Panvel ", /*#__PURE__*/React.createElement("b", null, atHub)), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "leg-dot",
+    style: {
+      background: 'var(--coral)'
+    }
+  }), "Not made ", /*#__PURE__*/React.createElement("b", null, notMade))));
+}
+function App() {
+  const [state, setState] = useState(() => {
+    const l = loadLocal();
+    return {
+      clients: l.clients || [],
+      orders: l.orders || [],
+      trips: l.trips || [],
+      transport_payments: l.transport_payments || [],
+      labour: l.labour || [],
+      settings: l.settings || {
+        bands: SEED_BANDS,
+        transport: SEED_TRANSPORT,
+        director: 'Hardik Patel',
+        sbUrl: '',
+        sbKey: ''
+      }
+    };
+  });
+  const [view, setView] = useState('dash');
+  const [sideOpen, setSideOpen] = useState(false);
+  useEffect(() => {
+    saveLocal(state);
+  }, [state]);
+  const upsert = (t, row) => setState(s => {
+    const ex = s[t].find(r => r.id === row.id);
+    return {
+      ...s,
+      [t]: ex ? s[t].map(r => r.id === row.id ? row : r) : [...s[t], row]
+    };
+  });
+  const remove = (t, id) => setState(s => ({
+    ...s,
+    [t]: s[t].filter(r => r.id !== id)
+  }));
+  const S = state.settings;
+  const attn = useMemo(() => state.clients.filter(c => clientSummary(c.id, state).attention).length, [state]);
+  const atHub = useMemo(() => {
+    let n = 0;
+    state.trips.forEach(t => (t.consignments || []).forEach(c => {
+      if (c.location === 'at_hub') n++;
+    }));
+    return n;
+  }, [state.trips]);
+  const unpaidT = state.trips.filter(t => tripTonne(t) > 0 && !(t.pay && t.pay.paid)).length;
+  const nav = [{
+    k: 'dash',
+    l: 'Control Tower',
+    ic: I.grid,
+    badge: attn
+  }, {
+    k: 'clients',
+    l: 'Clients & Orders',
+    ic: I.building
+  }, {
+    k: 'trips',
+    l: 'Dispatch Trips',
+    ic: I.truck,
+    badge: atHub
+  }, {
+    k: 'labour',
+    l: 'Labour',
+    ic: I.users
+  }, {
+    k: 'report',
+    l: 'Print & Approve',
+    ic: I.printer
+  }, {
+    k: 'transport',
+    l: 'Transport Pay',
+    ic: I.cash,
+    badge: unpaidT
+  }, {
+    k: 'settings',
+    l: 'Settings',
+    ic: I.cog
+  }];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "app"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "side" + (sideOpen ? ' open' : '')
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "brand"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "logo"
+  }, I.tower), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, "Control Tower"), /*#__PURE__*/React.createElement("span", null, "GWPL Logistics"))), nav.map(n => /*#__PURE__*/React.createElement("button", {
+    key: n.k,
+    className: "nav" + (view === n.k ? ' on' : ''),
+    onClick: () => {
+      setView(n.k);
+      setSideOpen(false);
+    }
+  }, n.ic, n.l, n.badge > 0 && /*#__PURE__*/React.createElement("span", {
+    className: "badge"
+  }, n.badge))), /*#__PURE__*/React.createElement("div", {
+    className: "side-foot"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "dot",
+    style: {
+      background: SB ? 'var(--green)' : 'var(--amber)'
+    }
+  }), SB ? 'Supabase synced' : 'Local device'))), /*#__PURE__*/React.createElement("div", {
+    className: "main"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "menu-btn no-print",
+    style: {
+      marginBottom: 12
+    },
+    onClick: () => setSideOpen(true)
+  }, I.menu), view === 'dash' && /*#__PURE__*/React.createElement(Dashboard, {
+    state: state,
+    setView: setView,
+    upsert: upsert,
+    S: S
+  }), view === 'clients' && /*#__PURE__*/React.createElement(Clients, {
+    state: state,
+    upsert: upsert,
+    remove: remove
+  }), view === 'trips' && /*#__PURE__*/React.createElement(Trips, {
+    state: state,
+    upsert: upsert,
+    remove: remove,
+    S: S
+  }), view === 'labour' && /*#__PURE__*/React.createElement(Labour, {
+    state: state,
+    upsert: upsert,
+    remove: remove
+  }), view === 'report' && /*#__PURE__*/React.createElement(Report, {
+    state: state,
+    S: S
+  }), view === 'transport' && /*#__PURE__*/React.createElement(Transport, {
+    state: state,
+    upsert: upsert,
+    remove: remove,
+    S: S
+  }), view === 'settings' && /*#__PURE__*/React.createElement(Settings, {
+    S: S,
+    save: v => setState(s => ({
+      ...s,
+      settings: v
+    })),
+    state: state,
+    setState: setState
+  })));
+}
+
+/* DASHBOARD */
+function Dashboard({
+  state,
+  setView,
+  upsert,
+  S
+}) {
+  const [clientId, setClientId] = useState('all');
+  const clients = [...state.clients].sort((a, b) => a.name.localeCompare(b.name));
+  if (clientId !== 'all') return /*#__PURE__*/React.createElement(ClientDashboard, {
+    summary: clientSummary(clientId, state),
+    state: state,
+    clients: clients,
+    clientId: clientId,
+    setClientId: setClientId,
+    setView: setView,
+    upsert: upsert
+  });
+  let delivered = 0,
+    atHub = 0,
+    notMade = 0;
+  state.orders.forEach(o => trackUnits(o).forEach(un => {
+    notMade += Math.max(0, un.qty - dispatchedForKey(o.id, un.key, state) - openingForKey(o, un.key));
+  }));
+  state.trips.forEach(t => (t.consignments || []).forEach(cn => {
+    const q = consQty(cn);
+    if (cn.location === 'delivered' || cn.location === 'porter_site') delivered += q;else atHub += q;
+  }));
+  const payable = state.trips.filter(t => tripTonne(t) > 0 && !(t.pay && t.pay.paid)).reduce((n, t) => n + tripPayAmount(t, state, S.bands), 0);
+  const clientDue = clients.reduce((n, c) => n + Math.max(0, clientSummary(c.id, state).balanceDue), 0);
+  const attnClients = clients.filter(c => clientSummary(c.id, state).attention);
+  const sampleOrders = state.orders.filter(o => o.orderType === 'sample' && orderDispatchedTotal(o, state) < orderTotalQty(o));
+  const hubOrders = [];
+  state.trips.forEach(t => (t.consignments || []).forEach(c => {
+    if (c.location === 'at_hub') hubOrders.push({
+      t,
+      c
+    });
+  }));
+  const stats = [{
+    k: 'Not yet made',
+    v: notMade,
+    s: 'balance to produce',
+    ic: I.factory,
+    bg: 'var(--coral-bg)',
+    col: 'var(--coral)'
+  }, {
+    k: 'At Panvel hub',
+    v: atHub,
+    s: hubOrders.length + ' orders waiting',
+    ic: I.box,
+    bg: 'var(--amber-bg)',
+    col: 'var(--amber)'
+  }, {
+    k: 'Follow-up sites',
+    v: attnClients.length,
+    s: 'delivered, payment pending',
+    ic: I.bell,
+    bg: 'var(--coral-bg)',
+    col: 'var(--coral)'
+  }, {
+    k: 'Client balance due',
+    v: fmt(clientDue),
+    s: 'across all orders',
+    ic: I.cash,
+    bg: 'var(--green-bg)',
+    col: 'var(--green)'
+  }];
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "top"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Control Tower"), /*#__PURE__*/React.createElement("p", null, "Pick a client for its full picture, or watch everything at once.")), /*#__PURE__*/React.createElement("div", {
+    className: "actions"
+  }, /*#__PURE__*/React.createElement("select", {
+    className: "client-pick",
+    value: clientId,
+    onChange: e => setClientId(e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "all"
+  }, "All clients — overview"), clients.map(c => /*#__PURE__*/React.createElement("option", {
+    key: c.id,
+    value: c.id
+  }, c.name, clientSummary(c.id, state).attention ? ' ●' : ''))), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p",
+    onClick: () => setView('trips')
+  }, I.plus, " New trip"))), /*#__PURE__*/React.createElement("div", {
+    className: "grid",
+    style: {
+      gridTemplateColumns: 'repeat(auto-fit,minmax(215px,1fr))',
+      marginBottom: 20
+    }
+  }, stats.map((s, i) => /*#__PURE__*/React.createElement("div", {
+    className: "card stat",
+    key: i
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ic",
+    style: {
+      background: s.bg,
+      color: s.col
+    }
+  }, s.ic), /*#__PURE__*/React.createElement("div", {
+    className: "k"
+  }, s.k), /*#__PURE__*/React.createElement("div", {
+    className: "v"
+  }, s.v), /*#__PURE__*/React.createElement("div", {
+    className: "s"
+  }, s.s)))), attnClients.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "card attn",
+    style: {
+      padding: 18,
+      marginBottom: 20,
+      background: 'var(--coral-bg)',
+      border: '1px solid #ffc9c9'
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15,
+      color: '#C23B3B',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 10
+    }
+  }, I.bell, " Payment follow-up needed"), attnClients.map(c => {
+    const s = clientSummary(c.id, state);
+    return /*#__PURE__*/React.createElement("div", {
+      key: c.id,
+      style: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '8px 0',
+        borderBottom: '1px dashed #ffc9c9',
+        flexWrap: 'wrap',
+        gap: 8
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, c.name), " ", /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 12,
+        color: '#C23B3B'
+      }
+    }, "delivered ", fmtDate(s.lastDeliv), " · balance ", fmt(s.balanceDue), " (", c.paymentTerms || 'terms n/a', ")")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        gap: 8
+      }
+    }, /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-g btn-sm",
+      onClick: () => setClientId(c.id)
+    }, "Open"), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-p btn-sm",
+      onClick: () => upsert('clients', {
+        ...c,
+        ackDate: today()
+      })
+    }, I.check, " Mark followed up")));
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 20,
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15,
+      marginBottom: 14
+    }
+  }, "Overall material status"), /*#__PURE__*/React.createElement(SegBar, {
+    delivered: delivered,
+    atHub: atHub,
+    notMade: notMade
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "grid",
+    style: {
+      gridTemplateColumns: '1fr 1fr'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '16px 20px',
+      borderBottom: '1px solid var(--line)'
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: 'var(--violet)'
+    }
+  }, I.sample), " Samples still pending")), sampleOrders.length === 0 ? /*#__PURE__*/React.createElement(Empty, {
+    icon: I.check,
+    title: "No pending samples",
+    sub: "All sample orders fully dispatched."
+  }) : /*#__PURE__*/React.createElement("div", {
+    className: "t-wrap"
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("tbody", null, sampleOrders.slice(0, 7).map(o => {
+    const c = state.clients.find(x => x.id === o.clientId);
+    return /*#__PURE__*/React.createElement("tr", {
+      key: o.id
+    }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("b", null, c?.name), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: 'var(--slate-2)'
+      }
+    }, "Order ", o.orderNo)), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, orderDispatchedTotal(o, state), "/", orderTotalQty(o)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
+      className: "chip c-sample"
+    }, "Sample")));
+  }))))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '16px 20px',
+      borderBottom: '1px solid var(--line)',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: 'var(--amber)'
+    }
+  }, I.box), " At Panvel hub"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    onClick: () => setView('trips')
+  }, "Trips")), hubOrders.length === 0 ? /*#__PURE__*/React.createElement(Empty, {
+    icon: I.check,
+    title: "Hub is clear",
+    sub: "Nothing waiting at Panvel."
+  }) : /*#__PURE__*/React.createElement("div", {
+    className: "t-wrap"
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("tbody", null, hubOrders.slice(0, 7).map(({
+    t,
+    c
+  }, i) => {
+    const o = state.orders.find(x => x.id === c.orderId);
+    const cl = state.clients.find(x => x.id === o?.clientId);
+    return /*#__PURE__*/React.createElement("tr", {
+      key: i
+    }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("b", null, cl?.name || '—'), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: 'var(--slate-2)'
+      }
+    }, "Order ", o?.orderNo)), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, consQty(c)), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, t.vehicleNo || '—'));
+  })))))));
+}
+function ClientDashboard({
+  summary: s,
+  state,
+  clients,
+  clientId,
+  setClientId,
+  setView,
+  upsert
+}) {
+  const c = s.c;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "top"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, c?.name), /*#__PURE__*/React.createElement("p", null, c?.site || 'Site not set', " · Terms: ", c?.paymentTerms || '—')), s.attention && /*#__PURE__*/React.createElement("span", {
+    className: "chip c-attn attn"
+  }, I.bell, " Payment pending")), /*#__PURE__*/React.createElement("div", {
+    className: "actions"
+  }, s.attention && /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p btn-sm",
+    onClick: () => upsert('clients', {
+      ...c,
+      ackDate: today()
+    })
+  }, I.check, " Mark followed up"), /*#__PURE__*/React.createElement("select", {
+    className: "client-pick",
+    value: clientId,
+    onChange: e => setClientId(e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "all"
+  }, "All clients — overview"), clients.map(x => /*#__PURE__*/React.createElement("option", {
+    key: x.id,
+    value: x.id
+  }, x.name))))), /*#__PURE__*/React.createElement("div", {
+    className: "grid",
+    style: {
+      gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))',
+      marginBottom: 18
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card stat"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "k"
+  }, "Order value"), /*#__PURE__*/React.createElement("div", {
+    className: "v",
+    style: {
+      fontSize: 24
+    }
+  }, fmt(s.orderValue)), /*#__PURE__*/React.createElement("div", {
+    className: "s"
+  }, "auto from qty × price")), /*#__PURE__*/React.createElement("div", {
+    className: "card stat"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "k"
+  }, "Received"), /*#__PURE__*/React.createElement("div", {
+    className: "v",
+    style: {
+      fontSize: 24,
+      color: 'var(--green)'
+    }
+  }, fmt(s.received)), /*#__PURE__*/React.createElement("div", {
+    className: "s"
+  }, "from accounts")), /*#__PURE__*/React.createElement("div", {
+    className: "card stat"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "k"
+  }, "Balance due"), /*#__PURE__*/React.createElement("div", {
+    className: "v",
+    style: {
+      fontSize: 24,
+      color: s.balanceDue > 0 ? 'var(--coral)' : 'var(--green)'
+    }
+  }, fmt(s.balanceDue)), /*#__PURE__*/React.createElement("div", {
+    className: "s"
+  }, "pending payment")), /*#__PURE__*/React.createElement("div", {
+    className: "card stat"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "k"
+  }, "On site"), /*#__PURE__*/React.createElement("div", {
+    className: "v",
+    style: {
+      fontSize: 24,
+      color: 'var(--aqua-d)'
+    }
+  }, s.delivered), /*#__PURE__*/React.createElement("div", {
+    className: "s"
+  }, "items delivered"))), /*#__PURE__*/React.createElement("div", {
+    className: "grid",
+    style: {
+      gridTemplateColumns: '1.4fr 1fr',
+      marginBottom: 18
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 20
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15,
+      marginBottom: 14
+    }
+  }, "Material status"), /*#__PURE__*/React.createElement(SegBar, {
+    delivered: s.delivered,
+    atHub: s.atHub,
+    notMade: s.notMade
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 16,
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kv",
+    style: {
+      flexDirection: 'column',
+      gap: 2,
+      borderBottom: 'none'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "Orders"), /*#__PURE__*/React.createElement("span", {
+    className: "val",
+    style: {
+      fontSize: 16
+    }
+  }, s.fullOrders, " full · ", s.sampleOrders, " sample")), /*#__PURE__*/React.createElement("div", {
+    className: "kv",
+    style: {
+      flexDirection: 'column',
+      gap: 2,
+      borderBottom: 'none'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "Shifting labour"), /*#__PURE__*/React.createElement("span", {
+    className: "val",
+    style: {
+      fontSize: 16
+    }
+  }, fmt(s.shiftingPaid), " paid", s.shiftingPending > 0 ? ` · ${fmt(s.shiftingPending)} due` : '')))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 20
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15,
+      marginBottom: 12
+    }
+  }, "Payment"), /*#__PURE__*/React.createElement("div", {
+    className: "kv"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "Terms"), /*#__PURE__*/React.createElement("span", {
+    className: "val",
+    style: {
+      fontFamily: '"Times New Roman",Times,serif',
+      fontSize: 12,
+      fontWeight: 600
+    }
+  }, c?.paymentTerms || '—')), /*#__PURE__*/React.createElement("div", {
+    className: "kv"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "Order value"), /*#__PURE__*/React.createElement("span", {
+    className: "val"
+  }, fmt(s.orderValue))), /*#__PURE__*/React.createElement("div", {
+    className: "kv"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "Received"), /*#__PURE__*/React.createElement("span", {
+    className: "val",
+    style: {
+      color: 'var(--green)'
+    }
+  }, fmt(s.received))), /*#__PURE__*/React.createElement("div", {
+    className: "kv"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "Balance due"), /*#__PURE__*/React.createElement("span", {
+    className: "val",
+    style: {
+      color: s.balanceDue > 0 ? 'var(--coral)' : 'var(--green)'
+    }
+  }, fmt(s.balanceDue))), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    style: {
+      marginTop: 12,
+      width: '100%',
+      justifyContent: 'center'
+    },
+    onClick: () => setView('clients')
+  }, "Manage orders & received"))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '16px 20px',
+      borderBottom: '1px solid var(--line)'
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15
+    }
+  }, "Orders for ", c?.name)), s.orders.length === 0 ? /*#__PURE__*/React.createElement(Empty, {
+    icon: I.doc,
+    title: "No orders yet",
+    sub: "Add orders in Clients & Orders."
+  }) : /*#__PURE__*/React.createElement("div", {
+    className: "t-wrap"
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Order"), /*#__PURE__*/React.createElement("th", null, "Type"), /*#__PURE__*/React.createElement("th", null, "Fixing"), /*#__PURE__*/React.createElement("th", null, "Total qty"), /*#__PURE__*/React.createElement("th", null, "Dispatched"), /*#__PURE__*/React.createElement("th", null, "Balance"), /*#__PURE__*/React.createElement("th", null, "Value"), /*#__PURE__*/React.createElement("th", null, "Received"))), /*#__PURE__*/React.createElement("tbody", null, s.orders.map(o => {
+    const disp = orderDispatchedTotal(o, state);
+    const tot = orderTotalQty(o);
+    return /*#__PURE__*/React.createElement("tr", {
+      key: o.id
+    }, /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, /*#__PURE__*/React.createElement("b", null, o.orderNo || '—')), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement(TypeChip, {
+      t: o.orderType
+    })), /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontSize: 12
+      }
+    }, o.fixingIncluded ? 'Included' : 'Excluded'), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, tot), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, disp), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        color: tot - disp > 0 ? 'var(--coral)' : 'var(--slate-2)'
+      }
+    }, tot - disp), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, fmt(orderVal(o, state))), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, fmt(o.received)));
+  }))))));
+}
+
+/* CLIENTS & ORDERS */
+function Clients({
+  state,
+  upsert,
+  remove
+}) {
+  const [editClient, setEditClient] = useState(null);
+  const [ordersFor, setOrdersFor] = useState(null);
+  const clients = [...state.clients].sort((a, b) => a.name.localeCompare(b.name));
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "top"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Clients & Orders"), /*#__PURE__*/React.createElement("p", null, "Set the client once, then add orders with quantity and price — value and balance calculate themselves.")), /*#__PURE__*/React.createElement("div", {
+    className: "actions"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p",
+    onClick: () => setEditClient({
+      id: uid()
+    })
+  }, I.plus, " Add client"))), clients.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement(Empty, {
+    icon: I.building,
+    title: "No clients yet",
+    sub: "Add your first client / site."
+  })) : /*#__PURE__*/React.createElement("div", {
+    className: "grid",
+    style: {
+      gridTemplateColumns: 'repeat(auto-fill,minmax(330px,1fr))'
+    }
+  }, clients.map(c => {
+    const s = clientSummary(c.id, state);
+    const initials = c.name.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+    return /*#__PURE__*/React.createElement("div", {
+      className: "card" + (s.attention ? ' attn' : ''),
+      key: c.id,
+      style: {
+        padding: 20,
+        border: s.attention ? '1px solid #ffc9c9' : undefined,
+        display: 'flex',
+        flexDirection: 'column'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        background: 'var(--violet-bg)',
+        color: 'var(--indigo)',
+        display: 'grid',
+        placeItems: 'center',
+        fontWeight: 800,
+        fontSize: 15,
+        flexShrink: 0
+      }
+    }, initials), /*#__PURE__*/React.createElement("div", {
+      style: {
+        minWidth: 0,
+        flex: 1
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 7
+      }
+    }, /*#__PURE__*/React.createElement("h3", {
+      style: {
+        fontSize: 16.5,
+        fontWeight: 700,
+        letterSpacing: '-.01em',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+      }
+    }, c.name), s.attention && /*#__PURE__*/React.createElement("span", {
+      className: "chip c-attn"
+    }, I.bell)), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12,
+        color: 'var(--slate)',
+        marginTop: 2
+      }
+    }, c.site || 'Site not set')), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-g btn-sm",
+      onClick: () => setEditClient(c),
+      style: {
+        flexShrink: 0
+      }
+    }, I.edit)), /*#__PURE__*/React.createElement("div", {
+      style: {
+        margin: '16px 0 14px'
+      }
+    }, /*#__PURE__*/React.createElement(SegBar, {
+      delivered: s.delivered,
+      atHub: s.atHub,
+      notMade: s.notMade
+    })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        borderTop: '1px solid var(--line)',
+        borderBottom: '1px solid var(--line)',
+        marginBottom: 14
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        flex: 1,
+        padding: '11px 0'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 10.5,
+        color: 'var(--slate-2)',
+        fontWeight: 700,
+        letterSpacing: '.04em',
+        textTransform: 'uppercase'
+      }
+    }, "Orders"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 15,
+        fontWeight: 700,
+        marginTop: 3
+      }
+    }, s.orders.length, s.sampleOrders ? /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        color: 'var(--slate-2)',
+        fontWeight: 500
+      }
+    }, " · ", s.sampleOrders, " sample") : '')), /*#__PURE__*/React.createElement("div", {
+      style: {
+        flex: 1.4,
+        padding: '11px 0 11px 14px',
+        borderLeft: '1px solid var(--line)'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 10.5,
+        color: 'var(--slate-2)',
+        fontWeight: 700,
+        letterSpacing: '.04em',
+        textTransform: 'uppercase'
+      }
+    }, "Order value"), /*#__PURE__*/React.createElement("div", {
+      className: "mono",
+      style: {
+        fontSize: 15,
+        fontWeight: 700,
+        marginTop: 3
+      }
+    }, fmt(s.orderValue)))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 14
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 12.5,
+        color: 'var(--slate)',
+        fontWeight: 600
+      }
+    }, "Balance due"), /*#__PURE__*/React.createElement("span", {
+      className: "mono",
+      style: {
+        fontSize: 16,
+        fontWeight: 800,
+        color: s.balanceDue > 0 ? 'var(--coral)' : 'var(--green)'
+      }
+    }, fmt(s.balanceDue))), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-p btn-sm",
+      style: {
+        marginTop: 'auto',
+        width: '100%',
+        justifyContent: 'center'
+      },
+      onClick: () => setOrdersFor(c)
+    }, I.doc, " Manage orders (", s.orders.length, ")"));
+  })), editClient && /*#__PURE__*/React.createElement(ClientModal, {
+    row: editClient,
+    state: state,
+    onClose: () => setEditClient(null),
+    onSave: c => {
+      upsert('clients', c);
+      setEditClient(null);
+    },
+    onDelete: () => {
+      if (state.orders.some(o => o.clientId === editClient.id)) {
+        alert('This client has orders — delete those first.');
+        return;
+      }
+      remove('clients', editClient.id);
+      setEditClient(null);
+    }
+  }), ordersFor && /*#__PURE__*/React.createElement(OrdersModal, {
+    client: ordersFor,
+    state: state,
+    upsert: upsert,
+    remove: remove,
+    onClose: () => setOrdersFor(null)
+  }));
+}
+function ClientModal({
+  row,
+  state,
+  onClose,
+  onSave,
+  onDelete
+}) {
+  const [c, setC] = useState({
+    ...row
+  });
+  const u = (k, v) => setC(s => ({
+    ...s,
+    [k]: v
+  }));
+  const isNew = !state.clients.find(x => x.id === row.id);
+  return /*#__PURE__*/React.createElement(Modal, {
+    title: isNew ? 'Add client' : 'Edit client',
+    onClose: onClose,
+    foot: /*#__PURE__*/React.createElement(React.Fragment, null, !isNew && /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-d",
+      onClick: onDelete
+    }, I.trash), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-g",
+      onClick: onClose
+    }, "Cancel"), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-p",
+      onClick: () => {
+        if (!c.name) {
+          alert('Name required');
+          return;
+        }
+        onSave(c);
+      }
+    }, I.check, " Save"))
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Client / project name"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "e.g. Pote Palacio",
+    value: c.name || '',
+    onChange: e => u('name', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Site location"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "e.g. Plot 107, Kharghar",
+    value: c.site || '',
+    onChange: e => u('site', e.target.value)
+  }))), /*#__PURE__*/React.createElement(Field, {
+    label: "Default payment terms",
+    hint: "Auto-fills each new order; editable per order"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "e.g. 50% advance 50% against delivery",
+    value: c.paymentTerms || '',
+    onChange: e => u('paymentTerms', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Notes"
+  }, /*#__PURE__*/React.createElement("textarea", {
+    rows: "2",
+    value: c.notes || '',
+    onChange: e => u('notes', e.target.value)
+  })));
+}
+function OrdersModal({
+  client,
+  state,
+  upsert,
+  remove,
+  onClose
+}) {
+  const [editOrder, setEditOrder] = useState(null);
+  const orders = state.orders.filter(o => o.clientId === client.id);
+  return /*#__PURE__*/React.createElement(Modal, {
+    wide: true,
+    title: `Orders — ${client.name}`,
+    onClose: onClose,
+    foot: /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-p",
+      onClick: () => setEditOrder({
+        id: uid(),
+        clientId: client.id,
+        orderType: 'full',
+        fixingIncluded: false,
+        gstPercent: 18,
+        paymentTerms: client.paymentTerms || '',
+        items: [{
+          id: uid(),
+          type: '',
+          totalQty: 1,
+          pricePerUnit: 0
+        }]
+      })
+    }, I.plus, " Add order")
+  }, orders.length === 0 ? /*#__PURE__*/React.createElement(Empty, {
+    icon: I.doc,
+    title: "No orders",
+    sub: "Add the client's first order with its materials, quantities and prices."
+  }) : orders.map(o => {
+    const disp = orderDispatchedTotal(o, state);
+    const tot = orderTotalQty(o);
+    const bal = orderVal(o, state) - num(o.received);
+    return /*#__PURE__*/React.createElement("div", {
+      className: "cons",
+      key: o.id,
+      style: {
+        padding: 16
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "cons-head"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "cons-title"
+    }, "Order ", /*#__PURE__*/React.createElement("span", {
+      className: "mono"
+    }, o.orderNo || '(no number)'), " ", /*#__PURE__*/React.createElement(TypeChip, {
+      t: o.orderType
+    })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        gap: 6
+      }
+    }, /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-g btn-sm",
+      onClick: () => setEditOrder(o)
+    }, I.edit, " Edit"), /*#__PURE__*/React.createElement("button", {
+      className: "mini-x",
+      onClick: () => {
+        if (orderDispatchedTotal(o, state) > 0) {
+          if (!confirm('This order has dispatched material. Delete anyway?')) return;
+        }
+        remove('orders', o.id);
+      }
+    }, I.trash))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        border: '1px solid var(--line)',
+        borderRadius: 12,
+        overflow: 'hidden',
+        marginBottom: 12
+      }
+    }, [['Value (incl. GST)', fmt(orderVal(o, state))], ['Received', fmt(o.received)], ['Balance', fmt(bal)], ['Dispatched', disp + ' / ' + tot]].map(([k, v], i) => /*#__PURE__*/React.createElement("div", {
+      key: k,
+      style: {
+        flex: 1,
+        minWidth: 120,
+        padding: '10px 14px',
+        borderLeft: i ? '1px solid var(--line)' : 'none'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 10,
+        color: 'var(--slate-2)',
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '.04em'
+      }
+    }, k), /*#__PURE__*/React.createElement("div", {
+      className: "mono",
+      style: {
+        fontSize: 14,
+        fontWeight: 700,
+        marginTop: 3,
+        color: k === 'Balance' ? bal > 0 ? 'var(--coral)' : 'var(--green)' : 'inherit'
+      }
+    }, v)))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12.5,
+        color: 'var(--slate)',
+        lineHeight: 1.8
+      }
+    }, (o.items || []).map(it => /*#__PURE__*/React.createElement("span", {
+      key: it.id,
+      style: {
+        marginRight: 14,
+        display: 'inline-block'
+      }
+    }, /*#__PURE__*/React.createElement("b", {
+      style: {
+        color: 'var(--ink-2)',
+        fontWeight: 600
+      }
+    }, it.isSet ? titleCase(setLabel(it.setType)) : titleCase(it.type) || '—'), " · ", it.totalQty, " ", it.isSet ? 'sets' : 'nos'))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11.5,
+        color: 'var(--slate-2)',
+        marginTop: 8
+      }
+    }, "Fixing: ", o.fixingIncluded ? 'Included' : 'Excluded', " · GST ", orderGstPct(o), "%"));
+  }), editOrder && /*#__PURE__*/React.createElement(OrderModal, {
+    row: editOrder,
+    state: state,
+    onClose: () => setEditOrder(null),
+    onSave: o => {
+      upsert('orders', o);
+      setEditOrder(null);
+    }
+  }));
+}
+function OrderModal({
+  row,
+  state,
+  onClose,
+  onSave
+}) {
+  const [o, setO] = useState({
+    ...row,
+    items: (row.items || []).map(x => ({
+      ...x
+    }))
+  });
+  const u = (k, v) => setO(s => ({
+    ...s,
+    [k]: v
+  }));
+  const upItem = (id, k, v) => u('items', o.items.map(it => it.id === id ? {
+    ...it,
+    [k]: v
+  } : it));
+  const addItem = () => u('items', [...o.items, {
+    id: uid(),
+    type: '',
+    totalQty: 1,
+    pricePerUnit: 0
+  }]);
+  const rmItem = id => u('items', o.items.filter(it => it.id !== id));
+  const val = orderVal(o, state);
+  return /*#__PURE__*/React.createElement(Modal, {
+    title: row.orderNo ? 'Edit order' : 'Add order',
+    onClose: onClose,
+    foot: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-g",
+      onClick: onClose
+    }, "Cancel"), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-p",
+      onClick: () => {
+        if (!o.orderNo) {
+          alert('Order number required');
+          return;
+        }
+        onSave(o);
+      }
+    }, I.check, " Save order"))
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "f-row-3"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Order number"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "e.g. PF 03",
+    value: o.orderNo || '',
+    onChange: e => u('orderNo', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Order type"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: o.orderType,
+    onChange: e => u('orderType', e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "full"
+  }, "Full order"), /*#__PURE__*/React.createElement("option", {
+    value: "sample"
+  }, "Sample"))), /*#__PURE__*/React.createElement(Field, {
+    label: "Rate includes fixing?"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: o.fixingIncluded ? 'y' : 'n',
+    onChange: e => u('fixingIncluded', e.target.value === 'y')
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "y"
+  }, "Yes — included"), /*#__PURE__*/React.createElement("option", {
+    value: "n"
+  }, "No — excluded")))), /*#__PURE__*/React.createElement(Field, {
+    label: "Payment terms (this order)"
+  }, /*#__PURE__*/React.createElement("input", {
+    value: o.paymentTerms || '',
+    onChange: e => u('paymentTerms', e.target.value)
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "section-t"
+  }, "Materials in this order"), /*#__PURE__*/React.createElement("div", {
+    className: "alert alert-info",
+    style: {
+      marginBottom: 12
+    }
+  }, I.clip, /*#__PURE__*/React.createElement("div", null, "Tick ", /*#__PURE__*/React.createElement("b", null, "Door set"), " for a door + frame together (Main, Bedroom, Staircase, Fire, Duct). Leave it off for single items — e.g. a Bath door where the client uses their own kadappa. Sets can be billed together or bifurcated.")), o.items.map(it => /*#__PURE__*/React.createElement("div", {
+    className: "cons",
+    key: it.id,
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "cons-head",
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      fontSize: 13,
+      fontWeight: 600,
+      cursor: 'pointer'
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: !!it.isSet,
+    onChange: e => upItem(it.id, 'isSet', e.target.checked)
+  }), " Door set (door + frame)"), /*#__PURE__*/React.createElement("button", {
+    className: "mini-x",
+    onClick: () => rmItem(it.id)
+  }, I.x)), it.isSet ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "f-row-3"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Set type"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: it.setType || '',
+    onChange: e => upItem(it.id, 'setType', e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "Select…"), SET_TYPES.map(s => /*#__PURE__*/React.createElement("option", {
+    key: s,
+    value: s
+  }, setLabel(s))))), /*#__PURE__*/React.createElement(Field, {
+    label: "No. of sets"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.totalQty,
+    onChange: e => upItem(it.id, 'totalQty', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Billing"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: it.billing || 'together',
+    onChange: e => upItem(it.id, 'billing', e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "together"
+  }, "Billed together"), /*#__PURE__*/React.createElement("option", {
+    value: "separate"
+  }, "Bifurcated (door + frame)")))), it.billing === 'separate' ? /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Door price"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.priceDoor || '',
+    onChange: e => upItem(it.id, 'priceDoor', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Frame price"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.priceFrame || '',
+    onChange: e => upItem(it.id, 'priceFrame', e.target.value)
+  }))) : /*#__PURE__*/React.createElement(Field, {
+    label: "Price per set"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.priceSet || '',
+    onChange: e => upItem(it.id, 'priceSet', e.target.value)
+  }))) : /*#__PURE__*/React.createElement("div", {
+    className: "f-row-3"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Material"
+  }, /*#__PURE__*/React.createElement("input", {
+    list: "mt",
+    placeholder: "Select or type",
+    value: it.type || '',
+    onChange: e => upItem(it.id, 'type', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Total qty"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.totalQty,
+    onChange: e => upItem(it.id, 'totalQty', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Price / unit"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.pricePerUnit,
+    onChange: e => upItem(it.id, 'pricePerUnit', e.target.value)
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 8,
+      borderTop: '1px dashed var(--line)',
+      paddingTop: 10
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      fontSize: 12.5,
+      fontWeight: 600,
+      cursor: 'pointer'
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: !!it.rateRevised,
+    onChange: e => upItem(it.id, 'rateRevised', e.target.checked)
+  }), " Rate revised mid-order (new rate from a date)"), it.rateRevised && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "New rate effective from",
+    hint: "Dispatched on/after this date = new rate; before = old rate"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: it.rateEffDate || '',
+    onChange: e => upItem(it.id, 'rateEffDate', e.target.value)
+  })), !it.isSet && /*#__PURE__*/React.createElement(Field, {
+    label: "New price / unit"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.newPrice || '',
+    onChange: e => upItem(it.id, 'newPrice', e.target.value)
+  })), it.isSet && it.billing !== 'separate' && /*#__PURE__*/React.createElement(Field, {
+    label: "New price per set"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.newPriceSet || '',
+    onChange: e => upItem(it.id, 'newPriceSet', e.target.value)
+  }))), it.isSet && it.billing === 'separate' && /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "New door price"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.newPriceDoor || '',
+    onChange: e => upItem(it.id, 'newPriceDoor', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "New frame price"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.newPriceFrame || '',
+    onChange: e => upItem(it.id, 'newPriceFrame', e.target.value)
+  }))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 8,
+      borderTop: '1px dashed var(--line)',
+      paddingTop: 10
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      fontSize: 12.5,
+      fontWeight: 600,
+      cursor: 'pointer'
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: !!it.hasOpening,
+    onChange: e => upItem(it.id, 'hasOpening', e.target.checked)
+  }), " Part already delivered before using this app"), it.hasOpening && (it.isSet ? /*#__PURE__*/React.createElement("div", {
+    className: "f-row-3",
+    style: {
+      marginTop: 10
+    }
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Doors already delivered"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.openingDoorQty || '',
+    onChange: e => upItem(it.id, 'openingDoorQty', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Frames already delivered"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.openingFrameQty || '',
+    onChange: e => upItem(it.id, 'openingFrameQty', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Delivered on",
+    hint: "Sets old vs new rate"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: it.openingDate || '',
+    onChange: e => upItem(it.id, 'openingDate', e.target.value)
+  }))) : /*#__PURE__*/React.createElement("div", {
+    className: "f-row",
+    style: {
+      marginTop: 10
+    }
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Already delivered (qty)"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: it.openingQty || '',
+    onChange: e => upItem(it.id, 'openingQty', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Delivered on",
+    hint: "Sets old vs new rate"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: it.openingDate || '',
+    onChange: e => upItem(it.id, 'openingDate', e.target.value)
+  }))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: 'right',
+      fontSize: 12,
+      color: 'var(--slate)'
+    }
+  }, "Line value: ", /*#__PURE__*/React.createElement("b", {
+    className: "mono",
+    style: {
+      color: 'var(--ink)'
+    }
+  }, fmt(itemValue(it, o.id, state)))))), /*#__PURE__*/React.createElement("datalist", {
+    id: "mt"
+  }, SINGLE_TYPES.map(m => /*#__PURE__*/React.createElement("option", {
+    key: m,
+    value: m
+  }))), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    onClick: addItem,
+    style: {
+      marginTop: 4
+    }
+  }, I.plus, " Add material"), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 14,
+      marginTop: 14,
+      background: 'var(--mint-2)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kv"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "Subtotal (before GST)"), /*#__PURE__*/React.createElement("span", {
+    className: "val"
+  }, fmt(orderSubtotal(o, state)))), /*#__PURE__*/React.createElement("div", {
+    className: "kv"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "GST %"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.1",
+    value: o.gstPercent == null ? 18 : o.gstPercent,
+    onChange: e => u('gstPercent', e.target.value),
+    style: {
+      width: 90,
+      padding: '6px 10px',
+      borderRadius: 8,
+      border: '1px solid var(--line)',
+      textAlign: 'right'
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "kv"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "GST amount"), /*#__PURE__*/React.createElement("span", {
+    className: "val"
+  }, fmt(orderGst(o, state)))), /*#__PURE__*/React.createElement("div", {
+    className: "kv"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "Grand total (incl. GST)"), /*#__PURE__*/React.createElement("span", {
+    className: "val",
+    style: {
+      fontSize: 16,
+      color: 'var(--ink)'
+    }
+  }, fmt(val))), /*#__PURE__*/React.createElement("div", {
+    className: "kv",
+    style: {
+      borderBottom: 'none'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "Amount received"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: o.received || '',
+    onChange: e => u('received', e.target.value),
+    style: {
+      width: 140,
+      padding: '7px 10px',
+      borderRadius: 8,
+      border: '1px solid var(--line)',
+      textAlign: 'right'
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "kv",
+    style: {
+      borderBottom: 'none'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "Balance due"), /*#__PURE__*/React.createElement("span", {
+    className: "val",
+    style: {
+      color: val - num(o.received) > 0 ? 'var(--coral)' : 'var(--green)'
+    }
+  }, fmt(val - num(o.received))))));
+}
+
+/* TRIPS */
+function Trips({
+  state,
+  upsert,
+  remove,
+  S
+}) {
+  const [edit, setEdit] = useState(null);
+  const [q, setQ] = useState('');
+  const toast = useToast();
+  const orderLabel = oid => {
+    const o = state.orders.find(x => x.id === oid);
+    const c = state.clients.find(x => x.id === o?.clientId);
+    return o ? `${c?.name || '—'} · ${o.orderNo}` : '—';
+  };
+  let trips = [...state.trips].sort((a, b) => new Date(b.date) - new Date(a.date));
+  if (q) trips = trips.filter(t => [t.vehicleNo, t.transport, t.lrNumber, ...(t.consignments || []).map(c => orderLabel(c.orderId) + ' ' + c.billNo)].join(' ').toLowerCase().includes(q.toLowerCase()));
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "top"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Dispatch Trips"), /*#__PURE__*/React.createElement("p", null, "One truck per trip. Pick the orders it carries — quantity balance carries over automatically.")), /*#__PURE__*/React.createElement("div", {
+    className: "actions"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "search"
+  }, I.search, /*#__PURE__*/React.createElement("input", {
+    placeholder: "Vehicle / client / order / LR",
+    value: q,
+    onChange: e => setQ(e.target.value),
+    style: {
+      width: 230
+    }
+  })), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p",
+    onClick: () => {
+      if (state.orders.length === 0) {
+        alert('Add a client and at least one order first (Clients & Orders).');
+        return;
+      }
+      setEdit({
+        id: uid(),
+        date: today(),
+        consignments: []
+      });
+    }
+  }, I.plus, " New trip"))), trips.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement(Empty, {
+    icon: I.truck,
+    title: "No trips yet",
+    sub: "Log the first truck loaded from Gujarat."
+  })) : /*#__PURE__*/React.createElement("div", {
+    className: "grid",
+    style: {
+      gridTemplateColumns: 'repeat(auto-fill,minmax(430px,1fr))'
+    }
+  }, trips.map(t => /*#__PURE__*/React.createElement(TripCard, {
+    key: t.id,
+    t: t,
+    state: state,
+    S: S,
+    onEdit: () => setEdit(t),
+    onDelete: () => remove('trips', t.id),
+    onAttach: files => upsert('trips', {
+      ...t,
+      lrAttachments: [...(t.lrAttachments || []), ...files]
+    })
+  }))), edit && /*#__PURE__*/React.createElement(TripModal, {
+    trip: edit,
+    state: state,
+    S: S,
+    onClose: () => setEdit(null),
+    onSave: t => {
+      const lr = (t.lrNumber || '').trim();
+      if (lr && state.trips.some(x => x.id !== t.id && (x.lrNumber || '').trim().toLowerCase() === lr.toLowerCase())) {
+        alert('LR number ' + lr + ' is already used on another trip. Each LR must be unique.');
+        return;
+      }
+      upsert('trips', t);
+      setEdit(null);
+      toast('Trip saved');
+    }
+  }));
+}
+function TripCard({
+  t,
+  state,
+  S,
+  onEdit,
+  onDelete,
+  onAttach
+}) {
+  const orderOf = oid => state.orders.find(x => x.id === oid);
+  const clientOf = oid => {
+    const o = orderOf(oid);
+    return state.clients.find(x => x.id === o?.clientId);
+  };
+  const calc = calcTransport(tripTonne(t), (t.consignments || []).filter(c => c.location === 'delivered' || c.location === 'porter_site').length > 1, S.bands);
+  const lrRef = useRef();
+  const addLR = async e => {
+    const fs = [...e.target.files];
+    const rd = await Promise.all(fs.map(readFile));
+    onAttach(rd);
+    e.target.value = '';
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 18
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 17,
+      fontWeight: 700
+    }
+  }, t.vehicleNo || 'No vehicle'), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: 'var(--slate)',
+      marginTop: 3
+    }
+  }, fmtDate(t.date), " · ", t.transport || '—', " · LR ", /*#__PURE__*/React.createElement("span", {
+    className: "mono"
+  }, t.lrNumber || 'pending'), (t.lrAttachments || []).length > 0 && /*#__PURE__*/React.createElement("span", {
+    title: "LR attached",
+    style: {
+      marginLeft: 5,
+      color: 'var(--aqua-d)'
+    }
+  }, I.file), t.pay && t.pay.paid && /*#__PURE__*/React.createElement("span", {
+    className: "chip c-paid",
+    style: {
+      marginLeft: 6
+    }
+  }, "Paid"))), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 18,
+      fontWeight: 700,
+      color: 'var(--aqua-d)'
+    }
+  }, tripTonne(t) || 0, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 11,
+      color: 'var(--slate-2)'
+    }
+  }, " t"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 7,
+      marginTop: 6
+    }
+  }, (t.consignments || []).map(c => {
+    const o = orderOf(c.orderId);
+    return /*#__PURE__*/React.createElement("div", {
+      key: c.id,
+      style: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        fontSize: 12.5,
+        background: 'var(--mint-2)',
+        padding: '8px 11px',
+        borderRadius: 10,
+        flexWrap: 'wrap'
+      }
+    }, c.manual ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("b", null, c.manualClient || 'Loose items'), /*#__PURE__*/React.createElement("span", {
+      className: "chip c-sample",
+      style: {
+        fontSize: 10
+      }
+    }, "Loose"), /*#__PURE__*/React.createElement(LocChip, {
+      loc: c.location
+    }), /*#__PURE__*/React.createElement("span", {
+      style: {
+        marginLeft: 'auto',
+        fontSize: 11,
+        color: 'var(--slate-2)'
+      }
+    }, (c.manualLines || []).length, " items · ", consQty(c), " pcs")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("b", null, clientOf(c.orderId)?.name || '—'), /*#__PURE__*/React.createElement("span", {
+      className: "mono",
+      style: {
+        color: 'var(--slate)',
+        fontSize: 11.5
+      }
+    }, o?.orderNo), o && /*#__PURE__*/React.createElement(TypeChip, {
+      t: o.orderType
+    }), /*#__PURE__*/React.createElement(LocChip, {
+      loc: c.location
+    }), /*#__PURE__*/React.createElement("span", {
+      style: {
+        marginLeft: 'auto',
+        fontSize: 11,
+        color: 'var(--slate-2)'
+      }
+    }, consQty(c), " pcs · ", c.unloadingBy === 'client' ? 'Unload: Client' : 'Unload: GWPL')));
+  }), (t.consignments || []).length === 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: 'var(--slate-2)',
+      padding: '6px 0'
+    }
+  }, "No orders added")), calc.band && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11.5,
+      color: 'var(--slate)',
+      marginTop: 10
+    }
+  }, "Expected transport: ", /*#__PURE__*/React.createElement("b", {
+    className: "mono"
+  }, fmt(calc.expMin), "–", fmt(calc.expMax)), " (", calc.band.label, ")"), (t.lrAttachments || []).length > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: 6,
+      marginTop: 10
+    }
+  }, t.lrAttachments.map((a, i) => /*#__PURE__*/React.createElement("a", {
+    key: i,
+    href: a.data,
+    download: a.name,
+    target: "_blank",
+    className: "chip",
+    style: {
+      background: 'var(--violet-bg)',
+      color: 'var(--indigo)',
+      textDecoration: 'none'
+    },
+    title: a.name
+  }, I.file, " ", a.name.length > 16 ? a.name.slice(0, 14) + '…' : a.name))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 8,
+      marginTop: 12,
+      justifyContent: 'flex-end'
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    ref: lrRef,
+    type: "file",
+    accept: "image/*,application/pdf",
+    multiple: true,
+    style: {
+      display: 'none'
+    },
+    onChange: addLR
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    onClick: () => lrRef.current.click(),
+    style: {
+      marginRight: 'auto'
+    }
+  }, I.upload, " Attach LR"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    onClick: onEdit
+  }, I.edit, " Edit"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-d btn-sm",
+    onClick: onDelete
+  }, I.trash)));
+}
+function TripModal({
+  trip,
+  state,
+  S,
+  onClose,
+  onSave
+}) {
+  const [t, setT] = useState(() => ({
+    ...trip,
+    consignments: (trip.consignments || []).map(c => ({
+      ...c,
+      dispatch: {
+        ...(c.dispatch || {})
+      },
+      weights: {
+        ...(c.weights || {})
+      }
+    }))
+  }));
+  const u = (k, v) => setT(s => ({
+    ...s,
+    [k]: v
+  }));
+  const addCons = () => u('consignments', [...t.consignments, {
+    id: uid(),
+    orderId: '',
+    billNo: '',
+    loadingPriority: '1st Loading',
+    unloadingBy: 'gwpl',
+    location: 'delivered',
+    dispatch: {},
+    weights: {}
+  }]);
+  const addManual = () => u('consignments', [...t.consignments, {
+    id: uid(),
+    manual: true,
+    manualClient: '',
+    billNo: '',
+    loadingPriority: 'Last Loading',
+    location: 'delivered',
+    manualLines: [{
+      id: uid(),
+      type: '',
+      qty: '',
+      unit: 'NOS',
+      weight: ''
+    }]
+  }]);
+  const autoT = tripAutoTonne(t);
+  const upCons = (id, nc) => u('consignments', t.consignments.map(c => c.id === id ? nc : c));
+  const rmCons = id => u('consignments', t.consignments.filter(c => c.id !== id));
+  const isNew = !state.trips.find(x => x.id === trip.id);
+  return /*#__PURE__*/React.createElement(Modal, {
+    wide: true,
+    title: isNew ? 'New trip' : 'Edit trip',
+    onClose: onClose,
+    foot: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-g",
+      onClick: onClose
+    }, "Cancel"), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-p",
+      onClick: () => onSave({
+        ...t,
+        tonnage: tripTonne(t)
+      })
+    }, I.check, " Save trip"))
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-t"
+  }, "Truck details"), /*#__PURE__*/React.createElement("div", {
+    className: "f-row-3"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Loading date"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: t.date,
+    onChange: e => u('date', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Vehicle number"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "MH48 CB 9081",
+    value: t.vehicleNo || '',
+    onChange: e => u('vehicleNo', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Total tonnage"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.01",
+    value: t.autoTonne === false ? t.tonnage ?? '' : autoT,
+    disabled: t.autoTonne !== false,
+    onChange: e => u('tonnage', e.target.value),
+    style: t.autoTonne !== false ? {
+      background: 'var(--mint-2)',
+      fontWeight: 700
+    } : {}
+  }), /*#__PURE__*/React.createElement("label", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 6,
+      fontSize: 11,
+      marginTop: 6,
+      cursor: 'pointer',
+      color: 'var(--slate)'
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: t.autoTonne !== false,
+    onChange: e => u('autoTonne', e.target.checked)
+  }), " Auto from dispatched weights (", autoT, " t)"))), /*#__PURE__*/React.createElement("div", {
+    className: "f-row-3"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Transport company"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: t.transport || '',
+    onChange: e => u('transport', e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "Select…"), S.transport.map(x => /*#__PURE__*/React.createElement("option", {
+    key: x
+  }, x)))), /*#__PURE__*/React.createElement(Field, {
+    label: "LR number",
+    hint: "Can be added later; must be unique"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "add now or after delivery",
+    value: t.lrNumber || '',
+    onChange: e => u('lrNumber', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Notes"
+  }, /*#__PURE__*/React.createElement("input", {
+    value: t.notes || '',
+    onChange: e => u('notes', e.target.value)
+  }))), /*#__PURE__*/React.createElement(Field, {
+    label: "LR / transport bill document",
+    hint: "Attach here — it shows in Transport Pay and on the print sheet"
+  }, /*#__PURE__*/React.createElement(Attach, {
+    items: t.lrAttachments,
+    onChange: a => u('lrAttachments', a),
+    label: "Attach LR document"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "section-t"
+  }, "Loaded in this truck (", t.consignments.length, ")"), t.consignments.map((c, i) => /*#__PURE__*/React.createElement(ConsBlock, {
+    key: c.id,
+    cons: c,
+    idx: i + 1,
+    state: state,
+    onChange: nc => upCons(c.id, nc),
+    onRemove: () => rmCons(c.id)
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 8,
+      marginTop: 4,
+      flexWrap: 'wrap'
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    onClick: addCons
+  }, I.plus, " Add order"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    onClick: addManual
+  }, I.plus, " Add loose / manual items")));
+}
+function ConsBlock({
+  cons,
+  idx,
+  state,
+  onChange,
+  onRemove
+}) {
+  const u = (k, v) => onChange({
+    ...cons,
+    [k]: v
+  });
+  if (cons.manual) {
+    const addLine = () => onChange({
+      ...cons,
+      manualLines: [...(cons.manualLines || []), {
+        id: uid(),
+        type: '',
+        qty: '',
+        unit: 'NOS',
+        weight: ''
+      }]
+    });
+    const upLine = (id, k, v) => onChange({
+      ...cons,
+      manualLines: cons.manualLines.map(l => l.id === id ? {
+        ...l,
+        [k]: v
+      } : l)
+    });
+    const rmLine = id => onChange({
+      ...cons,
+      manualLines: cons.manualLines.filter(l => l.id !== id)
+    });
+    return /*#__PURE__*/React.createElement("div", {
+      className: "cons"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "cons-head"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "cons-title"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "chip c-sample"
+    }, "Manual"), " Loose / hardware items"), /*#__PURE__*/React.createElement("button", {
+      className: "mini-x",
+      onClick: onRemove
+    }, I.trash)), /*#__PURE__*/React.createElement("div", {
+      className: "f-row-3"
+    }, /*#__PURE__*/React.createElement(Field, {
+      label: "Client / source (optional)"
+    }, /*#__PURE__*/React.createElement("input", {
+      list: "manualclients",
+      placeholder: "Select, type, or Teakwood / Red Meranti",
+      value: cons.manualClient || '',
+      onChange: e => u('manualClient', e.target.value)
+    }), /*#__PURE__*/React.createElement("datalist", {
+      id: "manualclients"
+    }, state.clients.map(c => /*#__PURE__*/React.createElement("option", {
+      key: c.id,
+      value: c.name
+    })), /*#__PURE__*/React.createElement("option", {
+      value: "Teakwood"
+    }), /*#__PURE__*/React.createElement("option", {
+      value: "Red Meranti"
+    }))), /*#__PURE__*/React.createElement(Field, {
+      label: "Loading priority"
+    }, /*#__PURE__*/React.createElement("select", {
+      value: cons.loadingPriority || 'Last Loading',
+      onChange: e => u('loadingPriority', e.target.value)
+    }, PRIORITIES.map(p => /*#__PURE__*/React.createElement("option", {
+      key: p
+    }, p)))), /*#__PURE__*/React.createElement(Field, {
+      label: "Location"
+    }, /*#__PURE__*/React.createElement("select", {
+      value: cons.location,
+      onChange: e => u('location', e.target.value)
+    }, LOCS.map(l => /*#__PURE__*/React.createElement("option", {
+      key: l.v,
+      value: l.v
+    }, l.l))))), /*#__PURE__*/React.createElement("div", {
+      className: "disp-head",
+      style: {
+        gridTemplateColumns: '2fr .8fr .9fr 1fr 1fr 32px'
+      }
+    }, /*#__PURE__*/React.createElement("div", null, "Item"), /*#__PURE__*/React.createElement("div", null, "Qty"), /*#__PURE__*/React.createElement("div", null, "Unit"), /*#__PURE__*/React.createElement("div", null, "Wt / unit"), /*#__PURE__*/React.createElement("div", null, "Total wt"), /*#__PURE__*/React.createElement("div", null)), (cons.manualLines || []).map(l => {
+      const tw = num(l.qty) * num(l.weight);
+      return /*#__PURE__*/React.createElement("div", {
+        className: "disp-row",
+        key: l.id,
+        style: {
+          gridTemplateColumns: '2fr .8fr .9fr 1fr 1fr 32px'
+        }
+      }, /*#__PURE__*/React.createElement("input", {
+        placeholder: "e.g. Black Rubber 10mm",
+        value: l.type,
+        onChange: e => upLine(l.id, 'type', e.target.value)
+      }), /*#__PURE__*/React.createElement("input", {
+        type: "number",
+        placeholder: "0",
+        value: l.qty,
+        onChange: e => upLine(l.id, 'qty', e.target.value)
+      }), /*#__PURE__*/React.createElement("input", {
+        list: "units",
+        placeholder: "NOS",
+        value: l.unit || '',
+        onChange: e => upLine(l.id, 'unit', e.target.value)
+      }), /*#__PURE__*/React.createElement("input", {
+        type: "number",
+        step: "0.1",
+        placeholder: "kg",
+        value: l.weight,
+        onChange: e => upLine(l.id, 'weight', e.target.value)
+      }), /*#__PURE__*/React.createElement("div", {
+        className: "tw"
+      }, tw ? tw.toFixed(0) + ' kg' : '—'), /*#__PURE__*/React.createElement("button", {
+        className: "mini-x",
+        onClick: () => rmLine(l.id)
+      }, I.x));
+    }), /*#__PURE__*/React.createElement("datalist", {
+      id: "units"
+    }, ['NOS', 'PCS', 'MTR', 'DRUM', 'SHEET', 'KG', 'SET', 'BUNDLE', 'LTR', 'BOX'].map(x => /*#__PURE__*/React.createElement("option", {
+      key: x,
+      value: x
+    }))), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-g btn-sm",
+      onClick: addLine,
+      style: {
+        marginTop: 8
+      }
+    }, I.plus, " Add item"));
+  }
+  const order = state.orders.find(o => o.id === cons.orderId);
+  const client = order ? state.clients.find(c => c.id === order.clientId) : null;
+  const setDisp = (key, v) => onChange({
+    ...cons,
+    dispatch: {
+      ...(cons.dispatch || {}),
+      [key]: v
+    }
+  });
+  const setWt = (key, v) => onChange({
+    ...cons,
+    weights: {
+      ...(cons.weights || {}),
+      [key]: v
+    }
+  });
+  return /*#__PURE__*/React.createElement("div", {
+    className: "cons"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "cons-head"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "cons-title"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "chip c-pri"
+  }, idx), client ? `${client.name} · ${order.orderNo}` : 'Select an order'), /*#__PURE__*/React.createElement("button", {
+    className: "mini-x",
+    onClick: onRemove
+  }, I.trash)), /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Order (client auto-fills)",
+    hint: order ? `Terms: ${order.paymentTerms || '—'}` : 'Pick from existing orders'
+  }, /*#__PURE__*/React.createElement("select", {
+    value: cons.orderId,
+    onChange: e => onChange({
+      ...cons,
+      orderId: e.target.value,
+      dispatch: {},
+      weights: {}
+    })
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "Select order…"), state.orders.map(o => {
+    const c = state.clients.find(x => x.id === o.clientId);
+    return /*#__PURE__*/React.createElement("option", {
+      key: o.id,
+      value: o.id
+    }, c?.name, " · ", o.orderNo, " (", o.orderType, ")");
+  }))), /*#__PURE__*/React.createElement(Field, {
+    label: "Bill no."
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "e.g. GJ 34",
+    value: cons.billNo,
+    onChange: e => u('billNo', e.target.value)
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "f-row-3"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Loading priority"
+  }, /*#__PURE__*/React.createElement("input", {
+    list: "pri",
+    value: cons.loadingPriority,
+    onChange: e => u('loadingPriority', e.target.value)
+  }), /*#__PURE__*/React.createElement("datalist", {
+    id: "pri"
+  }, PRIORITIES.map(p => /*#__PURE__*/React.createElement("option", {
+    key: p,
+    value: p
+  })))), /*#__PURE__*/React.createElement(Field, {
+    label: "Unloading by"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: cons.unloadingBy,
+    onChange: e => u('unloadingBy', e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "gwpl"
+  }, "GWPL"), /*#__PURE__*/React.createElement("option", {
+    value: "client"
+  }, "Client"))), /*#__PURE__*/React.createElement(Field, {
+    label: "Location"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: cons.location,
+    onChange: e => u('location', e.target.value)
+  }, LOCS.map(l => /*#__PURE__*/React.createElement("option", {
+    key: l.v,
+    value: l.v
+  }, l.l))))), order ? /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11.5,
+      fontWeight: 700,
+      color: 'var(--slate)',
+      textTransform: 'uppercase',
+      letterSpacing: '.05em',
+      margin: '6px 0 8px'
+    }
+  }, "Dispatch from this order"), /*#__PURE__*/React.createElement("div", {
+    className: "disp-head"
+  }, /*#__PURE__*/React.createElement("div", null, "Material"), /*#__PURE__*/React.createElement("div", null, "Balance left"), /*#__PURE__*/React.createElement("div", null, "Dispatch now"), /*#__PURE__*/React.createElement("div", null, "Wt / unit"), /*#__PURE__*/React.createElement("div", null, "Total wt")), trackUnits(order).map(un => {
+    const already = dispatchedForKey(order.id, un.key, state, cons.id) + openingForKey(order, un.key);
+    const avail = Math.max(0, un.qty - already);
+    const nowVal = num((cons.dispatch || {})[un.key]);
+    const wt = num((cons.weights || {})[un.key]);
+    const tw = nowVal * wt;
+    return /*#__PURE__*/React.createElement("div", {
+      className: "disp-row",
+      key: un.key
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "mat"
+    }, un.label || '—'), /*#__PURE__*/React.createElement("div", {
+      className: "bal",
+      style: {
+        color: avail > 0 ? 'var(--ink)' : 'var(--slate-2)'
+      }
+    }, avail, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        color: 'var(--slate-2)'
+      }
+    }, " / ", un.qty)), /*#__PURE__*/React.createElement("input", {
+      type: "number",
+      placeholder: "0",
+      value: (cons.dispatch || {})[un.key] ?? '',
+      onChange: e => setDisp(un.key, e.target.value)
+    }), /*#__PURE__*/React.createElement("input", {
+      type: "number",
+      step: "0.1",
+      placeholder: "kg",
+      value: (cons.weights || {})[un.key] ?? '',
+      onChange: e => setWt(un.key, e.target.value)
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "tw"
+    }, tw ? tw.toFixed(0) + ' kg' : '—'));
+  })) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: 'var(--slate-2)'
+    }
+  }, "Select an order to load its materials."));
+}
+
+/* LABOUR */
+function Labour({
+  state,
+  upsert,
+  remove
+}) {
+  const [edit, setEdit] = useState(null);
+  const rows = [...state.labour].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  const pending = rows.filter(r => !r.paid).reduce((n, r) => n + num(r.amount), 0);
+  const cName = id => state.clients.find(c => c.id === id)?.name || '—';
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "top"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Labour Charges"), /*#__PURE__*/React.createElement("p", null, "Unloading and floor-wise shifting (lift vs stairs). Tag a client so it lands on that dashboard.")), /*#__PURE__*/React.createElement("div", {
+    className: "actions"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p",
+    onClick: () => setEdit({
+      id: uid(),
+      date: today(),
+      type: 'unloading'
+    })
+  }, I.plus, " Add charge"))), /*#__PURE__*/React.createElement("div", {
+    className: "alert alert-info"
+  }, I.users, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, "Pending labour: ", fmt(pending)), " across ", rows.filter(r => !r.paid).length, " entries.")), rows.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement(Empty, {
+    icon: I.users,
+    title: "No labour charges",
+    sub: "Add unloading or shifting charges as they happen."
+  })) : /*#__PURE__*/React.createElement("div", {
+    className: "card t-wrap"
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Date"), /*#__PURE__*/React.createElement("th", null, "Type"), /*#__PURE__*/React.createElement("th", null, "Client / Site"), /*#__PURE__*/React.createElement("th", null, "Detail"), /*#__PURE__*/React.createElement("th", null, "Amount"), /*#__PURE__*/React.createElement("th", null, "Status"), /*#__PURE__*/React.createElement("th", null))), /*#__PURE__*/React.createElement("tbody", null, rows.map(r => /*#__PURE__*/React.createElement("tr", {
+    key: r.id
+  }, /*#__PURE__*/React.createElement("td", null, fmtDate(r.date)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
+    className: "chip " + (r.type === 'shifting' ? 'c-sample' : 'c-loaded'),
+    style: {
+      textTransform: 'capitalize'
+    }
+  }, r.type)), /*#__PURE__*/React.createElement("td", null, cName(r.clientId)), /*#__PURE__*/React.createElement("td", {
+    style: {
+      fontSize: 12,
+      color: 'var(--slate)'
+    }
+  }, r.type === 'shifting' ? `${r.method || '—'} · floor ${r.floor || '—'}` : r.notes || '—'), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("b", {
+    className: "mono"
+  }, fmt(r.amount)), (r.attachments || []).length > 0 && /*#__PURE__*/React.createElement("span", {
+    title: "Bill attached",
+    style: {
+      marginLeft: 5,
+      color: 'var(--indigo)'
+    }
+  }, I.file)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
+    className: "chip " + (r.paid ? 'c-paid' : 'c-hub')
+  }, r.paid ? 'Paid' : 'Unpaid')), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    onClick: () => setEdit(r)
+  }, I.edit))))))), edit && /*#__PURE__*/React.createElement(LabourModal, {
+    row: edit,
+    state: state,
+    onClose: () => setEdit(null),
+    onSave: r => {
+      upsert('labour', r);
+      setEdit(null);
+    },
+    onDelete: () => {
+      remove('labour', edit.id);
+      setEdit(null);
+    }
+  }));
+}
+function LabourModal({
+  row,
+  state,
+  onClose,
+  onSave,
+  onDelete
+}) {
+  const [r, setR] = useState({
+    ...row
+  });
+  const u = (k, v) => setR(s => ({
+    ...s,
+    [k]: v
+  }));
+  const isNew = r.amount == null && !row.clientId;
+  return /*#__PURE__*/React.createElement(Modal, {
+    title: "Labour charge",
+    onClose: onClose,
+    foot: /*#__PURE__*/React.createElement(React.Fragment, null, !isNew && /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-d",
+      onClick: onDelete
+    }, I.trash), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-g",
+      onClick: onClose
+    }, "Cancel"), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-p",
+      onClick: () => onSave(r)
+    }, I.check, " Save"))
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Date"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: r.date,
+    onChange: e => u('date', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Type"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: r.type,
+    onChange: e => u('type', e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "unloading"
+  }, "Unloading (truck)"), /*#__PURE__*/React.createElement("option", {
+    value: "loading"
+  }, "Loading to pickup"), /*#__PURE__*/React.createElement("option", {
+    value: "shifting"
+  }, "Shifting (floors)")))), /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Client / site"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: r.clientId || '',
+    onChange: e => u('clientId', e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "—"), state.clients.map(c => /*#__PURE__*/React.createElement("option", {
+    key: c.id,
+    value: c.id
+  }, c.name)))), /*#__PURE__*/React.createElement(Field, {
+    label: "Vehicle (optional)"
+  }, /*#__PURE__*/React.createElement("input", {
+    value: r.vehicleNo || '',
+    onChange: e => u('vehicleNo', e.target.value)
+  }))), r.type === 'shifting' && /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Method",
+    hint: "Lift and stairs have different rates"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: r.method || '',
+    onChange: e => u('method', e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "Select…"), /*#__PURE__*/React.createElement("option", null, "Lift"), /*#__PURE__*/React.createElement("option", null, "Stairs"))), /*#__PURE__*/React.createElement(Field, {
+    label: "Floor(s)"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "e.g. 3rd",
+    value: r.floor || '',
+    onChange: e => u('floor', e.target.value)
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Amount"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: r.amount || '',
+    onChange: e => u('amount', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Status"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: r.paid ? 'y' : 'n',
+    onChange: e => u('paid', e.target.value === 'y')
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "n"
+  }, "Unpaid"), /*#__PURE__*/React.createElement("option", {
+    value: "y"
+  }, "Paid")))), /*#__PURE__*/React.createElement(Field, {
+    label: "Notes / labour name"
+  }, /*#__PURE__*/React.createElement("input", {
+    value: r.notes || '',
+    onChange: e => u('notes', e.target.value)
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "section-t"
+  }, "Labour bill / receipt"), /*#__PURE__*/React.createElement(Attach, {
+    items: r.attachments,
+    onChange: a => u('attachments', a),
+    label: "Attach labour bill"
+  }));
+}
+
+/* REPORT */
+function Report({
+  state,
+  S
+}) {
+  const [mode, setMode] = useState('vehicle');
+  const [from, setFrom] = useState(''),
+    [to, setTo] = useState(''),
+    [vehicle, setVehicle] = useState(''),
+    [clientId, setClientId] = useState('');
+  const orderOf = oid => state.orders.find(x => x.id === oid);
+  const clientOf = oid => {
+    const o = orderOf(oid);
+    return state.clients.find(x => x.id === o?.clientId);
+  };
+  const trips = useMemo(() => {
+    const chron = [...state.trips].sort((a, b) => (a.date + a.id).localeCompare(b.date + b.id));
+    return chron.filter(t => {
+      if (mode === 'vehicle') return vehicle && (t.vehicleNo || '').toLowerCase().includes(vehicle.toLowerCase());
+      if (mode === 'client') {
+        const sel = state.clients.find(x => x.id === clientId)?.name;
+        return clientId && (t.consignments || []).some(c => c.manual ? c.manualClient === sel : orderOf(c.orderId)?.clientId === clientId);
+      }
+      if (from && t.date < from) return false;
+      if (to && t.date > to) return false;
+      return from || to;
+    });
+  }, [state.trips, mode, from, to, vehicle, clientId]);
+  // chronological ledger for balance-at-time
+  const running = {};
+  const rows = [];
+  let sr = 1;
+  [...state.trips].sort((a, b) => (a.date + a.id).localeCompare(b.date + b.id)).forEach(t => {
+    const inScope = trips.some(x => x.id === t.id);
+    (t.consignments || []).forEach(c => {
+      if (c.manual) {
+        const selName = state.clients.find(x => x.id === clientId)?.name;
+        const label = c.manualClient || 'Loose';
+        (c.manualLines || []).forEach(l => {
+          const disp = num(l.qty);
+          const wt = num(l.weight);
+          const unitClean = l.unit && !/^\s*\d/.test(l.unit) ? l.unit : '';
+          if (disp > 0 && inScope && (mode !== 'client' || c.manualClient === selName)) rows.push({
+            sr: sr++,
+            tripId: t.id,
+            date: t.date,
+            orderNo: '—',
+            terms: '',
+            client: label,
+            unload: '',
+            priority: c.loadingPriority || '',
+            bill: c.billNo,
+            type: l.type + (unitClean ? ' · ' + unitClean : ''),
+            manual: true,
+            qty: '—',
+            disp: String(disp) + (unitClean ? ' ' + unitClean : ''),
+            bal: '—',
+            wpd: wt || '',
+            tw: disp * wt,
+            vehicle: t.vehicleNo,
+            lr: t.lrNumber,
+            otype: 'full'
+          });
+        });
+        return;
+      }
+      const o = orderOf(c.orderId);
+      if (!o) return;
+      trackUnits(o).forEach(un => {
+        const disp = num((c.dispatch || {})[un.key]);
+        const rk = o.id + '|' + un.key;
+        const before = un.qty - (running[rk] || 0);
+        running[rk] = (running[rk] || 0) + disp;
+        const after = un.qty - running[rk];
+        const wt = num((c.weights || {})[un.key]);
+        if (disp > 0 && inScope && (mode !== 'client' || o.clientId === clientId)) rows.push({
+          sr: sr++,
+          tripId: t.id,
+          date: t.date,
+          orderNo: o.orderNo,
+          terms: o.paymentTerms,
+          client: clientOf(c.orderId)?.name,
+          unload: c.unloadingBy === 'client' ? 'By Client' : 'By GWPL',
+          priority: c.loadingPriority,
+          bill: c.billNo,
+          type: titleCase(un.label),
+          qty: before,
+          disp,
+          bal: after,
+          wpd: wt,
+          tw: disp * wt,
+          vehicle: t.vehicleNo,
+          lr: t.lrNumber,
+          otype: o.orderType
+        });
+      });
+    });
+  });
+  const tripsInScope = [...new Set(rows.map(r => r.tripId))].map(id => state.trips.find(t => t.id === id)).filter(Boolean);
+  const vehicles = [...new Set(rows.filter(r => r.vehicle).map(r => r.vehicle))];
+  const transportTotal = tripsInScope.reduce((n, t) => n + tripPayAmount(t, state, S.bands), 0);
+  const totalWt = rows.reduce((n, r) => n + num(r.tw), 0);
+  const attachments = tripsInScope.flatMap(t => (t.lrAttachments || []).map(a => ({
+    ...a,
+    v: t.vehicleNo,
+    lr: t.lrNumber
+  })));
+  // group consecutive rows sharing vehicle+order+client for merged cells
+  const groups = [];
+  rows.forEach((r, i) => {
+    const key = r.vehicle + '|' + r.orderNo + '|' + r.client;
+    const g = groups[groups.length - 1];
+    if (g && g.key === key) g.len++;else groups.push({
+      key,
+      start: i,
+      len: 1
+    });
+  });
+  const firstOf = {};
+  groups.forEach(g => {
+    firstOf[g.start] = g.len;
+  });
+  const rDates = [...new Set(rows.map(r => r.date))].filter(Boolean).sort();
+  const dateLabel = rDates.length === 0 ? '—' : rDates.length === 1 ? fmtDate(rDates[0]) : fmtDate(rDates[0]) + ' – ' + fmtDate(rDates[rDates.length - 1]);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "top no-print"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Print & Approve"), /*#__PURE__*/React.createElement("p", null, "Filter by date, vehicle or client → your dispatch sheet, ready for the Director.")), /*#__PURE__*/React.createElement("div", {
+    className: "actions"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p",
+    onClick: () => window.print(),
+    disabled: !rows.length
+  }, I.printer, " Print"))), /*#__PURE__*/React.createElement("div", {
+    className: "card no-print",
+    style: {
+      padding: 20,
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pill-toggle",
+    style: {
+      marginBottom: 16
+    }
+  }, [['vehicle', 'By vehicle'], ['date', 'By date'], ['client', 'By client']].map(([k, l]) => /*#__PURE__*/React.createElement("button", {
+    key: k,
+    className: mode === k ? 'on' : '',
+    onClick: () => setMode(k)
+  }, l))), mode === 'date' && /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "From"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: from,
+    onChange: e => setFrom(e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "To"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: to,
+    onChange: e => setTo(e.target.value)
+  }))), mode === 'vehicle' && /*#__PURE__*/React.createElement(Field, {
+    label: "Vehicle number"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "MH48 CB 9081",
+    value: vehicle,
+    onChange: e => setVehicle(e.target.value)
+  })), mode === 'client' && /*#__PURE__*/React.createElement(Field, {
+    label: "Client"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: clientId,
+    onChange: e => setClientId(e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "Select…"), state.clients.map(c => /*#__PURE__*/React.createElement("option", {
+    key: c.id,
+    value: c.id
+  }, c.name))))), rows.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "card no-print"
+  }, /*#__PURE__*/React.createElement(Empty, {
+    icon: I.printer,
+    title: "No rows match",
+    sub: "Choose a filter above."
+  })) : /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: '24px 26px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 18,
+      borderBottom: '2px solid var(--ink)',
+      paddingBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      flexWrap: 'wrap',
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: 21,
+      letterSpacing: '-.015em'
+    }
+  }, "Geetanjali Woodcraft Pvt. Ltd."), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12.5,
+      color: 'var(--slate)',
+      marginTop: 4
+    }
+  }, "Dispatch & Transport Statement", mode === 'vehicle' ? ` · Vehicle ${vehicle}` : mode === 'client' ? ` · ${state.clients.find(c => c.id === clientId)?.name || ''}` : '')), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11.5,
+      color: 'var(--slate-2)',
+      textAlign: 'right'
+    }
+  }, "Generated ", fmtDate(today()))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 34,
+      marginTop: 14,
+      flexWrap: 'wrap'
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10.5,
+      color: 'var(--slate-2)',
+      fontWeight: 700,
+      letterSpacing: '.05em',
+      textTransform: 'uppercase'
+    }
+  }, "Date"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 15,
+      fontWeight: 700,
+      marginTop: 3
+    }
+  }, dateLabel)), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10.5,
+      color: 'var(--slate-2)',
+      fontWeight: 700,
+      letterSpacing: '.05em',
+      textTransform: 'uppercase'
+    }
+  }, "Vehicle", vehicles.length > 1 ? 's' : ''), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 15,
+      fontWeight: 700,
+      marginTop: 3
+    },
+    className: "mono"
+  }, vehicles.join(', ') || '—')), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10.5,
+      color: 'var(--slate-2)',
+      fontWeight: 700,
+      letterSpacing: '.05em',
+      textTransform: 'uppercase'
+    }
+  }, "Total weight"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 15,
+      fontWeight: 700,
+      marginTop: 3
+    },
+    className: "mono"
+  }, totalWt.toFixed(0), " kg")))), /*#__PURE__*/React.createElement("div", {
+    className: "t-wrap"
+  }, /*#__PURE__*/React.createElement("table", {
+    className: "rep"
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Sr"), /*#__PURE__*/React.createElement("th", null, "Order"), /*#__PURE__*/React.createElement("th", null, "Client"), /*#__PURE__*/React.createElement("th", null, "Payment Terms"), /*#__PURE__*/React.createElement("th", null, "Priority"), /*#__PURE__*/React.createElement("th", null, "Unloading"), /*#__PURE__*/React.createElement("th", null, "Bill"), /*#__PURE__*/React.createElement("th", null, "Type"), /*#__PURE__*/React.createElement("th", null, "Qty"), /*#__PURE__*/React.createElement("th", null, "Disp"), /*#__PURE__*/React.createElement("th", null, "Bal"), /*#__PURE__*/React.createElement("th", null, "Wt/Door"), /*#__PURE__*/React.createElement("th", null, "Total Wt"), /*#__PURE__*/React.createElement("th", null, "Vehicle"), /*#__PURE__*/React.createElement("th", null, "LR"))), /*#__PURE__*/React.createElement("tbody", null, rows.map((r, i) => {
+    const span = firstOf[i];
+    const merged = span !== undefined;
+    return /*#__PURE__*/React.createElement("tr", {
+      key: r.sr
+    }, /*#__PURE__*/React.createElement("td", null, r.sr), merged && /*#__PURE__*/React.createElement("td", {
+      rowSpan: span,
+      className: "mono"
+    }, r.orderNo || '—'), merged && /*#__PURE__*/React.createElement("td", {
+      rowSpan: span
+    }, /*#__PURE__*/React.createElement("b", null, r.client), r.otype === 'sample' && /*#__PURE__*/React.createElement("span", {
+      className: "chip c-sample",
+      style: {
+        marginLeft: 4
+      }
+    }, "S")), merged && /*#__PURE__*/React.createElement("td", {
+      rowSpan: span
+    }, r.terms || '—'), merged && /*#__PURE__*/React.createElement("td", {
+      rowSpan: span
+    }, r.priority || '—'), merged && /*#__PURE__*/React.createElement("td", {
+      rowSpan: span
+    }, r.unload || '—'), merged && /*#__PURE__*/React.createElement("td", {
+      rowSpan: span,
+      className: "mono"
+    }, r.bill || '—'), /*#__PURE__*/React.createElement("td", {
+      className: r.manual ? "manual" : ""
+    }, r.type), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, r.qty), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, /*#__PURE__*/React.createElement("b", null, r.disp)), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        color: num(r.bal) > 0 ? 'var(--coral)' : 'var(--slate-2)'
+      }
+    }, r.bal), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, r.wpd || '—'), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, r.tw ? r.tw.toFixed(0) : '—'), merged && /*#__PURE__*/React.createElement("td", {
+      rowSpan: span,
+      className: "mono"
+    }, r.vehicle || '—'), merged && /*#__PURE__*/React.createElement("td", {
+      rowSpan: span,
+      className: "mono"
+    }, r.lr || '—'));
+  })), /*#__PURE__*/React.createElement("tfoot", null, /*#__PURE__*/React.createElement("tr", {
+    style: {
+      fontWeight: 700,
+      background: '#F5F6FD'
+    }
+  }, /*#__PURE__*/React.createElement("td", {
+    colSpan: 11,
+    className: "l"
+  }, "TOTAL"), /*#__PURE__*/React.createElement("td", null), /*#__PURE__*/React.createElement("td", {
+    className: "mono"
+  }, totalWt.toFixed(0), " kg"), /*#__PURE__*/React.createElement("td", null), /*#__PURE__*/React.createElement("td", null))))), attachments.length > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 24
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-t"
+  }, "LR documents attached"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 14
+    }
+  }, attachments.map((a, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      border: '1px solid var(--line)',
+      borderRadius: 12,
+      padding: 14,
+      breakInside: 'avoid'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12.5,
+      fontWeight: 700,
+      marginBottom: 8
+    }
+  }, "Vehicle ", /*#__PURE__*/React.createElement("span", {
+    className: "mono"
+  }, a.v || '—'), " · LR ", /*#__PURE__*/React.createElement("span", {
+    className: "mono"
+  }, a.lr || '—'), " ", /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: 'var(--slate-2)',
+      fontWeight: 400
+    }
+  }, "· ", a.name)), a.data && a.data.startsWith('data:image') ? /*#__PURE__*/React.createElement("img", {
+    src: a.data,
+    style: {
+      maxWidth: '100%',
+      borderRadius: 8,
+      border: '1px solid var(--line)'
+    }
+  }) : /*#__PURE__*/React.createElement("a", {
+    href: a.data,
+    download: a.name,
+    target: "_blank",
+    className: "attach-item"
+  }, I.file, " Open ", a.name, " (PDF)"))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 34,
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'flex-end',
+      fontSize: 12,
+      color: 'var(--slate)'
+    }
+  }, /*#__PURE__*/React.createElement("div", null, "Prepared by: ______________________"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: 'center'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderTop: '1px solid var(--slate)',
+      paddingTop: 6,
+      minWidth: 220
+    }
+  }, /*#__PURE__*/React.createElement("b", {
+    style: {
+      color: 'var(--ink)',
+      fontSize: 13
+    }
+  }, S.director || 'Hardik Patel'), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11
+    }
+  }, "Director, GWPL — Approved"))))));
+}
+
+/* TRANSPORT */
+function Transport({
+  state,
+  upsert,
+  remove,
+  S
+}) {
+  const [adj, setAdj] = useState(null);
+  const trips = [...state.trips].filter(t => tripTonne(t) > 0).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  const cName = t => {
+    const first = (t.consignments || []).find(c => !c.manual);
+    const o = first && state.orders.find(x => x.id === first.orderId);
+    return o ? state.clients.find(x => x.id === o.clientId)?.name : (t.consignments || []).find(c => c.manual)?.manualClient || '';
+  };
+  const byCo = {};
+  trips.forEach(t => {
+    const k = t.transport || '—';
+    const amt = tripPayAmount(t, state, S.bands);
+    byCo[k] = byCo[k] || {
+      total: 0,
+      paid: 0,
+      count: 0
+    };
+    byCo[k].total += amt;
+    if (t.pay && t.pay.paid) byCo[k].paid += amt;
+    byCo[k].count++;
+  });
+  const togglePaid = t => upsert('trips', {
+    ...t,
+    pay: {
+      ...(t.pay || {}),
+      paid: !(t.pay && t.pay.paid),
+      paidDate: !(t.pay && t.pay.paid) ? today() : ''
+    }
+  });
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "top"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Transport Payments"), /*#__PURE__*/React.createElement("p", null, "Auto-filled from every trip and its LR. You just mark Paid or Unpaid."))), /*#__PURE__*/React.createElement("div", {
+    className: "grid",
+    style: {
+      gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))',
+      marginBottom: 20
+    }
+  }, Object.entries(byCo).map(([k, v]) => /*#__PURE__*/React.createElement("div", {
+    className: "card stat",
+    key: k
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "k"
+  }, k), /*#__PURE__*/React.createElement("div", {
+    className: "v",
+    style: {
+      fontSize: 22
+    }
+  }, fmt(v.total)), /*#__PURE__*/React.createElement("div", {
+    className: "s"
+  }, fmt(v.paid), " paid · ", v.count, " LRs")))), trips.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement(Empty, {
+    icon: I.cash,
+    title: "No trips to pay yet",
+    sub: "Log a dispatch trip with tonnage, and it appears here automatically."
+  })) : /*#__PURE__*/React.createElement("div", {
+    className: "card t-wrap"
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Date"), /*#__PURE__*/React.createElement("th", null, "Vehicle"), /*#__PURE__*/React.createElement("th", null, "LR"), /*#__PURE__*/React.createElement("th", null, "Transport"), /*#__PURE__*/React.createElement("th", null, "Tonnage"), /*#__PURE__*/React.createElement("th", null, "Expected"), /*#__PURE__*/React.createElement("th", null, "To pay"), /*#__PURE__*/React.createElement("th", null, "LR doc"), /*#__PURE__*/React.createElement("th", null, "Status"), /*#__PURE__*/React.createElement("th", null))), /*#__PURE__*/React.createElement("tbody", null, trips.map(t => {
+    const ex = tripExpected(t, state, S.bands);
+    const amt = tripPayAmount(t, state, S.bands);
+    const paid = t.pay && t.pay.paid;
+    const over = ex.band && amt > ex.expMax + num(t.pay?.extra);
+    const atts = t.lrAttachments || [];
+    return /*#__PURE__*/React.createElement("tr", {
+      key: t.id
+    }, /*#__PURE__*/React.createElement("td", null, fmtDate(t.date)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("b", {
+      className: "mono"
+    }, t.vehicleNo || '—'), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: 'var(--slate-2)'
+      }
+    }, cName(t))), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, t.lrNumber || '—'), /*#__PURE__*/React.createElement("td", null, t.transport || '—'), /*#__PURE__*/React.createElement("td", {
+      className: "mono"
+    }, tripTonne(t), " t"), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        fontSize: 12,
+        color: 'var(--slate)'
+      }
+    }, ex.band ? `${fmt(ex.expMin)}–${fmt(ex.expMax)}` : '—'), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("b", {
+      className: "mono"
+    }, fmt(amt)), num(t.pay?.extra) > 0 && /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: 'var(--amber)'
+      }
+    }, "+", fmt(t.pay.extra), " extra"), over && /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: 'var(--coral)'
+      }
+    }, I.warn, " over")), /*#__PURE__*/React.createElement("td", null, atts.length ? atts.map((a, i) => /*#__PURE__*/React.createElement("a", {
+      key: i,
+      href: a.data,
+      download: a.name,
+      target: "_blank",
+      style: {
+        display: 'inline-flex',
+        marginRight: 6
+      },
+      title: a.name
+    }, I.file)) : /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        color: 'var(--slate-2)'
+      }
+    }, "none")), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-sm " + (paid ? 'btn-g' : 'btn-p'),
+      onClick: () => togglePaid(t),
+      style: paid ? {
+        color: 'var(--green)'
+      } : {}
+    }, paid ? /*#__PURE__*/React.createElement(React.Fragment, null, I.check, " Paid") : 'Mark paid')), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-g btn-sm",
+      onClick: () => setAdj(t),
+      title: "Adjust amount / attach LR"
+    }, I.edit)));
+  })))), adj && /*#__PURE__*/React.createElement(TransportAdjust, {
+    trip: adj,
+    state: state,
+    S: S,
+    onClose: () => setAdj(null),
+    onSave: t => {
+      upsert('trips', t);
+      setAdj(null);
+    }
+  }));
+}
+function TransportAdjust({
+  trip,
+  state,
+  S,
+  onClose,
+  onSave
+}) {
+  const [t, setT] = useState(() => ({
+    ...trip,
+    pay: {
+      ...(trip.pay || {})
+    },
+    lrAttachments: [...(trip.lrAttachments || [])]
+  }));
+  const up = (k, v) => setT(s => ({
+    ...s,
+    pay: {
+      ...s.pay,
+      [k]: v
+    }
+  }));
+  const ex = tripExpected(t, state, S.bands);
+  const amt = tripPayAmount(t, state, S.bands);
+  const over = ex.band && amt > ex.expMax + num(t.pay.extra);
+  return /*#__PURE__*/React.createElement(Modal, {
+    title: `Transport — ${t.vehicleNo || 'trip'} · LR ${t.lrNumber || '—'}`,
+    onClose: onClose,
+    foot: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-g",
+      onClick: onClose
+    }, "Cancel"), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-p",
+      onClick: () => onSave(t)
+    }, I.check, " Save"))
+  }, ex.band ? /*#__PURE__*/React.createElement("div", {
+    className: "alert alert-info"
+  }, I.cash, /*#__PURE__*/React.createElement("div", null, "Rate card: ", /*#__PURE__*/React.createElement("b", null, ex.band.label), tripDropClients(t, state) > 1 ? ' + 2-site' : '', " → expected ", /*#__PURE__*/React.createElement("b", null, fmt(ex.expMin), " – ", fmt(ex.expMax)), ". Leave \"actual\" blank to use the mid value automatically.")) : /*#__PURE__*/React.createElement("div", {
+    className: "alert alert-warn"
+  }, I.warn, /*#__PURE__*/React.createElement("div", null, "Tonnage ", tripTonne(t), " t doesn't match any rate band.")), /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Actual amount (optional)",
+    hint: "Only if it differs from expected"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: t.pay.actual ?? '',
+    onChange: e => up('actual', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Extra charge (if any)"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: t.pay.extra ?? '',
+    onChange: e => up('extra', e.target.value)
+  }))), num(t.pay.extra) > 0 && /*#__PURE__*/React.createElement(Field, {
+    label: "Reason for extra (required)"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "e.g. detention, extra hamali",
+    value: t.pay.extraReason || '',
+    onChange: e => up('extraReason', e.target.value)
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 14,
+      background: over ? 'var(--coral-bg)' : 'var(--green-bg)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kv"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lbl"
+  }, "To pay"), /*#__PURE__*/React.createElement("span", {
+    className: "val",
+    style: {
+      fontSize: 16
+    }
+  }, fmt(amt))), ex.band && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      marginTop: 5,
+      fontWeight: 600,
+      color: over ? 'var(--coral)' : 'var(--green)'
+    }
+  }, over ? '⚠ above expected max — verify' : '✓ within range')), /*#__PURE__*/React.createElement("div", {
+    className: "section-t"
+  }, "LR document"), /*#__PURE__*/React.createElement(Attach, {
+    items: t.lrAttachments,
+    onChange: a => setT(s => ({
+      ...s,
+      lrAttachments: a
+    })),
+    label: "Attach LR / transport bill"
+  }), /*#__PURE__*/React.createElement(Field, {
+    label: "Payment status",
+    hint: ""
+  }, /*#__PURE__*/React.createElement("select", {
+    value: t.pay.paid ? 'y' : 'n',
+    onChange: e => up('paid', e.target.value === 'y'),
+    style: {
+      marginTop: 14
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "n"
+  }, "Unpaid"), /*#__PURE__*/React.createElement("option", {
+    value: "y"
+  }, "Paid"))));
+}
+
+/* SETTINGS */
+function Settings({
+  S,
+  save,
+  state,
+  setState
+}) {
+  const [tab, setTab] = useState('rates');
+  const [newT, setNewT] = useState('');
+  const [sbUrl, setSbUrl] = useState(S.sbUrl || ''),
+    [sbKey, setSbKey] = useState(S.sbKey || '');
+  const [director, setDirector] = useState(S.director || 'Hardik Patel');
+  const toast = useToast();
+  const upBand = (id, k, v) => save({
+    ...S,
+    bands: S.bands.map(b => b.id === id ? {
+      ...b,
+      [k]: k === 'label' ? v : Number(v)
+    } : b)
+  });
+  const upBool = (id, k, v) => save({
+    ...S,
+    bands: S.bands.map(b => b.id === id ? {
+      ...b,
+      [k]: v
+    } : b)
+  });
+  const exportData = () => {
+    const blob = new Blob([JSON.stringify(state, null, 2)], {
+      type: 'application/json'
+    });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'gwpl-control-tower-backup.json';
+    a.click();
+    toast('Backup downloaded');
+  };
+  const importData = e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const d = JSON.parse(r.result);
+        setState(s => ({
+          ...s,
+          ...d
+        }));
+        toast('Data imported');
+      } catch (err) {
+        alert('Invalid file');
+      }
+    };
+    r.readAsText(f);
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "top"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Settings"), /*#__PURE__*/React.createElement("p", null, "Rate card, approver, transport list, cloud sync and backups."))), /*#__PURE__*/React.createElement("div", {
+    className: "tabbar"
+  }, [['rates', 'Rate card'], ['approver', 'Approver'], ['transport', 'Transport'], ['sync', 'Cloud sync'], ['data', 'Backup']].map(([k, l]) => /*#__PURE__*/React.createElement("button", {
+    key: k,
+    className: "tab" + (tab === k ? ' on' : ''),
+    onClick: () => setTab(k)
+  }, l))), tab === 'rates' && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 22
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "alert alert-info"
+  }, I.cash, /*#__PURE__*/React.createElement("div", null, "These bands drive the overcharge check — seeded from your rates. Adjust freely.")), /*#__PURE__*/React.createElement("div", {
+    className: "t-wrap"
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Band"), /*#__PURE__*/React.createElement("th", null, "Min t"), /*#__PURE__*/React.createElement("th", null, "Max t"), /*#__PURE__*/React.createElement("th", null, "Rate min"), /*#__PURE__*/React.createElement("th", null, "Rate max"), /*#__PURE__*/React.createElement("th", null, "Flat?"), /*#__PURE__*/React.createElement("th", null, "2-site ₹"), /*#__PURE__*/React.createElement("th", null))), /*#__PURE__*/React.createElement("tbody", null, S.bands.map(b => /*#__PURE__*/React.createElement("tr", {
+    key: b.id
+  }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
+    value: b.label,
+    onChange: e => upBand(b.id, 'label', e.target.value),
+    style: {
+      width: 100,
+      padding: '6px 8px',
+      borderRadius: 8,
+      border: '1px solid var(--line)'
+    }
+  })), ['min', 'max', 'rateMin', 'rateMax'].map(k => /*#__PURE__*/React.createElement("td", {
+    key: k
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: b[k],
+    onChange: e => upBand(b.id, k, e.target.value),
+    style: {
+      width: 72,
+      padding: '6px 8px',
+      borderRadius: 8,
+      border: '1px solid var(--line)'
+    }
+  }))), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: b.flat,
+    onChange: e => upBool(b.id, 'flat', e.target.checked)
+  })), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: b.twoSite,
+    onChange: e => upBand(b.id, 'twoSite', e.target.value),
+    style: {
+      width: 70,
+      padding: '6px 8px',
+      borderRadius: 8,
+      border: '1px solid var(--line)'
+    }
+  })), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
+    className: "mini-x",
+    onClick: () => save({
+      ...S,
+      bands: S.bands.filter(x => x.id !== b.id)
+    })
+  }, I.trash))))))), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    style: {
+      marginTop: 12
+    },
+    onClick: () => save({
+      ...S,
+      bands: [...S.bands, {
+        id: uid(),
+        label: 'New band',
+        min: 0,
+        max: 0,
+        rateMin: 0,
+        rateMax: 0,
+        flat: false,
+        twoSite: 4000
+      }]
+    })
+  }, I.plus, " Add band")), tab === 'approver' && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 22,
+      maxWidth: 480
+    }
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Approving Director (auto-signs the print)",
+    hint: "Appears in the Approved-by block on every printout"
+  }, /*#__PURE__*/React.createElement("input", {
+    value: director,
+    onChange: e => setDirector(e.target.value)
+  })), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p",
+    onClick: () => {
+      save({
+        ...S,
+        director
+      });
+      toast('Saved');
+    }
+  }, I.check, " Save")), tab === 'transport' && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 22,
+      maxWidth: 520
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "field",
+    style: {
+      display: 'flex',
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "New transport company",
+    value: newT,
+    onChange: e => setNewT(e.target.value)
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p",
+    onClick: () => {
+      if (newT.trim()) {
+        save({
+          ...S,
+          transport: [...S.transport, newT.trim()]
+        });
+        setNewT('');
+      }
+    }
+  }, I.plus, " Add")), S.transport.map((x, i) => /*#__PURE__*/React.createElement("div", {
+    className: "attach-item",
+    key: i
+  }, I.truck, /*#__PURE__*/React.createElement("span", {
+    className: "grow"
+  }, x), /*#__PURE__*/React.createElement("button", {
+    className: "mini-x",
+    onClick: () => save({
+      ...S,
+      transport: S.transport.filter((_, j) => j !== i)
+    })
+  }, I.x)))), tab === 'sync' && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 22,
+      maxWidth: 640
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "alert alert-info"
+  }, I.cloud, /*#__PURE__*/React.createElement("div", null, "Works on this device now. To share with Gujarat, paste your Supabase URL + anon key and run the SQL I'll give you.")), /*#__PURE__*/React.createElement(Field, {
+    label: "Supabase Project URL"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "https://xxxx.supabase.co",
+    value: sbUrl,
+    onChange: e => setSbUrl(e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Supabase anon key"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "eyJhbGc...",
+    value: sbKey,
+    onChange: e => setSbKey(e.target.value)
+  })), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p",
+    onClick: () => {
+      save({
+        ...S,
+        sbUrl,
+        sbKey
+      });
+      toast('Saved — reload to connect');
+    }
+  }, I.check, " Save connection"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: 'var(--slate)',
+      marginTop: 14,
+      lineHeight: 1.6
+    }
+  }, /*#__PURE__*/React.createElement("b", null, "Note:"), " Give me your Supabase project ref and I'll wire the read/write layer + RLS-safe SQL.")), tab === 'data' && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 22,
+      maxWidth: 520
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "alert alert-ok"
+  }, I.check, /*#__PURE__*/React.createElement("div", null, "Data is saved in this browser automatically. Download a backup regularly.")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p",
+    onClick: exportData
+  }, I.upload, " Download backup"), /*#__PURE__*/React.createElement("label", {
+    className: "btn btn-g",
+    style: {
+      cursor: 'pointer'
+    }
+  }, I.file, " Restore", /*#__PURE__*/React.createElement("input", {
+    type: "file",
+    accept: "application/json",
+    style: {
+      display: 'none'
+    },
+    onChange: importData
+  })))));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(ToastHost, null, /*#__PURE__*/React.createElement(App, null)));
+</script>
+</body>
+</html>
