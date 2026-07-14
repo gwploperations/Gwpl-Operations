@@ -1133,7 +1133,10 @@ function App() {
         } = await sb.from('gwpl_ctower').select('data').eq('id', 'main').maybeSingle();
         if (error) throw error;
         if (!alive) return;
-        if (data && data.data) applyRemote(data.data);else await sb.from('gwpl_ctower').upsert({
+        const cloud = data && data.data;
+        const cloudHas = cloud && CLOUD_KEYS.some(k => Array.isArray(cloud[k]) && cloud[k].length > 0);
+        const localHas = CLOUD_KEYS.some(k => Array.isArray(stateRef.current[k]) && stateRef.current[k].length > 0);
+        if (cloudHas) applyRemote(cloud);else await sb.from('gwpl_ctower').upsert({
           id: 'main',
           data: cloudSlice(stateRef.current),
           updated_by: clientId.current,
