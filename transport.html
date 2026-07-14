@@ -33,7 +33,8 @@ svg{width:1em;height:1em;flex-shrink:0}
 .app{display:flex;min-height:100vh}
 .side{width:236px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);color:var(--ink-2);padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
 .brand{display:flex;align-items:center;gap:11px;padding:6px 8px 20px}
-.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--indigo),var(--violet));display:grid;place-items:center;box-shadow:0 6px 16px rgba(79,70,229,.28)}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--indigo),var(--violet));display:grid;place-items:center;color:#fff;box-shadow:0 6px 16px rgba(79,70,229,.30)}
+.logo svg{width:22px;height:22px;stroke:#fff}
 .logo svg{width:22px;height:22px}
 .brand b{font-family:"Times New Roman",Times,Georgia,serif;color:var(--ink);font-size:16px;display:block;line-height:1.1;font-weight:800}
 .brand span{font-size:10.5px;color:var(--slate-2);letter-spacing:.12em;text-transform:uppercase}
@@ -852,7 +853,12 @@ function clientSummary(clientId, state) {
   };
 }
 const LS = 'gwpl_ctower_v4';
-let SB = null;
+const CLOUD_KEYS = ['clients', 'orders', 'trips', 'labour', 'transport_payments'];
+function cloudSlice(s) {
+  const o = {};
+  CLOUD_KEYS.forEach(k => o[k] = s[k] || []);
+  return o;
+}
 function loadLocal() {
   try {
     return JSON.parse(localStorage.getItem(LS)) || {};
@@ -1083,6 +1089,94 @@ function App() {
     [t]: s[t].filter(r => r.id !== id)
   }));
   const S = state.settings;
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+  });
+  const clientId = useRef(Math.random().toString(36).slice(2));
+  const applyingRemote = useRef(false);
+  const [syncStatus, setSyncStatus] = useState('local');
+  const sb = useMemo(() => {
+    try {
+      return S.sbUrl && S.sbKey && window.supabase ? window.supabase.createClient(S.sbUrl, S.sbKey) : null;
+    } catch (e) {
+      return null;
+    }
+  }, [S.sbUrl, S.sbKey]);
+  const applyRemote = d => {
+    applyingRemote.current = true;
+    setState(s => ({
+      ...s,
+      clients: d.clients || [],
+      orders: d.orders || [],
+      trips: d.trips || [],
+      labour: d.labour || [],
+      transport_payments: d.transport_payments || []
+    }));
+    setTimeout(() => {
+      applyingRemote.current = false;
+    }, 80);
+  };
+  useEffect(() => {
+    if (!sb) {
+      setSyncStatus('local');
+      return;
+    }
+    let channel;
+    let alive = true;
+    setSyncStatus('connecting');
+    (async () => {
+      try {
+        const {
+          data,
+          error
+        } = await sb.from('gwpl_ctower').select('data').eq('id', 'main').maybeSingle();
+        if (error) throw error;
+        if (!alive) return;
+        if (data && data.data) applyRemote(data.data);else await sb.from('gwpl_ctower').upsert({
+          id: 'main',
+          data: cloudSlice(stateRef.current),
+          updated_by: clientId.current,
+          updated_at: new Date().toISOString()
+        });
+        channel = sb.channel('ctower-main').on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'gwpl_ctower',
+          filter: 'id=eq.main'
+        }, payload => {
+          const n = payload.new;
+          if (!n || n.updated_by === clientId.current) return;
+          applyRemote(n.data || {});
+        }).subscribe(st => {
+          if (st === 'SUBSCRIBED' && alive) setSyncStatus('synced');
+        });
+        if (alive) setSyncStatus('synced');
+      } catch (e) {
+        if (alive) setSyncStatus('error');
+      }
+    })();
+    return () => {
+      alive = false;
+      if (channel) sb.removeChannel(channel);
+    };
+  }, [sb]);
+  useEffect(() => {
+    if (!sb || applyingRemote.current) return;
+    const id = setTimeout(() => {
+      sb.from('gwpl_ctower').upsert({
+        id: 'main',
+        data: cloudSlice(stateRef.current),
+        updated_by: clientId.current,
+        updated_at: new Date().toISOString()
+      }).then(({
+        error
+      }) => {
+        if (error) setSyncStatus('error');else setSyncStatus('synced');
+      });
+    }, 700);
+    return () => clearTimeout(id);
+  }, [state, sb]);
   const attn = useMemo(() => state.clients.filter(c => clientSummary(c.id, state).attention).length, [state]);
   const atHub = useMemo(() => {
     let n = 0;
@@ -1135,7 +1229,7 @@ function App() {
     className: "brand"
   }, /*#__PURE__*/React.createElement("div", {
     className: "logo"
-  }, I.tower), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, "Control Tower"), /*#__PURE__*/React.createElement("span", null, "GWPL Logistics"))), nav.map(n => /*#__PURE__*/React.createElement("button", {
+  }, I.truck), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, "Control Tower"), /*#__PURE__*/React.createElement("span", null, "GWPL Logistics"))), nav.map(n => /*#__PURE__*/React.createElement("button", {
     key: n.k,
     className: "nav" + (view === n.k ? ' on' : ''),
     onClick: () => {
@@ -1149,9 +1243,9 @@ function App() {
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
     className: "dot",
     style: {
-      background: SB ? 'var(--green)' : 'var(--amber)'
+      background: syncStatus === 'synced' ? 'var(--green)' : syncStatus === 'connecting' ? 'var(--amber)' : syncStatus === 'error' ? 'var(--coral)' : 'var(--slate-2)'
     }
-  }), SB ? 'Supabase synced' : 'Local device'))), /*#__PURE__*/React.createElement("div", {
+  }), syncStatus === 'synced' ? 'Cloud synced' : syncStatus === 'connecting' ? 'Connecting…' : syncStatus === 'error' ? 'Sync error — check keys' : 'Local device only'))), /*#__PURE__*/React.createElement("div", {
     className: "main"
   }, /*#__PURE__*/React.createElement("button", {
     className: "menu-btn no-print",
@@ -4229,11 +4323,54 @@ function Settings({
     className: "card",
     style: {
       padding: 22,
-      maxWidth: 640
+      maxWidth: 680
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "alert alert-info"
-  }, I.cloud, /*#__PURE__*/React.createElement("div", null, "Works on this device now. To share with Gujarat, paste your Supabase URL + anon key and run the SQL I'll give you.")), /*#__PURE__*/React.createElement(Field, {
+  }, I.cloud, /*#__PURE__*/React.createElement("div", null, "Turn on cloud sync so Gujarat enters trips and you just watch the dashboards — same data on every device, live.")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 700,
+      margin: '4px 0 8px'
+    }
+  }, "Step 1 — Run this SQL in Supabase"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: 'var(--slate)',
+      marginBottom: 8
+    }
+  }, "Supabase → SQL Editor → New query → paste → Run."), /*#__PURE__*/React.createElement("pre", {
+    style: {
+      background: '#0B1020',
+      color: '#E6E8F5',
+      padding: '14px 16px',
+      borderRadius: 12,
+      fontSize: 11.5,
+      overflowX: 'auto',
+      lineHeight: 1.5
+    }
+  }, `create table if not exists gwpl_ctower (
+  id text primary key,
+  data jsonb not null,
+  updated_by text,
+  updated_at timestamptz default now()
+);
+alter table gwpl_ctower enable row level security;
+create policy "ctower all" on gwpl_ctower
+  for all to anon using (true) with check (true);
+alter publication supabase_realtime add table gwpl_ctower;`), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 700,
+      margin: '16px 0 8px'
+    }
+  }, "Step 2 — Paste your project keys"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: 'var(--slate)',
+      marginBottom: 10
+    }
+  }, "Supabase → Project Settings → API. Use the ", /*#__PURE__*/React.createElement("b", null, "anon public"), " key."), /*#__PURE__*/React.createElement(Field, {
     label: "Supabase Project URL"
   }, /*#__PURE__*/React.createElement("input", {
     placeholder: "https://xxxx.supabase.co",
@@ -4250,19 +4387,25 @@ function Settings({
     onClick: () => {
       save({
         ...S,
-        sbUrl,
-        sbKey
+        sbUrl: sbUrl.trim(),
+        sbKey: sbKey.trim()
       });
-      toast('Saved — reload to connect');
+      toast('Connecting to Supabase…');
     }
-  }, I.check, " Save connection"), /*#__PURE__*/React.createElement("div", {
+  }, I.check, " Connect & sync"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: 'var(--slate)',
-      marginTop: 14,
-      lineHeight: 1.6
+      marginTop: 16,
+      lineHeight: 1.7,
+      borderTop: '1px solid var(--line)',
+      paddingTop: 14
     }
-  }, /*#__PURE__*/React.createElement("b", null, "Note:"), " Give me your Supabase project ref and I'll wire the read/write layer + RLS-safe SQL.")), tab === 'data' && /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("b", null, "How it works:"), " the first device to connect uploads its current data to the cloud; every other device that connects with the same keys pulls it and stays in sync live. Settings and keys stay on each device (not synced).", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("b", {
+    style: {
+      color: 'var(--coral)'
+    }
+  }, "Important:"), " connect from the device that has your ", /*#__PURE__*/React.createElement("i", null, "correct"), " data ", /*#__PURE__*/React.createElement("b", null, "first"), " — the cloud takes whatever that first device has. Other devices will then mirror it (their local data is replaced).")), tab === 'data' && /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
       padding: 22,
