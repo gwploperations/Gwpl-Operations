@@ -195,6 +195,8 @@ tbody tr:hover{background:var(--mint)}
   .menu-btn{display:grid !important}
 }
 .menu-btn{display:none;width:38px;height:38px;border-radius:10px;background:#fff;box-shadow:var(--shadow);place-items:center;color:var(--ink)}
+.side-backdrop{display:none}
+@media (max-width:900px){.side-backdrop{display:block;position:fixed;inset:0;background:rgba(11,16,32,.4);z-index:55}}
 
 @media print{
   .side,.top .actions,.menu-btn,.tabbar,.no-print{display:none !important}
@@ -1124,7 +1126,10 @@ function App() {
   }];
   return /*#__PURE__*/React.createElement("div", {
     className: "app"
-  }, /*#__PURE__*/React.createElement("div", {
+  }, sideOpen && /*#__PURE__*/React.createElement("div", {
+    className: "side-backdrop",
+    onClick: () => setSideOpen(false)
+  }), /*#__PURE__*/React.createElement("div", {
     className: "side" + (sideOpen ? ' open' : '')
   }, /*#__PURE__*/React.createElement("div", {
     className: "brand"
@@ -1726,7 +1731,7 @@ function Clients({
   })) : /*#__PURE__*/React.createElement("div", {
     className: "grid",
     style: {
-      gridTemplateColumns: 'repeat(auto-fill,minmax(330px,1fr))'
+      gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,330px),1fr))'
     }
   }, clients.map(c => {
     const s = clientSummary(c.id, state);
@@ -2553,7 +2558,7 @@ function Trips({
   })) : /*#__PURE__*/React.createElement("div", {
     className: "grid",
     style: {
-      gridTemplateColumns: 'repeat(auto-fill,minmax(430px,1fr))'
+      gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,430px),1fr))'
     }
   }, trips.map(t => /*#__PURE__*/React.createElement(TripCard, {
     key: t.id,
