@@ -903,6 +903,71 @@ function ToastHost({
   }, I.check, m));
 }
 const useToast = () => useContext(ToastCtx);
+const ViewCtx = createContext();
+const useViewer = () => useContext(ViewCtx);
+function ViewerHost({
+  children
+}) {
+  const [a, setA] = useState(null);
+  const isImg = a && (a.data || '').startsWith('data:image');
+  return /*#__PURE__*/React.createElement(ViewCtx.Provider, {
+    value: setA
+  }, children, a && /*#__PURE__*/React.createElement("div", {
+    className: "overlay",
+    onClick: () => setA(null)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal wide",
+    onClick: e => e.stopPropagation(),
+    style: {
+      maxWidth: 940
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-head"
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap'
+    }
+  }, a.name), /*#__PURE__*/React.createElement("button", {
+    className: "x",
+    onClick: () => setA(null)
+  }, I.x)), /*#__PURE__*/React.createElement("div", {
+    className: "modal-body",
+    style: {
+      background: '#F5F6FD',
+      textAlign: 'center'
+    }
+  }, isImg ? /*#__PURE__*/React.createElement("img", {
+    src: a.data,
+    alt: a.name,
+    style: {
+      maxWidth: '100%',
+      borderRadius: 10,
+      border: '1px solid var(--line)'
+    }
+  }) : /*#__PURE__*/React.createElement("iframe", {
+    src: a.data,
+    title: a.name,
+    style: {
+      width: '100%',
+      height: '70vh',
+      border: '1px solid var(--line)',
+      borderRadius: 10,
+      background: '#fff'
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "modal-foot"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "btn btn-g",
+    href: a.data,
+    download: a.name
+  }, I.file, " Download"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p",
+    onClick: () => setA(null)
+  }, I.check, " Close")))));
+}
 function Modal({
   title,
   onClose,
@@ -984,6 +1049,7 @@ function Attach({
   label
 }) {
   const ref = useRef();
+  const view = useViewer();
   const add = async e => {
     const fs = [...e.target.files];
     const rd = await Promise.all(fs.map(readFile));
@@ -1016,11 +1082,18 @@ function Attach({
   }), (items || []).map((f, i) => /*#__PURE__*/React.createElement("div", {
     className: "attach-item",
     key: i
-  }, I.file, /*#__PURE__*/React.createElement("a", {
+  }, I.file, /*#__PURE__*/React.createElement("button", {
     className: "grow",
-    href: f.data,
-    download: f.name,
-    target: "_blank"
+    onClick: () => view(f),
+    style: {
+      textAlign: 'left',
+      background: 'none',
+      border: 'none',
+      color: 'var(--indigo)',
+      cursor: 'pointer',
+      font: 'inherit'
+    },
+    title: 'View ' + f.name
   }, f.name), /*#__PURE__*/React.createElement("button", {
     className: "mini-x",
     onClick: () => onChange(items.filter((_, j) => j !== i))
@@ -2704,6 +2777,7 @@ function TripCard({
   };
   const calc = calcTransport(tripTonne(t), (t.consignments || []).filter(c => c.location === 'delivered' || c.location === 'porter_site').length > 1, S.bands, t.flatRate);
   const lrRef = useRef();
+  const view = useViewer();
   const addLR = async e => {
     const fs = [...e.target.files];
     const rd = await Promise.all(fs.map(readFile));
@@ -2837,18 +2911,17 @@ function TripCard({
       gap: 6,
       marginTop: 10
     }
-  }, t.lrAttachments.map((a, i) => /*#__PURE__*/React.createElement("a", {
+  }, t.lrAttachments.map((a, i) => /*#__PURE__*/React.createElement("button", {
     key: i,
-    href: a.data,
-    download: a.name,
-    target: "_blank",
+    onClick: () => view(a),
     className: "chip",
     style: {
       background: 'var(--violet-bg)',
       color: 'var(--indigo)',
-      textDecoration: 'none'
+      cursor: 'pointer',
+      border: 'none'
     },
-    title: a.name
+    title: 'View ' + a.name
   }, I.file, " ", a.name.length > 16 ? a.name.slice(0, 14) + '…' : a.name))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
@@ -3528,6 +3601,7 @@ function Report({
   state,
   S
 }) {
+  const view = useViewer();
   const [mode, setMode] = useState('vehicle');
   const [from, setFrom] = useState(''),
     [to, setTo] = useState(''),
@@ -3896,12 +3970,15 @@ function Report({
       borderRadius: 8,
       border: '1px solid var(--line)'
     }
-  }) : /*#__PURE__*/React.createElement("a", {
-    href: a.data,
-    download: a.name,
-    target: "_blank",
-    className: "attach-item"
-  }, I.file, " Open ", a.name, " (PDF)"))))), /*#__PURE__*/React.createElement("div", {
+  }) : /*#__PURE__*/React.createElement("button", {
+    onClick: () => view(a),
+    className: "attach-item no-print",
+    style: {
+      cursor: 'pointer',
+      border: '1px solid var(--line)',
+      background: '#fff'
+    }
+  }, I.file, " View ", a.name, " (PDF)"))))), /*#__PURE__*/React.createElement("div", {
     style: {
       marginTop: 34,
       display: 'flex',
@@ -3940,6 +4017,7 @@ function Transport({
   S
 }) {
   const [adj, setAdj] = useState(null);
+  const view = useViewer();
   const trips = [...state.trips].filter(t => tripTonne(t) > 0).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   const cName = t => {
     const first = (t.consignments || []).find(c => !c.manual);
@@ -4032,16 +4110,19 @@ function Transport({
         fontSize: 11,
         color: 'var(--coral)'
       }
-    }, I.warn, " over")), /*#__PURE__*/React.createElement("td", null, atts.length ? atts.map((a, i) => /*#__PURE__*/React.createElement("a", {
+    }, I.warn, " over")), /*#__PURE__*/React.createElement("td", null, atts.length ? atts.map((a, i) => /*#__PURE__*/React.createElement("button", {
       key: i,
-      href: a.data,
-      download: a.name,
-      target: "_blank",
+      onClick: () => view(a),
       style: {
         display: 'inline-flex',
-        marginRight: 6
+        marginRight: 6,
+        color: 'var(--indigo)',
+        cursor: 'pointer',
+        background: 'none',
+        border: 'none',
+        padding: 2
       },
-      title: a.name
+      title: 'View ' + a.name
     }, I.file)) : /*#__PURE__*/React.createElement("span", {
       style: {
         fontSize: 11,
@@ -4465,7 +4546,7 @@ function Settings({
     onChange: importData
   })))));
 }
-ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(ToastHost, null, /*#__PURE__*/React.createElement(App, null)));
+ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(ToastHost, null, /*#__PURE__*/React.createElement(ViewerHost, null, /*#__PURE__*/React.createElement(App, null))));
 </script>
 </body>
 </html>
