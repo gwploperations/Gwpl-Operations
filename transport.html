@@ -621,7 +621,7 @@ const SEED_BANDS = [{
   twoSite: 0
 }];
 const SEED_TRANSPORT = ['JP Transport', 'Astha Transport', 'Dreams Transport', 'Setul Transport'];
-function calcTransport(tonnage, twoSites, bands) {
+function calcTransport(tonnage, twoSites, bands, forceFlat) {
   const t = num(tonnage);
   const band = bands.find(b => t >= b.min && t <= b.max);
   if (!band) return {
@@ -630,7 +630,7 @@ function calcTransport(tonnage, twoSites, bands) {
     expMax: 0,
     twoSiteCharge: 0
   };
-  const tsc = twoSites && !band.flat ? band.twoSite : 0;
+  const tsc = twoSites && !band.flat && !forceFlat ? band.twoSite : 0;
   return {
     band,
     expMin: band.rateMin * t + tsc,
@@ -793,7 +793,7 @@ function tripDropClients(t, state) {
   return set.size;
 }
 function tripExpected(t, state, bands) {
-  return calcTransport(tripTonne(t), tripDropClients(t, state) > 1, bands);
+  return calcTransport(tripTonne(t), tripDropClients(t, state) > 1, bands, t.flatRate);
 }
 function tripPayAmount(t, state, bands) {
   const p = t.pay || {};
@@ -2702,7 +2702,7 @@ function TripCard({
     const o = orderOf(oid);
     return state.clients.find(x => x.id === o?.clientId);
   };
-  const calc = calcTransport(tripTonne(t), (t.consignments || []).filter(c => c.location === 'delivered' || c.location === 'porter_site').length > 1, S.bands);
+  const calc = calcTransport(tripTonne(t), (t.consignments || []).filter(c => c.location === 'delivered' || c.location === 'porter_site').length > 1, S.bands, t.flatRate);
   const lrRef = useRef();
   const addLR = async e => {
     const fs = [...e.target.files];
@@ -2824,7 +2824,13 @@ function TripCard({
     }
   }, "Expected transport: ", /*#__PURE__*/React.createElement("b", {
     className: "mono"
-  }, fmt(calc.expMin), "–", fmt(calc.expMax)), " (", calc.band.label, ")"), (t.lrAttachments || []).length > 0 && /*#__PURE__*/React.createElement("div", {
+  }, fmt(calc.expMin), "–", fmt(calc.expMax)), " (", calc.band.label, ")", t.flatRate && /*#__PURE__*/React.createElement("span", {
+    className: "chip c-sample",
+    style: {
+      marginLeft: 6,
+      fontSize: 10
+    }
+  }, "Flat")), (t.lrAttachments || []).length > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       flexWrap: 'wrap',
@@ -2982,6 +2988,40 @@ function TripModal({
     checked: t.autoTonne !== false,
     onChange: e => u('autoTonne', e.target.checked)
   }), " Auto from dispatched weights (", autoT, " t)"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: 'var(--mint-2)',
+      border: '1px solid var(--line)',
+      borderRadius: 12,
+      padding: '12px 14px',
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 9,
+      fontSize: 13,
+      fontWeight: 600,
+      cursor: 'pointer'
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: !!t.flatRate,
+    onChange: e => u('flatRate', e.target.checked)
+  }), " Flat rate for this trip (no 2-site charge)"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11.5,
+      color: 'var(--slate)',
+      marginTop: 6,
+      lineHeight: 1.6
+    }
+  }, (() => {
+    const ex = tripExpected(t, state, S.bands);
+    const drops = tripDropClients(t, state);
+    return ex.band ? /*#__PURE__*/React.createElement(React.Fragment, null, "Band ", /*#__PURE__*/React.createElement("b", null, ex.band.label), " · ", drops > 1 ? `${drops} delivery sites` : 'single site', " → expected ", /*#__PURE__*/React.createElement("b", {
+      className: "mono"
+    }, fmt(ex.expMin), "–", fmt(ex.expMax)), ex.twoSiteCharge ? /*#__PURE__*/React.createElement(React.Fragment, null, " (incl. ", fmt(ex.twoSiteCharge), " 2-site)") : t.flatRate && drops > 1 ? /*#__PURE__*/React.createElement(React.Fragment, null, " · 2-site charge waived") : null) : /*#__PURE__*/React.createElement(React.Fragment, null, "Tonnage doesn't match any rate band yet.");
+  })())), /*#__PURE__*/React.createElement("div", {
     className: "f-row-3"
   }, /*#__PURE__*/React.createElement(Field, {
     label: "Transport company"
@@ -3554,9 +3594,10 @@ function Report({
       trackUnits(o).forEach(un => {
         const disp = num((c.dispatch || {})[un.key]);
         const rk = o.id + '|' + un.key;
-        const before = un.qty - (running[rk] || 0);
-        running[rk] = (running[rk] || 0) + disp;
-        const after = un.qty - running[rk];
+        if (running[rk] === undefined) running[rk] = openingForKey(o, un.key);
+        const before = Math.max(0, un.qty - running[rk]);
+        running[rk] = running[rk] + disp;
+        const after = Math.max(0, un.qty - running[rk]);
         const wt = num((c.weights || {})[un.key]);
         if (disp > 0 && inScope && (mode !== 'client' || o.clientId === clientId)) rows.push({
           sr: sr++,
@@ -4064,9 +4105,26 @@ function TransportAdjust({
     }, I.check, " Save"))
   }, ex.band ? /*#__PURE__*/React.createElement("div", {
     className: "alert alert-info"
-  }, I.cash, /*#__PURE__*/React.createElement("div", null, "Rate card: ", /*#__PURE__*/React.createElement("b", null, ex.band.label), tripDropClients(t, state) > 1 ? ' + 2-site' : '', " → expected ", /*#__PURE__*/React.createElement("b", null, fmt(ex.expMin), " – ", fmt(ex.expMax)), ". Leave \"actual\" blank to use the mid value automatically.")) : /*#__PURE__*/React.createElement("div", {
+  }, I.cash, /*#__PURE__*/React.createElement("div", null, "Rate card: ", /*#__PURE__*/React.createElement("b", null, ex.band.label), tripDropClients(t, state) > 1 && !t.flatRate ? ' + 2-site' : '', " → expected ", /*#__PURE__*/React.createElement("b", null, fmt(ex.expMin), " – ", fmt(ex.expMax)), ". Leave \"actual\" blank to use the mid value automatically.")) : /*#__PURE__*/React.createElement("div", {
     className: "alert alert-warn"
-  }, I.warn, /*#__PURE__*/React.createElement("div", null, "Tonnage ", tripTonne(t), " t doesn't match any rate band.")), /*#__PURE__*/React.createElement("div", {
+  }, I.warn, /*#__PURE__*/React.createElement("div", null, "Tonnage ", tripTonne(t), " t doesn't match any rate band.")), /*#__PURE__*/React.createElement("label", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 9,
+      fontSize: 13,
+      fontWeight: 600,
+      cursor: 'pointer',
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: !!t.flatRate,
+    onChange: e => setT(s => ({
+      ...s,
+      flatRate: e.target.checked
+    }))
+  }), " Flat rate for this trip (no 2-site charge)"), /*#__PURE__*/React.createElement("div", {
     className: "f-row"
   }, /*#__PURE__*/React.createElement(Field, {
     label: "Actual amount (optional)",
