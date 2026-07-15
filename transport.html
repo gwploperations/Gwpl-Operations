@@ -853,12 +853,27 @@ function clientSummary(clientId, state) {
   };
 }
 const LS = 'gwpl_ctower_v4';
+// Cloud connection is built in — every browser, profile and phone connects automatically.
+const SB_URL = 'https://txkyuhudxukgmsaxvxvr.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4a3l1aHVkeHVrZ21zYXh2eHZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwMzAwMjUsImV4cCI6MjA5OTYwNjAyNX0.EbBtJMc6VZYJiLBRL_8YpWpY31MHJbqBjZFOtRsMzRQ';
 const CLOUD_KEYS = ['clients', 'orders', 'trips', 'labour', 'transport_payments'];
-function cloudSlice(s) {
+const cloudSlice = s => {
   const o = {};
   CLOUD_KEYS.forEach(k => o[k] = s[k] || []);
   return o;
+};
+const cloudHasData = d => !!d && CLOUD_KEYS.some(k => Array.isArray(d[k]) && d[k].length > 0);
+let _sb = null;
+function getSB() {
+  if (_sb !== null) return _sb;
+  try {
+    _sb = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null;
+  } catch (e) {
+    _sb = null;
+  }
+  return _sb;
 }
+const CID = Math.random().toString(36).slice(2);
 function loadLocal() {
   try {
     return JSON.parse(localStorage.getItem(LS)) || {};
@@ -1066,9 +1081,7 @@ function App() {
       settings: l.settings || {
         bands: SEED_BANDS,
         transport: SEED_TRANSPORT,
-        director: 'Hardik Patel',
-        sbUrl: '',
-        sbKey: ''
+        director: 'Hardik Patel'
       }
     };
   });
@@ -1093,18 +1106,12 @@ function App() {
   useEffect(() => {
     stateRef.current = state;
   });
-  const clientId = useRef(Math.random().toString(36).slice(2));
-  const applyingRemote = useRef(false);
-  const [syncStatus, setSyncStatus] = useState('local');
-  const sb = useMemo(() => {
-    try {
-      return S.sbUrl && S.sbKey && window.supabase ? window.supabase.createClient(S.sbUrl, S.sbKey) : null;
-    } catch (e) {
-      return null;
-    }
-  }, [S.sbUrl, S.sbKey]);
+  const fromCloud = useRef(false);
+  const ready = useRef(false);
+  const [sync, setSync] = useState('connecting');
+  const sb = useMemo(() => getSB(), []);
   const applyRemote = d => {
-    applyingRemote.current = true;
+    fromCloud.current = true;
     setState(s => ({
       ...s,
       clients: d.clients || [],
@@ -1114,17 +1121,16 @@ function App() {
       transport_payments: d.transport_payments || []
     }));
     setTimeout(() => {
-      applyingRemote.current = false;
-    }, 80);
+      fromCloud.current = false;
+    }, 100);
   };
   useEffect(() => {
     if (!sb) {
-      setSyncStatus('local');
+      setSync('offline');
       return;
     }
-    let channel;
-    let alive = true;
-    setSyncStatus('connecting');
+    let channel,
+      alive = true;
     (async () => {
       try {
         const {
@@ -1134,29 +1140,29 @@ function App() {
         if (error) throw error;
         if (!alive) return;
         const cloud = data && data.data;
-        const cloudHas = cloud && CLOUD_KEYS.some(k => Array.isArray(cloud[k]) && cloud[k].length > 0);
-        const localHas = CLOUD_KEYS.some(k => Array.isArray(stateRef.current[k]) && stateRef.current[k].length > 0);
-        if (cloudHas) applyRemote(cloud);else await sb.from('gwpl_ctower').upsert({
+        if (cloudHasData(cloud)) applyRemote(cloud);else if (cloudHasData(stateRef.current)) await sb.from('gwpl_ctower').upsert({
           id: 'main',
           data: cloudSlice(stateRef.current),
-          updated_by: clientId.current,
+          updated_by: CID,
           updated_at: new Date().toISOString()
         });
-        channel = sb.channel('ctower-main').on('postgres_changes', {
+        channel = sb.channel('ctower').on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'gwpl_ctower',
           filter: 'id=eq.main'
-        }, payload => {
-          const n = payload.new;
-          if (!n || n.updated_by === clientId.current) return;
-          applyRemote(n.data || {});
-        }).subscribe(st => {
-          if (st === 'SUBSCRIBED' && alive) setSyncStatus('synced');
-        });
-        if (alive) setSyncStatus('synced');
+        }, p => {
+          if (!p.new || p.new.updated_by === CID) return;
+          applyRemote(p.new.data || {});
+        }).subscribe();
+        if (alive) {
+          setSync('live');
+          setTimeout(() => {
+            ready.current = true;
+          }, 300);
+        }
       } catch (e) {
-        if (alive) setSyncStatus('error');
+        if (alive) setSync('error');
       }
     })();
     return () => {
@@ -1165,19 +1171,17 @@ function App() {
     };
   }, [sb]);
   useEffect(() => {
-    if (!sb || applyingRemote.current) return;
+    if (!sb || !ready.current || fromCloud.current) return;
     const id = setTimeout(() => {
       sb.from('gwpl_ctower').upsert({
         id: 'main',
         data: cloudSlice(stateRef.current),
-        updated_by: clientId.current,
+        updated_by: CID,
         updated_at: new Date().toISOString()
       }).then(({
         error
-      }) => {
-        if (error) setSyncStatus('error');else setSyncStatus('synced');
-      });
-    }, 700);
+      }) => setSync(error ? 'error' : 'live'));
+    }, 600);
     return () => clearTimeout(id);
   }, [state, sb]);
   const attn = useMemo(() => state.clients.filter(c => clientSummary(c.id, state).attention).length, [state]);
@@ -1246,9 +1250,9 @@ function App() {
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
     className: "dot",
     style: {
-      background: syncStatus === 'synced' ? 'var(--green)' : syncStatus === 'connecting' ? 'var(--amber)' : syncStatus === 'error' ? 'var(--coral)' : 'var(--slate-2)'
+      background: sync === 'live' ? 'var(--green)' : sync === 'connecting' ? 'var(--amber)' : 'var(--coral)'
     }
-  }), syncStatus === 'synced' ? 'Cloud synced' : syncStatus === 'connecting' ? 'Connecting…' : syncStatus === 'error' ? 'Sync error — check keys' : 'Local device only'))), /*#__PURE__*/React.createElement("div", {
+  }), sync === 'live' ? 'Live — all devices' : sync === 'connecting' ? 'Connecting…' : sync === 'offline' ? 'Offline — local only' : 'Connection error'))), /*#__PURE__*/React.createElement("div", {
     className: "main"
   }, /*#__PURE__*/React.createElement("button", {
     className: "menu-btn no-print",
@@ -4139,8 +4143,6 @@ function Settings({
 }) {
   const [tab, setTab] = useState('rates');
   const [newT, setNewT] = useState('');
-  const [sbUrl, setSbUrl] = useState(S.sbUrl || ''),
-    [sbKey, setSbKey] = useState(S.sbKey || '');
   const [director, setDirector] = useState(S.director || 'Hardik Patel');
   const toast = useToast();
   const upBand = (id, k, v) => save({
@@ -4189,7 +4191,7 @@ function Settings({
     className: "top"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Settings"), /*#__PURE__*/React.createElement("p", null, "Rate card, approver, transport list, cloud sync and backups."))), /*#__PURE__*/React.createElement("div", {
     className: "tabbar"
-  }, [['rates', 'Rate card'], ['approver', 'Approver'], ['transport', 'Transport'], ['sync', 'Cloud sync'], ['data', 'Backup']].map(([k, l]) => /*#__PURE__*/React.createElement("button", {
+  }, [['rates', 'Rate card'], ['approver', 'Approver'], ['transport', 'Transport'], ['cloud', 'Cloud'], ['data', 'Backup']].map(([k, l]) => /*#__PURE__*/React.createElement("button", {
     key: k,
     className: "tab" + (tab === k ? ' on' : ''),
     onClick: () => setTab(k)
@@ -4322,93 +4324,60 @@ function Settings({
       ...S,
       transport: S.transport.filter((_, j) => j !== i)
     })
-  }, I.x)))), tab === 'sync' && /*#__PURE__*/React.createElement("div", {
+  }, I.x)))), tab === 'cloud' && /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
       padding: 22,
-      maxWidth: 680
+      maxWidth: 620
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "alert alert-info"
-  }, I.cloud, /*#__PURE__*/React.createElement("div", null, "Turn on cloud sync so Gujarat enters trips and you just watch the dashboards — same data on every device, live.")), /*#__PURE__*/React.createElement("div", {
+    className: "alert alert-ok"
+  }, I.cloud, /*#__PURE__*/React.createElement("div", null, "Cloud is ", /*#__PURE__*/React.createElement("b", null, "built in"), " — every browser, profile, phone and the Gujarat PC opens the same live data automatically. Nothing to set up.")), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       fontWeight: 700,
-      margin: '4px 0 8px'
+      margin: '4px 0 6px'
     }
-  }, "Step 1 — Run this SQL in Supabase"), /*#__PURE__*/React.createElement("div", {
+  }, "Seed the cloud from this device"), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 12,
+      fontSize: 12.5,
       color: 'var(--slate)',
-      marginBottom: 8
+      lineHeight: 1.7,
+      marginBottom: 12
     }
-  }, "Supabase → SQL Editor → New query → paste → Run."), /*#__PURE__*/React.createElement("pre", {
+  }, "If this browser is the one holding your correct data and other devices show blank, push it up once. This ", /*#__PURE__*/React.createElement("b", {
     style: {
-      background: '#0B1020',
-      color: '#E6E8F5',
-      padding: '14px 16px',
-      borderRadius: 12,
-      fontSize: 11.5,
-      overflowX: 'auto',
-      lineHeight: 1.5
+      color: 'var(--coral)'
     }
-  }, `create table if not exists gwpl_ctower (
-  id text primary key,
-  data jsonb not null,
-  updated_by text,
-  updated_at timestamptz default now()
-);
-alter table gwpl_ctower enable row level security;
-create policy "ctower all" on gwpl_ctower
-  for all to anon using (true) with check (true);
-alter publication supabase_realtime add table gwpl_ctower;`), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 13,
-      fontWeight: 700,
-      margin: '16px 0 8px'
-    }
-  }, "Step 2 — Paste your project keys"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: 'var(--slate)',
-      marginBottom: 10
-    }
-  }, "Supabase → Project Settings → API. Use the ", /*#__PURE__*/React.createElement("b", null, "anon public"), " key."), /*#__PURE__*/React.createElement(Field, {
-    label: "Supabase Project URL"
-  }, /*#__PURE__*/React.createElement("input", {
-    placeholder: "https://xxxx.supabase.co",
-    value: sbUrl,
-    onChange: e => setSbUrl(e.target.value)
-  })), /*#__PURE__*/React.createElement(Field, {
-    label: "Supabase anon key"
-  }, /*#__PURE__*/React.createElement("input", {
-    placeholder: "eyJhbGc...",
-    value: sbKey,
-    onChange: e => setSbKey(e.target.value)
-  })), /*#__PURE__*/React.createElement("button", {
+  }, "replaces"), " whatever is in the cloud, and every other device will then show this data."), /*#__PURE__*/React.createElement("button", {
     className: "btn btn-p",
-    onClick: () => {
-      save({
-        ...S,
-        sbUrl: sbUrl.trim(),
-        sbKey: sbKey.trim()
+    onClick: async () => {
+      const sb = getSB();
+      if (!sb) {
+        toast('Cloud not reachable');
+        return;
+      }
+      if (!confirm('Upload THIS device\'s data to the cloud and overwrite what is there?')) return;
+      const {
+        error
+      } = await sb.from('gwpl_ctower').upsert({
+        id: 'main',
+        data: cloudSlice(state),
+        updated_by: CID,
+        updated_at: new Date().toISOString()
       });
-      toast('Connecting to Supabase…');
+      toast(error ? 'Upload failed' : 'Uploaded — all devices now show this data');
     }
-  }, I.check, " Connect & sync"), /*#__PURE__*/React.createElement("div", {
+  }, I.upload, " Upload this device's data to cloud"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: 'var(--slate)',
       marginTop: 16,
-      lineHeight: 1.7,
       borderTop: '1px solid var(--line)',
-      paddingTop: 14
+      paddingTop: 14,
+      lineHeight: 1.7
     }
-  }, /*#__PURE__*/React.createElement("b", null, "How it works:"), " the first device to connect uploads its current data to the cloud; every other device that connects with the same keys pulls it and stays in sync live. Settings and keys stay on each device (not synced).", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("b", {
-    style: {
-      color: 'var(--coral)'
-    }
-  }, "Important:"), " connect from the device that has your ", /*#__PURE__*/React.createElement("i", null, "correct"), " data ", /*#__PURE__*/React.createElement("b", null, "first"), " — the cloud takes whatever that first device has. Other devices will then mirror it (their local data is replaced).")), tab === 'data' && /*#__PURE__*/React.createElement("div", {
+  }, "Green dot \"Live — all devices\" in the sidebar means you're connected. Changes appear on other devices within a second or two.")), tab === 'data' && /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
       padding: 22,
