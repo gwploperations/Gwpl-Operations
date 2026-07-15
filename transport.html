@@ -215,7 +215,13 @@ tbody tr:hover{background:var(--mint)}
 .rep td.manual{color:var(--slate);font-style:italic}
 .rep th{background:#F5F6FD;color:var(--ink-2);font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
 .rep tfoot td{background:#F5F6FD;border-bottom:none}
-@media print{@page{size:A4 landscape;margin:9mm}.rep{font-size:10.5px}.rep th,.rep td{padding:6px 7px}}
+@media print{@page{size:A4 landscape;margin:9mm}.rep{font-size:10.5px}.rep th,.rep td{padding:6px 7px}
+  .lr-wrap{display:grid !important;grid-template-columns:1fr 1fr;gap:6mm;margin-top:6mm !important}
+  .lr-doc{break-inside:avoid;page-break-inside:avoid;border:1px solid #bbb !important;border-radius:0 !important;padding:4mm !important;margin:0 !important}
+  .lr-doc img{max-height:105mm !important;width:auto !important;max-width:100% !important;display:block;margin:0 auto}
+  .lr-head{font-size:9.5px !important;margin-bottom:2mm !important}
+  .section-t{break-after:avoid;page-break-after:avoid;margin-top:0 !important}
+}
 </style>
 </head>
 <body>
@@ -621,6 +627,24 @@ const SEED_BANDS = [{
   twoSite: 0
 }];
 const SEED_TRANSPORT = ['JP Transport', 'Astha Transport', 'Dreams Transport', 'Setul Transport'];
+const LABOUR_TYPES = [{
+  v: 'unloading',
+  l: 'Unloading (truck)'
+}, {
+  v: 'loading',
+  l: 'Loading to pickup'
+}, {
+  v: 'shifting',
+  l: 'Shifting (floors)'
+}, {
+  v: 'porter_factory',
+  l: 'Porter — site to Panvel factory'
+}, {
+  v: 'porter_site',
+  l: 'Porter — site to another site'
+}];
+const isPorter = t => t === 'porter_factory' || t === 'porter_site';
+const labourTypeLabel = t => (LABOUR_TYPES.find(x => x.v === t) || {}).l || t;
 function calcTransport(tonnage, twoSites, bands, forceFlat) {
   const t = num(tonnage);
   const band = bands.find(b => t >= b.min && t <= b.max);
@@ -905,6 +929,299 @@ function ToastHost({
 const useToast = () => useContext(ToastCtx);
 const ViewCtx = createContext();
 const useViewer = () => useContext(ViewCtx);
+function detectBox(img) {
+  try {
+    const w = 260,
+      h = Math.max(1, Math.round(img.naturalHeight * (260 / img.naturalWidth)));
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const g = c.getContext('2d');
+    g.drawImage(img, 0, 0, w, h);
+    const d = g.getImageData(0, 0, w, h).data;
+    const lum = new Float32Array(w * h);
+    let mn = 255,
+      mx = 0;
+    for (let i = 0; i < w * h; i++) {
+      const l = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+      lum[i] = l;
+      if (l < mn) mn = l;
+      if (l > mx) mx = l;
+    }
+    if (mx - mn < 40) return null;
+    const th = mn + (mx - mn) * 0.55;
+    let x0 = w,
+      y0 = h,
+      x1 = 0,
+      y1 = 0,
+      hit = 0;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      if (lum[y * w + x] >= th) {
+        hit++;
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+    }
+    if (!hit || x1 - x0 < w * 0.15 || y1 - y0 < h * 0.15) return null;
+    const sx = img.naturalWidth / w,
+      sy = img.naturalHeight / h,
+      px = w * 0.012,
+      py = h * 0.012;
+    const bx = Math.max(0, x0 - px) * sx,
+      by = Math.max(0, y0 - py) * sy;
+    return {
+      x: bx,
+      y: by,
+      w: Math.min(w, x1 + px) * sx - bx,
+      h: Math.min(h, y1 + py) * sy - by
+    };
+  } catch (e) {
+    return null;
+  }
+}
+const CropCtx = createContext();
+const useCropper = () => useContext(CropCtx);
+function CropHost({
+  children
+}) {
+  const [job, setJob] = useState(null);
+  const open = att => new Promise(res => setJob({
+    att,
+    res
+  }));
+  return /*#__PURE__*/React.createElement(CropCtx.Provider, {
+    value: open
+  }, children, job && /*#__PURE__*/React.createElement(CropModal, {
+    att: job.att,
+    finish: a => {
+      job.res(a);
+      setJob(null);
+    }
+  }));
+}
+function CropModal({
+  att,
+  finish
+}) {
+  const [src, setSrc] = useState(att.data);
+  const [box, setBox] = useState(null);
+  const [nat, setNat] = useState({
+    w: 0,
+    h: 0
+  });
+  const imgRef = useRef();
+  const wrapRef = useRef();
+  const drag = useRef(null);
+  const onLoad = e => {
+    const im = e.target;
+    setNat({
+      w: im.naturalWidth,
+      h: im.naturalHeight
+    });
+    const b = detectBox(im);
+    setBox(b || {
+      x: 0,
+      y: 0,
+      w: im.naturalWidth,
+      h: im.naturalHeight
+    });
+  };
+  const scale = () => {
+    const im = imgRef.current;
+    return im && nat.w ? im.clientWidth / nat.w : 1;
+  };
+  const auto = () => {
+    const b = detectBox(imgRef.current);
+    setBox(b || {
+      x: 0,
+      y: 0,
+      w: nat.w,
+      h: nat.h
+    });
+  };
+  const full = () => setBox({
+    x: 0,
+    y: 0,
+    w: nat.w,
+    h: nat.h
+  });
+  const rotate = () => {
+    const im = imgRef.current;
+    const c = document.createElement('canvas');
+    c.width = nat.h;
+    c.height = nat.w;
+    const g = c.getContext('2d');
+    g.translate(nat.h / 2, nat.w / 2);
+    g.rotate(Math.PI / 2);
+    g.drawImage(im, -nat.w / 2, -nat.h / 2);
+    const u = c.toDataURL('image/jpeg', 0.9);
+    setBox(null);
+    setSrc(u);
+  };
+  const down = (e, mode) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const s = scale();
+    drag.current = {
+      mode,
+      sx: e.clientX,
+      sy: e.clientY,
+      b: {
+        ...box
+      },
+      s
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+  const move = e => {
+    const d = drag.current;
+    if (!d) return;
+    const dx = (e.clientX - d.sx) / d.s,
+      dy = (e.clientY - d.sy) / d.s;
+    if (d.mode === 'move') {
+      setBox({
+        ...d.b,
+        x: Math.min(Math.max(0, d.b.x + dx), nat.w - d.b.w),
+        y: Math.min(Math.max(0, d.b.y + dy), nat.h - d.b.h)
+      });
+    } else {
+      const nw = Math.max(40, Math.min(d.b.w + dx, nat.w - d.b.x)),
+        nh = Math.max(40, Math.min(d.b.h + dy, nat.h - d.b.y));
+      setBox({
+        ...d.b,
+        w: nw,
+        h: nh
+      });
+    }
+  };
+  const up = () => {
+    drag.current = null;
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerup', up);
+  };
+  const apply = () => {
+    const im = imgRef.current;
+    const c = document.createElement('canvas');
+    const MAX = 1600;
+    const r = Math.min(1, MAX / box.w);
+    c.width = Math.round(box.w * r);
+    c.height = Math.round(box.h * r);
+    c.getContext('2d').drawImage(im, box.x, box.y, box.w, box.h, 0, 0, c.width, c.height);
+    finish({
+      name: att.name,
+      data: c.toDataURL('image/jpeg', 0.85)
+    });
+  };
+  const s = scale();
+  return /*#__PURE__*/React.createElement("div", {
+    className: "overlay"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal wide",
+    style: {
+      maxWidth: 900
+    },
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-head"
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15
+    }
+  }, "Crop LR — keep only the document"), /*#__PURE__*/React.createElement("button", {
+    className: "x",
+    onClick: () => finish(att)
+  }, I.x)), /*#__PURE__*/React.createElement("div", {
+    className: "modal-body",
+    style: {
+      background: '#F5F6FD'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "alert alert-info",
+    style: {
+      marginBottom: 12
+    }
+  }, I.file, /*#__PURE__*/React.createElement("div", null, "The document edges are detected automatically. Drag the box to adjust, or use the corner handle.")), /*#__PURE__*/React.createElement("div", {
+    ref: wrapRef,
+    style: {
+      position: 'relative',
+      display: 'inline-block',
+      maxWidth: '100%',
+      lineHeight: 0,
+      userSelect: 'none'
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    ref: imgRef,
+    src: src,
+    onLoad: onLoad,
+    style: {
+      maxWidth: '100%',
+      maxHeight: '52vh',
+      display: 'block'
+    },
+    draggable: false
+  }), box && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      inset: 0,
+      boxShadow: `0 0 0 9999px rgba(11,16,32,.45)`,
+      clipPath: `polygon(0 0,100% 0,100% 100%,0 100%,0 0,${box.x * s}px ${box.y * s}px,${box.x * s}px ${(box.y + box.h) * s}px,${(box.x + box.w) * s}px ${(box.y + box.h) * s}px,${(box.x + box.w) * s}px ${box.y * s}px,${box.x * s}px ${box.y * s}px)`,
+      pointerEvents: 'none'
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    onPointerDown: e => down(e, 'move'),
+    style: {
+      position: 'absolute',
+      left: box.x * s,
+      top: box.y * s,
+      width: box.w * s,
+      height: box.h * s,
+      border: '2px solid #4F46E5',
+      cursor: 'move',
+      boxSizing: 'border-box'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    onPointerDown: e => down(e, 'size'),
+    style: {
+      position: 'absolute',
+      right: -8,
+      bottom: -8,
+      width: 16,
+      height: 16,
+      background: '#4F46E5',
+      border: '2px solid #fff',
+      borderRadius: 4,
+      cursor: 'nwse-resize'
+    }
+  })))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 8,
+      marginTop: 12,
+      flexWrap: 'wrap'
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    onClick: auto
+  }, "Auto-detect"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    onClick: rotate
+  }, "Rotate 90°"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
+    onClick: full
+  }, "Full image"))), /*#__PURE__*/React.createElement("div", {
+    className: "modal-foot"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g",
+    onClick: () => finish(att)
+  }, "Use original"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p",
+    onClick: apply,
+    disabled: !box
+  }, I.check, " Crop & attach"))));
+}
 function ViewerHost({
   children
 }) {
@@ -1050,10 +1367,15 @@ function Attach({
 }) {
   const ref = useRef();
   const view = useViewer();
+  const crop = useCropper();
   const add = async e => {
     const fs = [...e.target.files];
     const rd = await Promise.all(fs.map(readFile));
-    onChange([...(items || []), ...rd]);
+    const out = [];
+    for (const f of rd) {
+      out.push((f.data || '').startsWith('data:image') ? await crop(f) : f);
+    }
+    onChange([...(items || []), ...out]);
     e.target.value = '';
   };
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
@@ -2778,10 +3100,15 @@ function TripCard({
   const calc = calcTransport(tripTonne(t), (t.consignments || []).filter(c => c.location === 'delivered' || c.location === 'porter_site').length > 1, S.bands, t.flatRate);
   const lrRef = useRef();
   const view = useViewer();
+  const crop = useCropper();
   const addLR = async e => {
     const fs = [...e.target.files];
     const rd = await Promise.all(fs.map(readFile));
-    onAttach(rd);
+    const out = [];
+    for (const f of rd) {
+      out.push((f.data || '').startsWith('data:image') ? await crop(f) : f);
+    }
+    onAttach(out);
     e.target.value = '';
   };
   return /*#__PURE__*/React.createElement("div", {
@@ -3427,7 +3754,7 @@ function Labour({
   const cName = id => state.clients.find(c => c.id === id)?.name || '—';
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "top"
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Labour Charges"), /*#__PURE__*/React.createElement("p", null, "Unloading and floor-wise shifting (lift vs stairs). Tag a client so it lands on that dashboard.")), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Labour Charges"), /*#__PURE__*/React.createElement("p", null, "Unloading, floor-wise shifting, and porter movements between sites or back to Panvel factory.")), /*#__PURE__*/React.createElement("div", {
     className: "actions"
   }, /*#__PURE__*/React.createElement("button", {
     className: "btn btn-p",
@@ -3446,19 +3773,20 @@ function Labour({
     sub: "Add unloading or shifting charges as they happen."
   })) : /*#__PURE__*/React.createElement("div", {
     className: "card t-wrap"
-  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Date"), /*#__PURE__*/React.createElement("th", null, "Type"), /*#__PURE__*/React.createElement("th", null, "Client / Site"), /*#__PURE__*/React.createElement("th", null, "Detail"), /*#__PURE__*/React.createElement("th", null, "Amount"), /*#__PURE__*/React.createElement("th", null, "Status"), /*#__PURE__*/React.createElement("th", null))), /*#__PURE__*/React.createElement("tbody", null, rows.map(r => /*#__PURE__*/React.createElement("tr", {
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Date"), /*#__PURE__*/React.createElement("th", null, "Type"), /*#__PURE__*/React.createElement("th", null, "Client / Route"), /*#__PURE__*/React.createElement("th", null, "Detail"), /*#__PURE__*/React.createElement("th", null, "Amount"), /*#__PURE__*/React.createElement("th", null, "Status"), /*#__PURE__*/React.createElement("th", null))), /*#__PURE__*/React.createElement("tbody", null, rows.map(r => /*#__PURE__*/React.createElement("tr", {
     key: r.id
   }, /*#__PURE__*/React.createElement("td", null, fmtDate(r.date)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
-    className: "chip " + (r.type === 'shifting' ? 'c-sample' : 'c-loaded'),
+    className: "chip " + (isPorter(r.type) ? 'c-porter' : r.type === 'shifting' ? 'c-sample' : 'c-loaded')
+  }, isPorter(r.type) ? 'Porter' : labourTypeLabel(r.type).replace(/ \(.*\)/, ''))), /*#__PURE__*/React.createElement("td", null, isPorter(r.type) ? /*#__PURE__*/React.createElement("span", {
     style: {
-      textTransform: 'capitalize'
+      fontSize: 12
     }
-  }, r.type)), /*#__PURE__*/React.createElement("td", null, cName(r.clientId)), /*#__PURE__*/React.createElement("td", {
+  }, /*#__PURE__*/React.createElement("b", null, r.fromSite || '—'), " → ", /*#__PURE__*/React.createElement("b", null, r.toSite || '—')) : cName(r.clientId)), /*#__PURE__*/React.createElement("td", {
     style: {
       fontSize: 12,
       color: 'var(--slate)'
     }
-  }, r.type === 'shifting' ? `${r.method || '—'} · floor ${r.floor || '—'}` : r.notes || '—'), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("b", {
+  }, isPorter(r.type) ? r.material || r.notes || '—' : r.type === 'shifting' ? `${r.method || '—'} · floor ${r.floor || '—'}` : r.notes || '—'), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("b", {
     className: "mono"
   }, fmt(r.amount)), (r.attachments || []).length > 0 && /*#__PURE__*/React.createElement("span", {
     title: "Bill attached",
@@ -3526,16 +3854,45 @@ function LabourModal({
   }, /*#__PURE__*/React.createElement("select", {
     value: r.type,
     onChange: e => u('type', e.target.value)
-  }, /*#__PURE__*/React.createElement("option", {
-    value: "unloading"
-  }, "Unloading (truck)"), /*#__PURE__*/React.createElement("option", {
-    value: "loading"
-  }, "Loading to pickup"), /*#__PURE__*/React.createElement("option", {
-    value: "shifting"
-  }, "Shifting (floors)")))), /*#__PURE__*/React.createElement("div", {
+  }, LABOUR_TYPES.map(t => /*#__PURE__*/React.createElement("option", {
+    key: t.v,
+    value: t.v
+  }, t.l))))), isPorter(r.type) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "f-row"
   }, /*#__PURE__*/React.createElement(Field, {
-    label: "Client / site"
+    label: "From",
+    hint: "Where material was picked up"
+  }, /*#__PURE__*/React.createElement("input", {
+    list: "sites",
+    placeholder: "e.g. Siya Lifespaces",
+    value: r.fromSite || '',
+    onChange: e => u('fromSite', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "To",
+    hint: "Where it was taken"
+  }, /*#__PURE__*/React.createElement("input", {
+    list: "sites",
+    placeholder: r.type === 'porter_factory' ? 'Panvel Factory' : 'e.g. Pote Palacio',
+    value: r.toSite || (r.type === 'porter_factory' ? 'Panvel Factory' : ''),
+    onChange: e => u('toSite', e.target.value)
+  }))), /*#__PURE__*/React.createElement("datalist", {
+    id: "sites"
+  }, state.clients.map(c => /*#__PURE__*/React.createElement("option", {
+    key: c.id,
+    value: c.name
+  })), /*#__PURE__*/React.createElement("option", {
+    value: "Panvel Factory"
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Material shifted (optional)",
+    hint: "What went on the porter"
+  }, /*#__PURE__*/React.createElement("input", {
+    placeholder: "e.g. 12 Bedroom Door Frames",
+    value: r.material || '',
+    onChange: e => u('material', e.target.value)
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: isPorter(r.type) ? 'Bill to client / site' : 'Client / site'
   }, /*#__PURE__*/React.createElement("select", {
     value: r.clientId || '',
     onChange: e => u('clientId', e.target.value)
@@ -3545,7 +3902,7 @@ function LabourModal({
     key: c.id,
     value: c.id
   }, c.name)))), /*#__PURE__*/React.createElement(Field, {
-    label: "Vehicle (optional)"
+    label: isPorter(r.type) ? 'Porter vehicle / name' : 'Vehicle (optional)'
   }, /*#__PURE__*/React.createElement("input", {
     value: r.vehicleNo || '',
     onChange: e => u('vehicleNo', e.target.value)
@@ -3935,6 +4292,7 @@ function Report({
   }, /*#__PURE__*/React.createElement("div", {
     className: "section-t"
   }, "LR documents attached"), /*#__PURE__*/React.createElement("div", {
+    className: "lr-wrap",
     style: {
       display: 'flex',
       flexDirection: 'column',
@@ -3942,13 +4300,14 @@ function Report({
     }
   }, attachments.map((a, i) => /*#__PURE__*/React.createElement("div", {
     key: i,
+    className: "lr-doc",
     style: {
       border: '1px solid var(--line)',
       borderRadius: 12,
-      padding: 14,
-      breakInside: 'avoid'
+      padding: 14
     }
   }, /*#__PURE__*/React.createElement("div", {
+    className: "lr-head",
     style: {
       fontSize: 12.5,
       fontWeight: 700,
@@ -3958,15 +4317,13 @@ function Report({
     className: "mono"
   }, a.v || '—'), " · LR ", /*#__PURE__*/React.createElement("span", {
     className: "mono"
-  }, a.lr || '—'), " ", /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: 'var(--slate-2)',
-      fontWeight: 400
-    }
-  }, "· ", a.name)), a.data && a.data.startsWith('data:image') ? /*#__PURE__*/React.createElement("img", {
+  }, a.lr || '—')), a.data && a.data.startsWith('data:image') ? /*#__PURE__*/React.createElement("img", {
     src: a.data,
     style: {
       maxWidth: '100%',
+      maxHeight: 420,
+      display: 'block',
+      margin: '0 auto',
       borderRadius: 8,
       border: '1px solid var(--line)'
     }
@@ -4546,7 +4903,7 @@ function Settings({
     onChange: importData
   })))));
 }
-ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(ToastHost, null, /*#__PURE__*/React.createElement(ViewerHost, null, /*#__PURE__*/React.createElement(App, null))));
+ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(ToastHost, null, /*#__PURE__*/React.createElement(ViewerHost, null, /*#__PURE__*/React.createElement(CropHost, null, /*#__PURE__*/React.createElement(App, null)))));
 </script>
 </body>
 </html>
