@@ -580,52 +580,50 @@ const LOCS = [{
   l: 'Porter to Panvel Factory',
   c: 'c-porter'
 }];
-const SEED_BANDS = [{
+const STD_BANDS = [{
   id: 'b1',
-  label: '~7 tonne',
-  min: 6,
-  max: 8.9,
-  rateMin: 5000,
-  rateMax: 5500,
-  flat: false,
-  twoSite: 4000
-}, {
-  id: 'b2',
-  label: '~10 tonne',
-  min: 9,
-  max: 11.4,
+  label: 'Up to 10 t (billed min 10)',
+  min: 0,
+  max: 10,
   rateMin: 4200,
   rateMax: 4300,
   flat: false,
-  twoSite: 4000
+  twoSite: 4000,
+  billMin: 10
 }, {
-  id: 'b3',
-  label: '~12 tonne',
-  min: 11.5,
-  max: 13.9,
+  id: 'b2',
+  label: '11–12 t',
+  min: 10.01,
+  max: 12,
   rateMin: 4000,
   rateMax: 4100,
   flat: false,
-  twoSite: 4000
+  twoSite: 4000,
+  billMin: 0
+}, {
+  id: 'b3',
+  label: '13–20 t',
+  min: 12.01,
+  max: 20,
+  rateMin: 3600,
+  rateMax: 3800,
+  flat: false,
+  twoSite: 4000,
+  billMin: 0
 }, {
   id: 'b4',
-  label: '~18 tonne',
-  min: 14,
-  max: 19.9,
-  rateMin: 3300,
-  rateMax: 3400,
-  flat: false,
-  twoSite: 4000
-}, {
-  id: 'b5',
-  label: '28–32 tonne',
-  min: 20,
-  max: 34,
+  label: 'Trailer (28–32 t)',
+  min: 20.01,
+  max: 40,
   rateMin: 2700,
   rateMax: 2700,
   flat: true,
-  twoSite: 0
+  twoSite: 0,
+  billMin: 0
 }];
+const SEED_BANDS = STD_BANDS.map(b => ({
+  ...b
+}));
 const SEED_TRANSPORT = ['JP Transport', 'Astha Transport', 'Dreams Transport', 'Setul Transport'];
 const LABOUR_TYPES = [{
   v: 'unloading',
@@ -645,21 +643,24 @@ const LABOUR_TYPES = [{
 }];
 const isPorter = t => t === 'porter_factory' || t === 'porter_site';
 const labourTypeLabel = t => (LABOUR_TYPES.find(x => x.v === t) || {}).l || t;
-function calcTransport(tonnage, twoSites, bands, forceFlat) {
-  const t = num(tonnage);
+function calcTransport(billedT, twoSites, bands, forceFlat) {
+  const t = num(billedT);
   const band = bands.find(b => t >= b.min && t <= b.max);
   if (!band) return {
     band: null,
     expMin: 0,
     expMax: 0,
-    twoSiteCharge: 0
+    twoSiteCharge: 0,
+    billed: t
   };
-  const tsc = twoSites && !band.flat && !forceFlat ? band.twoSite : 0;
+  const mult = Math.max(t, num(band.billMin) || 0);
+  const tsc = twoSites && !band.flat && !forceFlat ? num(band.twoSite) : 0;
   return {
     band,
-    expMin: band.rateMin * t + tsc,
-    expMax: band.rateMax * t + tsc,
-    twoSiteCharge: tsc
+    expMin: band.rateMin * mult + tsc,
+    expMax: band.rateMax * mult + tsc,
+    twoSiteCharge: tsc,
+    billed: mult
   };
 }
 function unitRates(it, component) {
@@ -804,6 +805,10 @@ function tripWeightKg(t) {
 }
 const tripAutoTonne = t => Math.round(tripWeightKg(t) / 1000 * 100) / 100;
 const tripTonne = t => t.autoTonne === false ? num(t.tonnage) : tripAutoTonne(t);
+const billedTonne = t => {
+  const b = num(t.billedTonne);
+  return b > 0 ? b : Math.ceil(tripTonne(t));
+};
 function tripDropClients(t, state) {
   const set = new Set();
   (t.consignments || []).forEach(c => {
@@ -817,7 +822,22 @@ function tripDropClients(t, state) {
   return set.size;
 }
 function tripExpected(t, state, bands) {
-  return calcTransport(tripTonne(t), tripDropClients(t, state) > 1, bands, t.flatRate);
+  if (t.priceMode === 'actual') {
+    const wt = tripTonne(t);
+    const r = num(t.actualRate);
+    const tsc = tripDropClients(t, state) > 1 && !t.flatRate ? 4000 : 0;
+    return {
+      band: {
+        label: 'Actual load × custom rate'
+      },
+      expMin: r * wt + tsc,
+      expMax: r * wt + tsc,
+      twoSiteCharge: tsc,
+      billed: wt,
+      actual: true
+    };
+  }
+  return calcTransport(billedTonne(t), tripDropClients(t, state) > 1, bands, t.flatRate);
 }
 function tripPayAmount(t, state, bands) {
   const p = t.pay || {};
@@ -3097,7 +3117,7 @@ function TripCard({
     const o = orderOf(oid);
     return state.clients.find(x => x.id === o?.clientId);
   };
-  const calc = calcTransport(tripTonne(t), (t.consignments || []).filter(c => c.location === 'delivered' || c.location === 'porter_site').length > 1, S.bands, t.flatRate);
+  const calc = tripExpected(t, state, S.bands);
   const lrRef = useRef();
   const view = useViewer();
   const crop = useCropper();
@@ -3225,13 +3245,19 @@ function TripCard({
     }
   }, "Expected transport: ", /*#__PURE__*/React.createElement("b", {
     className: "mono"
-  }, fmt(calc.expMin), "–", fmt(calc.expMax)), " (", calc.band.label, ")", t.flatRate && /*#__PURE__*/React.createElement("span", {
+  }, calc.expMin === calc.expMax ? fmt(calc.expMin) : fmt(calc.expMin) + '–' + fmt(calc.expMax)), " (", calc.band.label, ")", t.flatRate && /*#__PURE__*/React.createElement("span", {
     className: "chip c-sample",
     style: {
       marginLeft: 6,
       fontSize: 10
     }
-  }, "Flat")), (t.lrAttachments || []).length > 0 && /*#__PURE__*/React.createElement("div", {
+  }, "Flat"), calc.actual && /*#__PURE__*/React.createElement("span", {
+    className: "chip c-porter",
+    style: {
+      marginLeft: 6,
+      fontSize: 10
+    }
+  }, "Actual load")), (t.lrAttachments || []).length > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       flexWrap: 'wrap',
@@ -3387,7 +3413,16 @@ function TripModal({
     type: "checkbox",
     checked: t.autoTonne !== false,
     onChange: e => u('autoTonne', e.target.checked)
-  }), " Auto from dispatched weights (", autoT, " t)"))), /*#__PURE__*/React.createElement("div", {
+  }), " Auto from dispatched weights (", autoT, " t)")), /*#__PURE__*/React.createElement(Field, {
+    label: "Billed tonnage (truck booked)",
+    hint: "What you PAY for. Blank = actual rounded up. Up to 10 t always bills as 10."
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.5",
+    placeholder: String(Math.ceil(tripTonne(t)) || 0),
+    value: t.billedTonne ?? '',
+    onChange: e => u('billedTonne', e.target.value)
+  }))), /*#__PURE__*/React.createElement("div", {
     style: {
       background: 'var(--mint-2)',
       border: '1px solid var(--line)',
@@ -3395,14 +3430,57 @@ function TripModal({
       padding: '12px 14px',
       marginBottom: 14
     }
-  }, /*#__PURE__*/React.createElement("label", {
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12.5,
+      fontWeight: 700,
+      marginBottom: 8
+    }
+  }, "How is this trip priced?"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 8,
+      flexWrap: 'wrap',
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-sm " + (t.priceMode !== 'actual' ? 'btn-p' : 'btn-g'),
+    onClick: () => u('priceMode', 'booked')
+  }, "By booked tonnage"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-sm " + (t.priceMode === 'actual' ? 'btn-p' : 'btn-g'),
+    onClick: () => u('priceMode', 'actual')
+  }, "By actual load × rate")), t.priceMode === 'actual' ? /*#__PURE__*/React.createElement("div", {
+    className: "f-row"
+  }, /*#__PURE__*/React.createElement(Field, {
+    label: "Rate per tonne",
+    hint: "Charged on actual weight carried"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    placeholder: "e.g. 5500",
+    value: t.actualRate || '',
+    onChange: e => u('actualRate', e.target.value)
+  })), /*#__PURE__*/React.createElement(Field, {
+    label: "Actual weight"
+  }, /*#__PURE__*/React.createElement("input", {
+    value: tripTonne(t) + ' t',
+    disabled: true,
+    style: {
+      background: 'var(--mint-2)'
+    }
+  }))) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11.5,
+      color: 'var(--slate)'
+    }
+  }, "Uses the rate card × the billed tonnage below (up to 10 t bills as 10)."), /*#__PURE__*/React.createElement("label", {
     style: {
       display: 'flex',
       alignItems: 'center',
       gap: 9,
       fontSize: 13,
       fontWeight: 600,
-      cursor: 'pointer'
+      cursor: 'pointer',
+      marginTop: 12
     }
   }, /*#__PURE__*/React.createElement("input", {
     type: "checkbox",
@@ -3418,9 +3496,9 @@ function TripModal({
   }, (() => {
     const ex = tripExpected(t, state, S.bands);
     const drops = tripDropClients(t, state);
-    return ex.band ? /*#__PURE__*/React.createElement(React.Fragment, null, "Band ", /*#__PURE__*/React.createElement("b", null, ex.band.label), " · ", drops > 1 ? `${drops} delivery sites` : 'single site', " → expected ", /*#__PURE__*/React.createElement("b", {
+    return ex.band ? /*#__PURE__*/React.createElement(React.Fragment, null, "Band ", /*#__PURE__*/React.createElement("b", null, ex.band.label), " · billed ", /*#__PURE__*/React.createElement("b", null, ex.billed, " t"), " · ", drops > 1 ? `${drops} sites` : 'single site', " → expected ", /*#__PURE__*/React.createElement("b", {
       className: "mono"
-    }, fmt(ex.expMin), "–", fmt(ex.expMax)), ex.twoSiteCharge ? /*#__PURE__*/React.createElement(React.Fragment, null, " (incl. ", fmt(ex.twoSiteCharge), " 2-site)") : t.flatRate && drops > 1 ? /*#__PURE__*/React.createElement(React.Fragment, null, " · 2-site charge waived") : null) : /*#__PURE__*/React.createElement(React.Fragment, null, "Tonnage doesn't match any rate band yet.");
+    }, fmt(ex.expMin), "–", fmt(ex.expMax)), ex.twoSiteCharge ? /*#__PURE__*/React.createElement(React.Fragment, null, " (incl. ", fmt(ex.twoSiteCharge), " 2-site)") : t.flatRate && drops > 1 ? /*#__PURE__*/React.createElement(React.Fragment, null, " · 2-site waived") : null) : /*#__PURE__*/React.createElement(React.Fragment, null, "Billed tonnage ", billedTonne(t), " t doesn't match any rate band.");
   })())), /*#__PURE__*/React.createElement("div", {
     className: "f-row-3"
   }, /*#__PURE__*/React.createElement(Field, {
@@ -4434,7 +4512,7 @@ function Transport({
     const ex = tripExpected(t, state, S.bands);
     const amt = tripPayAmount(t, state, S.bands);
     const paid = t.pay && t.pay.paid;
-    const over = ex.band && amt > ex.expMax + num(t.pay?.extra);
+    const over = ex.band && !ex.actual && amt > ex.expMax + num(t.pay?.extra);
     const atts = t.lrAttachments || [];
     return /*#__PURE__*/React.createElement("tr", {
       key: t.id
@@ -4530,7 +4608,7 @@ function TransportAdjust({
   }));
   const ex = tripExpected(t, state, S.bands);
   const amt = tripPayAmount(t, state, S.bands);
-  const over = ex.band && amt > ex.expMax + num(t.pay.extra);
+  const over = ex.band && !ex.actual && amt > ex.expMax + num(t.pay.extra);
   return /*#__PURE__*/React.createElement(Modal, {
     title: `Transport — ${t.vehicleNo || 'trip'} · LR ${t.lrNumber || '—'}`,
     onClose: onClose,
@@ -4545,7 +4623,36 @@ function TransportAdjust({
     className: "alert alert-info"
   }, I.cash, /*#__PURE__*/React.createElement("div", null, "Rate card: ", /*#__PURE__*/React.createElement("b", null, ex.band.label), tripDropClients(t, state) > 1 && !t.flatRate ? ' + 2-site' : '', " → expected ", /*#__PURE__*/React.createElement("b", null, fmt(ex.expMin), " – ", fmt(ex.expMax)), ". Leave \"actual\" blank to use the mid value automatically.")) : /*#__PURE__*/React.createElement("div", {
     className: "alert alert-warn"
-  }, I.warn, /*#__PURE__*/React.createElement("div", null, "Tonnage ", tripTonne(t), " t doesn't match any rate band.")), /*#__PURE__*/React.createElement("label", {
+  }, I.warn, /*#__PURE__*/React.createElement("div", null, "Tonnage ", tripTonne(t), " t doesn't match any rate band.")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 8,
+      flexWrap: 'wrap',
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-sm " + (t.priceMode !== 'actual' ? 'btn-p' : 'btn-g'),
+    onClick: () => setT(s => ({
+      ...s,
+      priceMode: 'booked'
+    }))
+  }, "By booked tonnage"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-sm " + (t.priceMode === 'actual' ? 'btn-p' : 'btn-g'),
+    onClick: () => setT(s => ({
+      ...s,
+      priceMode: 'actual'
+    }))
+  }, "By actual load × rate")), t.priceMode === 'actual' && /*#__PURE__*/React.createElement(Field, {
+    label: "Rate per tonne (on actual weight)"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    placeholder: "e.g. 5500",
+    value: t.actualRate || '',
+    onChange: e => setT(s => ({
+      ...s,
+      actualRate: e.target.value
+    }))
+  })), /*#__PURE__*/React.createElement("label", {
     style: {
       display: 'flex',
       alignItems: 'center',
@@ -4603,9 +4710,9 @@ function TransportAdjust({
       fontSize: 12,
       marginTop: 5,
       fontWeight: 600,
-      color: over ? 'var(--coral)' : 'var(--green)'
+      color: ex.actual ? 'var(--slate)' : over ? 'var(--coral)' : 'var(--green)'
     }
-  }, over ? '⚠ above expected max — verify' : '✓ within range')), /*#__PURE__*/React.createElement("div", {
+  }, ex.actual ? 'Priced on actual load × your rate' : over ? '⚠ above expected max — verify' : '✓ within range')), /*#__PURE__*/React.createElement("div", {
     className: "section-t"
   }, "LR document"), /*#__PURE__*/React.createElement(Attach, {
     items: t.lrAttachments,
@@ -4698,24 +4805,24 @@ function Settings({
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "alert alert-info"
-  }, I.cash, /*#__PURE__*/React.createElement("div", null, "These bands drive the overcharge check — seeded from your rates. Adjust freely.")), /*#__PURE__*/React.createElement("div", {
+  }, I.cash, /*#__PURE__*/React.createElement("div", null, "These bands drive the expected-transport and overcharge check. Expected = rate × ", /*#__PURE__*/React.createElement("b", null, "billed tonnage"), ". \"Min bill t\" forces a minimum charge (e.g. up to 10 t always bills as 10).")), /*#__PURE__*/React.createElement("div", {
     className: "t-wrap"
-  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Band"), /*#__PURE__*/React.createElement("th", null, "Min t"), /*#__PURE__*/React.createElement("th", null, "Max t"), /*#__PURE__*/React.createElement("th", null, "Rate min"), /*#__PURE__*/React.createElement("th", null, "Rate max"), /*#__PURE__*/React.createElement("th", null, "Flat?"), /*#__PURE__*/React.createElement("th", null, "2-site ₹"), /*#__PURE__*/React.createElement("th", null))), /*#__PURE__*/React.createElement("tbody", null, S.bands.map(b => /*#__PURE__*/React.createElement("tr", {
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Band"), /*#__PURE__*/React.createElement("th", null, "Min t"), /*#__PURE__*/React.createElement("th", null, "Max t"), /*#__PURE__*/React.createElement("th", null, "Rate min"), /*#__PURE__*/React.createElement("th", null, "Rate max"), /*#__PURE__*/React.createElement("th", null, "Min bill t"), /*#__PURE__*/React.createElement("th", null, "Flat?"), /*#__PURE__*/React.createElement("th", null, "2-site ₹"), /*#__PURE__*/React.createElement("th", null))), /*#__PURE__*/React.createElement("tbody", null, S.bands.map(b => /*#__PURE__*/React.createElement("tr", {
     key: b.id
   }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
     value: b.label,
     onChange: e => upBand(b.id, 'label', e.target.value),
     style: {
-      width: 100,
+      width: 120,
       padding: '6px 8px',
       borderRadius: 8,
       border: '1px solid var(--line)'
     }
-  })), ['min', 'max', 'rateMin', 'rateMax'].map(k => /*#__PURE__*/React.createElement("td", {
+  })), ['min', 'max', 'rateMin', 'rateMax', 'billMin'].map(k => /*#__PURE__*/React.createElement("td", {
     key: k
   }, /*#__PURE__*/React.createElement("input", {
     type: "number",
-    value: b[k],
+    value: b[k] ?? 0,
     onChange: e => upBand(b.id, k, e.target.value),
     style: {
       width: 72,
@@ -4743,11 +4850,15 @@ function Settings({
       ...S,
       bands: S.bands.filter(x => x.id !== b.id)
     })
-  }, I.trash))))))), /*#__PURE__*/React.createElement("button", {
-    className: "btn btn-g btn-sm",
+  }, I.trash))))))), /*#__PURE__*/React.createElement("div", {
     style: {
-      marginTop: 12
-    },
+      display: 'flex',
+      gap: 8,
+      marginTop: 12,
+      flexWrap: 'wrap'
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-g btn-sm",
     onClick: () => save({
       ...S,
       bands: [...S.bands, {
@@ -4757,11 +4868,22 @@ function Settings({
         max: 0,
         rateMin: 0,
         rateMax: 0,
+        billMin: 0,
         flat: false,
         twoSite: 4000
       }]
     })
-  }, I.plus, " Add band")), tab === 'approver' && /*#__PURE__*/React.createElement("div", {
+  }, I.plus, " Add band"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-p btn-sm",
+    onClick: () => {
+      if (confirm('Replace the rate card with the standard GWPL slabs (up to 10 / 11-12 / 13-20 / trailer)?')) save({
+        ...S,
+        bands: STD_BANDS.map(b => ({
+          ...b
+        }))
+      });
+    }
+  }, I.check, " Load standard GWPL rates"))), tab === 'approver' && /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
       padding: 22,
