@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GWPL | Order Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root{
+    --bg:#14171B;
+    --panel:#1B1F24;
+    --panel-2:#20252B;
+    --line:#2C323A;
+    --brass:#C68A46;
+    --brass-light:#E0AD70;
+    --walnut:#8A5A34;
+    --text:#EDEAE4;
+    --muted:#8D93A0;
+    --muted-2:#5E6470;
+    --ok:#5FBF83;
+    --warn:#E0B450;
+    --bad:#E0715F;
+    --info:#6FA0D6;
+
+    --role-admin:#C68A46;
+    --role-sales:#6FA0D6;
+    --role-sizing:#8A6FD6;
+    --role-piyush:#5FBF9E;
+    --role-khushal:#D68F5F;
+    --role-milan:#6FBFD6;
+  }
+  *{box-sizing:border-box;}
+  html,body,#root{height:100%;margin:0;}
+  body{
+    font-family:"Inter",-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:"Fraunces","Georgia",serif;}
+  .mono{font-family:"JetBrains Mono",monospace;}
+  ::selection{background:var(--brass);color:#14171B;}
+  button{font-family:inherit;}
+  input,select{font-family:inherit;color:var(--text);}
+
+  /* ============ LOGIN ============ */
+  .login-stage{
+    height:100vh;display:flex;align-items:stretch;overflow:hidden;
+    background:
+      repeating-linear-gradient(100deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 68px),
+      linear-gradient(160deg,#14171B 0%,#191D22 60%,#14171B 100%);
+  }
+  .login-brand{
+    flex:0 0 40%;display:flex;flex-direction:column;justify-content:center;padding:60px;
+    border-right:1px solid var(--line);position:relative;
+  }
+  .login-brand::before{
+    content:"";position:absolute;inset:0;
+    background:
+      linear-gradient(180deg, transparent 0%, transparent 8%, var(--line) 8%, var(--line) calc(8% + 1px), transparent calc(8% + 1px)),
+      linear-gradient(180deg, transparent 46%, var(--line) 46%, var(--line) calc(46% + 1px), transparent calc(46% + 1px)),
+      linear-gradient(180deg, transparent 92%, var(--line) 92%, var(--line) calc(92% + 1px), transparent calc(92% + 1px));
+    pointer-events:none;
+  }
+  .brand-eyebrow{color:var(--brass);font-size:11px;letter-spacing:3px;font-weight:600;text-transform:uppercase;margin-bottom:14px;}
+  .login-brand h1{font-size:44px;font-weight:600;line-height:1.08;margin:0 0 18px;color:var(--text);}
+  .login-brand h1 em{color:var(--brass-light);font-style:normal;}
+  .login-brand p{color:var(--muted);font-size:14.5px;line-height:1.6;max-width:340px;margin:0;}
+  .login-tags{margin-top:36px;display:flex;gap:10px;flex-wrap:wrap;}
+  .login-tag{
+    border:1px solid var(--line);color:var(--muted);font-size:11px;padding:5px 10px;border-radius:3px;
+    font-family:"JetBrains Mono",monospace;
+  }
+
+  .login-panel{flex:1;display:flex;align-items:center;justify-content:center;padding:40px;}
+  .login-card{width:100%;max-width:420px;}
+  .login-card h2{font-size:15px;color:var(--muted);font-weight:600;margin:0 0 22px;text-transform:uppercase;letter-spacing:1.5px;}
+  .role-list{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;}
+  .role-tag{
+    display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);
+    border-left:4px solid var(--role-color, var(--brass));border-radius:4px;padding:13px 16px;cursor:pointer;
+    transition:.15s;text-align:left;
+  }
+  .role-tag:hover{background:var(--panel-2);}
+  .role-tag.active{background:var(--panel-2);border-color:var(--role-color);box-shadow:0 0 0 1px var(--role-color);}
+  .role-tag .rt-dot{width:9px;height:9px;border-radius:50%;background:var(--role-color, var(--brass));flex-shrink:0;}
+  .role-tag .rt-name{font-weight:600;font-size:14.5px;color:var(--text);}
+  .role-tag .rt-sub{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .pin-row{display:flex;gap:10px;}
+  .pin-row input{
+    flex:1;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:12px 14px;
+    font-size:18px;letter-spacing:6px;text-align:center;color:var(--text);
+  }
+  .pin-row input:focus{outline:none;border-color:var(--brass);}
+  .enter-btn{
+    background:var(--brass);color:#14171B;border:none;border-radius:4px;padding:0 22px;font-weight:700;
+    font-size:14px;cursor:pointer;
+  }
+  .enter-btn:hover{background:var(--brass-light);}
+  .enter-btn:disabled{background:var(--muted-2);cursor:not-allowed;}
+  .login-err{color:var(--bad);font-size:12.5px;margin-top:10px;}
+
+  /* ============ APP SHELL ============ */
+  .app{display:flex;flex-direction:column;height:100vh;}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;background:var(--panel);
+    border-bottom:1px solid var(--line);padding:12px 22px;flex-shrink:0;
+  }
+  .topbar-brand{display:flex;align-items:center;gap:10px;}
+  .topbar-brand .mark{width:8px;height:22px;background:var(--brass);border-radius:1px;}
+  .topbar-brand h1{font-size:16px;margin:0;font-weight:600;letter-spacing:.2px;}
+  .topbar-brand .sub{font-size:11px;color:var(--muted);margin-top:1px;}
+  .topbar-right{display:flex;align-items:center;gap:12px;}
+  .sync-pill{
+    display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);
+    border:1px solid var(--line);padding:6px 12px;border-radius:20px;
+  }
+  .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);}
+  .sync-dot.off{background:var(--bad);}
+  .role-chip{
+    display:flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--line);
+    padding:6px 12px;border-radius:20px;font-size:12.5px;font-weight:600;
+  }
+  .role-chip .rt-dot{width:8px;height:8px;border-radius:50%;}
+  .ghost-btn{
+    background:transparent;border:1px solid var(--line);color:var(--muted);padding:7px 13px;
+    border-radius:5px;font-size:12.5px;cursor:pointer;
+  }
+  .ghost-btn:hover{color:var(--text);border-color:var(--muted-2);}
+
+  .toolbar{
+    display:flex;align-items:center;justify-content:space-between;padding:14px 22px;
+    background:var(--bg);flex-shrink:0;gap:14px;border-bottom:1px solid var(--line);
+  }
+  .search-in{
+    flex:1;max-width:340px;background:var(--panel);border:1px solid var(--line);border-radius:5px;
+    padding:9px 14px;font-size:13px;color:var(--text);
+  }
+  .search-in:focus{outline:none;border-color:var(--brass);}
+  .toolbar-actions{display:flex;gap:9px;align-items:center;}
+  .count-note{font-size:12px;color:var(--muted-2);}
+  .primary-btn{
+    background:var(--brass);color:#14171B;border:none;padding:9px 18px;border-radius:5px;
+    font-size:13px;font-weight:700;cursor:pointer;
+  }
+  .primary-btn:hover{background:var(--brass-light);}
+
+  /* ============ ORDER LIST ============ */
+  .list-wrap{flex:1;overflow:auto;padding:18px 22px 40px;}
+  .empty-state{padding:80px 20px;text-align:center;color:var(--muted);}
+  .empty-state h3{color:var(--text);font-weight:600;margin-bottom:8px;}
+
+  .order-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:15px 18px;
+    margin-bottom:10px;cursor:pointer;transition:.12s;display:grid;
+    grid-template-columns:110px 1.4fr 1fr 1fr 210px;gap:18px;align-items:center;
+  }
+  .order-card:hover{border-color:var(--brass);background:var(--panel-2);}
+  .oc-tag{
+    font-family:"JetBrains Mono",monospace;font-weight:700;font-size:13px;color:var(--brass-light);
+    background:rgba(198,138,70,0.12);border:1px solid rgba(198,138,70,0.35);border-radius:4px;
+    padding:5px 9px;display:inline-block;text-align:center;
+  }
+  .oc-main .oc-project{font-weight:600;font-size:14.5px;color:var(--text);}
+  .oc-main .oc-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+  .oc-col{font-size:12.5px;color:var(--muted);}
+  .oc-col .oc-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted-2);margin-bottom:2px;}
+  .oc-col .oc-val{color:var(--text);font-weight:500;}
+
+  .stage-track{display:flex;align-items:center;gap:3px;}
+  .stage-dot{width:20px;height:5px;border-radius:3px;background:var(--line);position:relative;}
+  .stage-dot.done{background:var(--ok);}
+  .stage-dot.current{background:var(--warn);}
+  .stage-track-label{font-size:10px;color:var(--muted-2);margin-top:5px;}
+
+  /* ============ MODAL ============ */
+  .modal-veil{
+    position:fixed;inset:0;background:rgba(10,12,14,0.72);display:flex;align-items:center;justify-content:center;
+    z-index:50;padding:26px;backdrop-filter:blur(2px);
+  }
+  .modal-box{
+    background:var(--panel);border:1px solid var(--line);border-radius:9px;width:100%;max-width:760px;
+    max-height:88vh;display:flex;flex-direction:column;overflow:hidden;
+  }
+  .modal-box.narrow{max-width:460px;}
+  .modal-head{
+    display:flex;align-items:center;justify-content:space-between;padding:18px 22px;
+    border-bottom:1px solid var(--line);flex-shrink:0;
+  }
+  .modal-head h2{font-size:19px;margin:0;font-weight:600;}
+  .modal-head .oc-tag{margin-top:6px;}
+  .close-x{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;}
+  .close-x:hover{color:var(--text);}
+  .modal-body{overflow-y:auto;padding:20px 22px;flex:1;}
+  .modal-foot{padding:16px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0;}
+
+  .field-card{border:1px solid var(--line);border-radius:7px;margin-bottom:14px;overflow:hidden;}
+  .field-card-head{
+    padding:9px 15px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+    color:#14171B;display:flex;align-items:center;justify-content:space-between;
+  }
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);}
+  .field-grid.cols-4{grid-template-columns:1fr 1fr 1fr 1fr;}
+  .field-cell{background:var(--panel);padding:11px 15px;}
+  .field-cell label{display:block;font-size:10.5px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+  .field-cell .fc-val{font-size:13.5px;color:var(--text);font-weight:500;min-height:19px;}
+  .field-cell input, .field-cell select{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;padding:7px 9px;font-size:13px;
+  }
+  .field-cell input:disabled, .field-cell select:disabled{background:transparent;border-color:transparent;padding:0;color:var(--text);}
+  .field-cell input:focus, .field-cell select:focus{outline:none;border-color:var(--brass);}
+
+  .form-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--brass-light);margin:18px 0 8px;}
+  .form-section-title:first-child{margin-top:0;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+  .form-grid.cols-4{grid-template-columns:1fr 1fr 1fr 1fr;}
+  .form-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;}
+  .form-field input,.form-field select{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:9px 11px;font-size:13px;
+  }
+  .form-field input:focus,.form-field select:focus{outline:none;border-color:var(--brass);}
+  .toggle-row{display:flex;gap:8px;}
+  .toggle-opt{
+    flex:1;text-align:center;padding:9px;border:1px solid var(--line);border-radius:5px;font-size:12.5px;
+    font-weight:600;cursor:pointer;color:var(--muted);background:var(--panel-2);
+  }
+  .toggle-opt.active-yes{background:rgba(95,191,131,0.15);border-color:var(--ok);color:var(--ok);}
+  .toggle-opt.active-no{background:rgba(224,113,95,0.12);border-color:var(--bad);color:var(--bad);}
+
+  .sales-manager-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;margin-bottom:14px;}
+  .sales-manager-row{
+    display:flex;align-items:center;justify-content:space-between;background:var(--panel-2);
+    border:1px solid var(--line);border-radius:5px;padding:9px 13px;font-size:13px;
+  }
+  .sm-del{background:none;border:none;color:var(--bad);cursor:pointer;font-size:13px;}
+
+  .dup-warning{
+    background:rgba(224,180,80,0.1);border:1px solid var(--warn);border-radius:6px;padding:14px 16px;
+    font-size:13px;color:var(--text);margin-bottom:16px;line-height:1.6;
+  }
+  .status-pill{
+    display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;text-transform:capitalize;
+  }
+  .status-pill.ok{background:rgba(95,191,131,0.15);color:var(--ok);}
+  .status-pill.warn{background:rgba(224,180,80,0.15);color:var(--warn);}
+  .status-pill.bad{background:rgba(224,113,95,0.15);color:var(--bad);}
+  .status-pill.neutral{background:var(--line);color:var(--muted);}
+
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+// ============ CONFIGURATION ============
+const APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+const POLL_MS = 5000;
+
+async function apiGet() {
+  const res = await fetch(APPS_SCRIPT_URL, { method: "GET" });
+  return res.json();
+}
+async function apiPost(payload) {
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload),
+  });
+  return res.json();
+}
+
+// Role PINs are a UI convenience for internal use, not real security. Change before sharing.
+const ROLES = {
+  ankit:   { label: "Ankit",         sub: "Full access — everything",       pin: "4321", group: "admin",   color: "var(--role-admin)" },
+  vidhi:   { label: "Vidhi Shinde",  sub: "Sales — order intake",           pin: "1111", group: "sales",   color: "var(--role-sales)" },
+  bajrang: { label: "Bajrang",       sub: "Sizing",                         pin: "2222", group: "sizing",  color: "var(--role-sizing)" },
+  madhav:  { label: "Madhav",        sub: "Sizing",                         pin: "2233", group: "sizing",  color: "var(--role-sizing)" },
+  piyush:  { label: "Piyush",        sub: "Laminate & edgeband",            pin: "3333", group: "piyush",  color: "var(--role-piyush)" },
+  khushal: { label: "Khushal",       sub: "Production date",                pin: "4444", group: "khushal", color: "var(--role-khushal)" },
+  milan:   { label: "Milan",         sub: "Installation, QC & site status", pin: "5555", group: "milan",   color: "var(--role-milan)" },
+};
+
+function canEditGroup(role, fieldGroup) {
+  return ROLES[role].group === "admin" || ROLES[role].group === fieldGroup;
+}
+
+const QTY_FIELDS = [
+  { key: "mdf", label: "MDF" }, { key: "md", label: "MD" },
+  { key: "bdf", label: "BDF" }, { key: "bd", label: "BD" },
+  { key: "btf", label: "BTF" }, { key: "btd", label: "BTD" },
+  { key: "frf", label: "FRF" }, { key: "frd", label: "FRD" },
+];
+
+function blankOrder() {
+  return {
+    order_no: "", order_year: new Date().getFullYear(), salesperson: "", developer_name: "",
+    project_name: "", location: "", office_coordinator: "", office_coordinator_no: "",
+    site_coordinator: "", site_coordinator_no: "", order_type: "Sample", cnc_slotting: "No",
+    mdf: "", md: "", bdf: "", bd: "", btf: "", btd: "", frf: "", frd: "",
+    other_label: "", other_frame_qty: "", other_door_qty: "",
+    door_lock: "", door_lock_brand: "", hinges: "", hinges_brand: "",
+  };
+}
+
+function stageStatus(order, hw) {
+  const stages = [
+    { label: "Sales", done: !!order.order_no },
+    { label: "Sizing", done: order.sizing_received === "Yes" },
+    { label: "Hardware", done: order.cnc_slotting !== "Yes" || (hw && hw.door_lock && hw.hinges) },
+    { label: "Laminate", done: order.laminate_ordered === "Yes" && order.edgeband_ordered === "Yes" },
+    { label: "Production", done: !!order.production_date },
+    { label: "Install", done: !!order.installation_date },
+    { label: "QC", done: order.qc_status === "Passed" },
+  ];
+  return stages;
+}
+
+// ---------------- Login ----------------
+function Login({ onLogin }) {
+  const [role, setRole] = useState(null);
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState("");
+
+  const submit = () => {
+    if (!role) return;
+    if (pin === ROLES[role].pin) {
+      localStorage.setItem("gwpl_ort_role", role);
+      onLogin(role);
+    } else {
+      setError("That PIN doesn't match. Try again.");
+    }
+  };
+
+  return (
+    <div className="login-stage">
+      <div className="login-brand">
+        <div className="brand-eyebrow">Geetanjali Woodcraft Pvt. Ltd.</div>
+        <h1>Every order,<br/><em>tracked door to door.</em></h1>
+        <p>From first sales entry through sizing, hardware, lamination, production and site installation — one running record, kept in your Google Sheet.</p>
+        <div className="login-tags">
+          <span className="login-tag">SALES</span>
+          <span className="login-tag">SIZING</span>
+          <span className="login-tag">HARDWARE</span>
+          <span className="login-tag">LAMINATE</span>
+          <span className="login-tag">PRODUCTION</span>
+          <span className="login-tag">INSTALL</span>
+          <span className="login-tag">QC</span>
+        </div>
+      </div>
+      <div className="login-panel">
+        <div className="login-card">
+          <h2>Sign in to continue</h2>
+          <div className="role-list">
+            {Object.entries(ROLES).map(([key, r]) => (
+              <button
+                key={key}
+                className={"role-tag" + (role === key ? " active" : "")}
+                style={{ "--role-color": r.color }}
+                onClick={() => { setRole(key); setError(""); }}
+              >
+                <span className="rt-dot"></span>
+                <span>
+                  <span className="rt-name">{r.label}</span>
+                  <span className="rt-sub" style={{display:"block"}}>{r.sub}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="pin-row">
+            <input
+              type="password" inputMode="numeric" maxLength="4" placeholder="PIN"
+              value={pin}
+              onChange={e => setPin(e.target.value.replace(/\D/g, ""))}
+              onKeyDown={e => e.key === "Enter" && submit()}
+            />
+            <button className="enter-btn" onClick={submit} disabled={!role}>Enter</button>
+          </div>
+          {error && <div className="login-err">{error}</div>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Inline editable field ----------------
+function EditField({ value, onCommit, editable, type = "text", options = null }) {
+  const [val, setVal] = useState(value ?? "");
+  useEffect(() => setVal(value ?? ""), [value]);
+
+  if (!editable) {
+    return <div className="fc-val">{value || <span style={{ color: "var(--muted-2)" }}>—</span>}</div>;
+  }
+  if (type === "select") {
+    return (
+      <select value={val} onChange={e => { setVal(e.target.value); onCommit(e.target.value); }}>
+        <option value=""></option>
+        {options.map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+    );
+  }
+  return (
+    <input
+      type={type}
+      value={val}
+      onChange={e => setVal(e.target.value)}
+      onBlur={() => { if (val !== (value ?? "")) onCommit(val); }}
+      onKeyDown={e => e.key === "Enter" && e.target.blur()}
+    />
+  );
+}
+
+// ---------------- Order detail modal ----------------
+function OrderDetail({ order, hardware, role, onClose, onUpdateOrder, onUpdateHardware }) {
+  const salesEditable = canEditGroup(role, "sales");
+  const stages = stageStatus(order, hardware);
+
+  const Card = ({ title, color, group, children }) => (
+    <div className="field-card">
+      <div className="field-card-head" style={{ background: color }}>{title}</div>
+      {children}
+    </div>
+  );
+
+  return (
+    <div className="modal-veil" onClick={onClose}>
+      <div className="modal-box" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <div>
+            <h2>{order.project_name || "Untitled project"}</h2>
+            <span className="oc-tag mono">{order.order_no}</span>
+          </div>
+          <button className="close-x" onClick={onClose}>✕</button>
+        </div>
+        <div className="modal-body">
+          <Card title="Sales Details" color="var(--role-sales)">
+            <div className="field-grid">
+              {[
+                ["salesperson", "Salesperson"], ["developer_name", "Developer"], ["project_name", "Project Name"],
+                ["location", "Location"], ["office_coordinator", "Office Coordinator"], ["office_coordinator_no", "Office Coord. No."],
+                ["site_coordinator", "Site Coordinator"], ["site_coordinator_no", "Site Coord. No."],
+              ].map(([k, label]) => (
+                <div className="field-cell" key={k}>
+                  <label>{label}</label>
+                  <EditField value={order[k]} editable={salesEditable} onCommit={v => onUpdateOrder(k, v)} />
+                </div>
+              ))}
+              <div className="field-cell">
+                <label>Order Type</label>
+                <EditField value={order.order_type} editable={salesEditable} type="select" options={["Sample", "Full Order"]} onCommit={v => onUpdateOrder("order_type", v)} />
+              </div>
+              <div className="field-cell">
+                <label>CNC Slotting</label>
+                <EditField value={order.cnc_slotting} editable={salesEditable} type="select" options={["Yes", "No"]} onCommit={v => onUpdateOrder("cnc_slotting", v)} />
+              </div>
+            </div>
+          </Card>
+
+          <Card title="Quantities" color="var(--role-sales)">
+            <div className="field-grid cols-4">
+              {QTY_FIELDS.map(q => (
+                <div className="field-cell" key={q.key}>
+                  <label>{q.label}</label>
+                  <EditField value={order[q.key]} type="number" editable={salesEditable} onCommit={v => onUpdateOrder(q.key, v)} />
+                </div>
+              ))}
+              <div className="field-cell">
+                <label>Other (label)</label>
+                <EditField value={order.other_label} editable={salesEditable} onCommit={v => onUpdateOrder("other_label", v)} />
+              </div>
+              <div className="field-cell">
+                <label>Other Frame Qty</label>
+                <EditField value={order.other_frame_qty} type="number" editable={salesEditable} onCommit={v => onUpdateOrder("other_frame_qty", v)} />
+              </div>
+              <div className="field-cell">
+                <label>Other Door Qty</label>
+                <EditField value={order.other_door_qty} type="number" editable={salesEditable} onCommit={v => onUpdateOrder("other_door_qty", v)} />
+              </div>
+            </div>
+          </Card>
+
+          {order.cnc_slotting === "Yes" && (
+            <Card title="Hardware" color="var(--role-sales)">
+              <div className="field-grid">
+                <div className="field-cell">
+                  <label>Door Lock</label>
+                  <EditField value={hardware.door_lock} editable={salesEditable} type="select" options={["Yes", "No"]} onCommit={v => onUpdateHardware("door_lock", v)} />
+                </div>
+                <div className="field-cell">
+                  <label>Door Lock Brand</label>
+                  <EditField value={hardware.door_lock_brand} editable={salesEditable} onCommit={v => onUpdateHardware("door_lock_brand", v)} />
+                </div>
+                <div className="field-cell">
+                  <label>Hinges</label>
+                  <EditField value={hardware.hinges} editable={salesEditable} type="select" options={["Yes", "No"]} onCommit={v => onUpdateHardware("hinges", v)} />
+                </div>
+                <div className="field-cell">
+                  <label>Hinges Brand</label>
+                  <EditField value={hardware.hinges_brand} editable={salesEditable} onCommit={v => onUpdateHardware("hinges_brand", v)} />
+                </div>
+              </div>
+            </Card>
+          )}
+
+          <Card title="Sizing — Bajrang / Madhav" color="var(--role-sizing)">
+            <div className="field-grid">
+              <div className="field-cell">
+                <label>Sizing Received</label>
+                <EditField value={order.sizing_received} editable={canEditGroup(role, "sizing")} type="select" options={["Yes", "No"]} onCommit={v => onUpdateOrder("sizing_received", v)} />
+              </div>
+              <div className="field-cell">
+                <label>Sizing Date</label>
+                <EditField value={order.sizing_date} type="date" editable={canEditGroup(role, "sizing")} onCommit={v => onUpdateOrder("sizing_date", v)} />
+              </div>
+              <div className="field-cell">
+                <label>Confirmed By</label>
+                <EditField value={order.sizing_confirmed_by} editable={canEditGroup(role, "sizing")} onCommit={v => onUpdateOrder("sizing_confirmed_by", v)} />
+              </div>
+            </div>
+          </Card>
+
+          <Card title="Laminate & Edgeband — Piyush" color="var(--role-piyush)">
+            <div className="field-grid">
+              <div className="field-cell">
+                <label>Laminate Ordered</label>
+                <EditField value={order.laminate_ordered} editable={canEditGroup(role, "piyush")} type="select" options={["Yes", "No"]} onCommit={v => onUpdateOrder("laminate_ordered", v)} />
+              </div>
+              <div className="field-cell">
+                <label>Laminate ETA</label>
+                <EditField value={order.laminate_eta} type="date" editable={canEditGroup(role, "piyush")} onCommit={v => onUpdateOrder("laminate_eta", v)} />
+              </div>
+              <div className="field-cell">
+                <label>Edgeband Ordered</label>
+                <EditField value={order.edgeband_ordered} editable={canEditGroup(role, "piyush")} type="select" options={["Yes", "No"]} onCommit={v => onUpdateOrder("edgeband_ordered", v)} />
+              </div>
+              <div className="field-cell">
+                <label>Edgeband ETA</label>
+                <EditField value={order.edgeband_eta} type="date" editable={canEditGroup(role, "piyush")} onCommit={v => onUpdateOrder("edgeband_eta", v)} />
+              </div>
+            </div>
+          </Card>
+
+          <Card title="Production — Khushal" color="var(--role-khushal)">
+            <div className="field-grid">
+              <div className="field-cell">
+                <label>Production Date</label>
+                <EditField value={order.production_date} type="date" editable={canEditGroup(role, "khushal")} onCommit={v => onUpdateOrder("production_date", v)} />
+              </div>
+            </div>
+          </Card>
+
+          <Card title="Installation, QC & Site — Milan" color="var(--role-milan)">
+            <div className="field-grid">
+              <div className="field-cell">
+                <label>Installation Date</label>
+                <EditField value={order.installation_date} type="date" editable={canEditGroup(role, "milan")} onCommit={v => onUpdateOrder("installation_date", v)} />
+              </div>
+              <div className="field-cell">
+                <label>QC Status</label>
+                <EditField value={order.qc_status} editable={canEditGroup(role, "milan")} type="select" options={["Pending", "In Progress", "Passed", "Failed"]} onCommit={v => onUpdateOrder("qc_status", v)} />
+              </div>
+              <div className="field-cell">
+                <label>Site Status</label>
+                <EditField value={order.site_status} editable={canEditGroup(role, "milan")} type="select" options={["Not Started", "In Progress", "Completed"]} onCommit={v => onUpdateOrder("site_status", v)} />
+              </div>
+            </div>
+          </Card>
+
+          <div className="stage-track" style={{ marginTop: 6 }}>
+            {stages.map((s, i) => <div key={i} className={"stage-dot" + (s.done ? " done" : "")} title={s.label}></div>)}
+          </div>
+          <div className="stage-track-label">{stages.filter(s => s.done).length} of {stages.length} stages complete</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- New order modal ----------------
+function NewOrderModal({ salespersons, onClose, onCreated }) {
+  const [form, setForm] = useState(blankOrder());
+  const [dup, setDup] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
+
+  const submit = async (override) => {
+    if (!form.order_no || !form.project_name) { alert("Order No. and Project Name are required."); return; }
+    setSaving(true);
+    const result = await apiPost({ action: "insertOrder", values: form, override: !!override });
+    setSaving(false);
+    if (result.duplicate) {
+      setDup(result);
+      return;
+    }
+    onCreated();
+  };
+
+  return (
+    <div className="modal-veil" onClick={onClose}>
+      <div className="modal-box" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <h2>New Order</h2>
+          <button className="close-x" onClick={onClose}>✕</button>
+        </div>
+        <div className="modal-body">
+          {dup && (
+            <div className="dup-warning">
+              <strong>Order No. "{form.order_no}" is already used this year</strong> — for "{dup.project_name}" ({dup.salesperson}).
+              Double-check before continuing. If this is intentional, you can override and save anyway.
+            </div>
+          )}
+
+          <div className="form-section-title">Order Basics</div>
+          <div className="form-grid">
+            <div className="form-field"><label>Order No.</label><input value={form.order_no} onChange={e => set("order_no", e.target.value)} /></div>
+            <div className="form-field">
+              <label>Salesperson</label>
+              <input list="sp-list" value={form.salesperson} onChange={e => set("salesperson", e.target.value)} placeholder="Type initials..." />
+              <datalist id="sp-list">{salespersons.map(s => <option key={s} value={s} />)}</datalist>
+            </div>
+            <div className="form-field"><label>Developer Name</label><input value={form.developer_name} onChange={e => set("developer_name", e.target.value)} /></div>
+            <div className="form-field"><label>Project Name</label><input value={form.project_name} onChange={e => set("project_name", e.target.value)} /></div>
+            <div className="form-field"><label>Location</label><input value={form.location} onChange={e => set("location", e.target.value)} /></div>
+            <div className="form-field">
+              <label>Sample or Full Order</label>
+              <div className="toggle-row">
+                <div className={"toggle-opt" + (form.order_type === "Sample" ? " active-yes" : "")} onClick={() => set("order_type", "Sample")}>Sample</div>
+                <div className={"toggle-opt" + (form.order_type === "Full Order" ? " active-yes" : "")} onClick={() => set("order_type", "Full Order")}>Full Order</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-section-title">Coordinators</div>
+          <div className="form-grid">
+            <div className="form-field"><label>Office Coordinator</label><input value={form.office_coordinator} onChange={e => set("office_coordinator", e.target.value)} /></div>
+            <div className="form-field"><label>Office Coordinator No.</label><input value={form.office_coordinator_no} onChange={e => set("office_coordinator_no", e.target.value)} /></div>
+            <div className="form-field"><label>Site Coordinator</label><input value={form.site_coordinator} onChange={e => set("site_coordinator", e.target.value)} /></div>
+            <div className="form-field"><label>Site Coordinator No.</label><input value={form.site_coordinator_no} onChange={e => set("site_coordinator_no", e.target.value)} /></div>
+          </div>
+
+          <div className="form-section-title">Quantities</div>
+          <div className="form-grid cols-4">
+            {QTY_FIELDS.map(q => (
+              <div className="form-field" key={q.key}><label>{q.label}</label><input type="number" value={form[q.key]} onChange={e => set(q.key, e.target.value)} /></div>
+            ))}
+            <div className="form-field"><label>Other (label)</label><input value={form.other_label} onChange={e => set("other_label", e.target.value)} /></div>
+            <div className="form-field"><label>Other Frame Qty</label><input type="number" value={form.other_frame_qty} onChange={e => set("other_frame_qty", e.target.value)} /></div>
+            <div className="form-field"><label>Other Door Qty</label><input type="number" value={form.other_door_qty} onChange={e => set("other_door_qty", e.target.value)} /></div>
+          </div>
+
+          <div className="form-section-title">CNC Slotting</div>
+          <div className="toggle-row" style={{ marginBottom: 12 }}>
+            <div className={"toggle-opt" + (form.cnc_slotting === "Yes" ? " active-yes" : "")} onClick={() => set("cnc_slotting", "Yes")}>Yes</div>
+            <div className={"toggle-opt" + (form.cnc_slotting === "No" ? " active-no" : "")} onClick={() => set("cnc_slotting", "No")}>No</div>
+          </div>
+
+          {form.cnc_slotting === "Yes" && (
+            <React.Fragment>
+              <div className="form-section-title">Hardware</div>
+              <div className="form-grid">
+                <div className="form-field">
+                  <label>Door Lock</label>
+                  <select value={form.door_lock} onChange={e => set("door_lock", e.target.value)}>
+                    <option value=""></option><option>Yes</option><option>No</option>
+                  </select>
+                </div>
+                <div className="form-field"><label>Door Lock Brand</label><input value={form.door_lock_brand} onChange={e => set("door_lock_brand", e.target.value)} /></div>
+                <div className="form-field">
+                  <label>Hinges</label>
+                  <select value={form.hinges} onChange={e => set("hinges", e.target.value)}>
+                    <option value=""></option><option>Yes</option><option>No</option>
+                  </select>
+                </div>
+                <div className="form-field"><label>Hinges Brand</label><input value={form.hinges_brand} onChange={e => set("hinges_brand", e.target.value)} /></div>
+              </div>
+            </React.Fragment>
+          )}
+        </div>
+        <div className="modal-foot">
+          <button className="ghost-btn" onClick={onClose}>Cancel</button>
+          {dup ? (
+            <button className="primary-btn" onClick={() => submit(true)} disabled={saving}>Override & Save Anyway</button>
+          ) : (
+            <button className="primary-btn" onClick={() => submit(false)} disabled={saving}>{saving ? "Saving..." : "Save Order"}</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Salesperson manager ----------------
+function SalespersonManager({ salespersons, onClose, onChanged }) {
+  const [name, setName] = useState("");
+
+  const add = async () => {
+    if (!name.trim()) return;
+    await apiPost({ action: "addSalesperson", name: name.trim() });
+    setName("");
+    onChanged();
+  };
+  const remove = async (n) => {
+    if (!window.confirm("Remove " + n + " from the salesperson list?")) return;
+    await apiPost({ action: "deleteSalesperson", name: n });
+    onChanged();
+  };
+
+  return (
+    <div className="modal-veil" onClick={onClose}>
+      <div className="modal-box narrow" onClick={e => e.stopPropagation()}>
+        <div className="modal-head"><h2>Salespersons</h2><button className="close-x" onClick={onClose}>✕</button></div>
+        <div className="modal-body">
+          <div className="sales-manager-list">
+            {salespersons.map(n => (
+              <div className="sales-manager-row" key={n}>
+                {n}
+                <button className="sm-del" onClick={() => remove(n)}>Remove</button>
+              </div>
+            ))}
+          </div>
+          <div className="form-grid" style={{ gridTemplateColumns: "1fr auto" }}>
+            <input placeholder="New salesperson name" value={name} onChange={e => setName(e.target.value)} onKeyDown={e => e.key === "Enter" && add()} />
+            <button className="primary-btn" onClick={add}>Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Order card row ----------------
+function OrderCard({ order, hardware, onOpen }) {
+  const stages = stageStatus(order, hardware);
+  return (
+    <div className="order-card" onClick={onOpen}>
+      <div><span className="oc-tag mono">{order.order_no}</span></div>
+      <div className="oc-main">
+        <div className="oc-project">{order.project_name || "Untitled"}</div>
+        <div className="oc-meta">{order.developer_name} · {order.location}</div>
+      </div>
+      <div className="oc-col"><div className="oc-label">Salesperson</div><div className="oc-val">{order.salesperson || "—"}</div></div>
+      <div className="oc-col"><div className="oc-label">Type</div><div className="oc-val">{order.order_type || "—"}</div></div>
+      <div>
+        <div className="stage-track">
+          {stages.map((s, i) => <div key={i} className={"stage-dot" + (s.done ? " done" : "")} title={s.label}></div>)}
+        </div>
+        <div className="stage-track-label">{stages.filter(s => s.done).length}/{stages.length} stages</div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Main App ----------------
+function App() {
+  const [role, setRole] = useState(() => localStorage.getItem("gwpl_ort_role"));
+  const [orders, setOrders] = useState([]);
+  const [hardwareMap, setHardwareMap] = useState({});
+  const [salespersons, setSalespersons] = useState([]);
+  const [search, setSearch] = useState("");
+  const [connected, setConnected] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [openOrder, setOpenOrder] = useState(null);
+  const [showNew, setShowNew] = useState(false);
+  const [showSalesMgr, setShowSalesMgr] = useState(false);
+  const editingRef = useRef(false);
+  const pollRef = useRef(null);
+
+  const fetchAll = useCallback(async () => {
+    try {
+      const data = await apiGet();
+      if (!editingRef.current) {
+        setOrders(data.orders || []);
+        const hw = {};
+        (data.hardware || []).forEach(h => (hw[h.order_no] = h));
+        setHardwareMap(hw);
+        setSalespersons(data.salespersons || []);
+      }
+      setConnected(true);
+    } catch (err) {
+      setConnected(false);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (!role) return;
+    fetchAll();
+    pollRef.current = setInterval(fetchAll, POLL_MS);
+    return () => clearInterval(pollRef.current);
+  }, [role, fetchAll]);
+
+  useEffect(() => {
+    if (openOrder) {
+      const fresh = orders.find(o => o.row === openOrder.row);
+      if (fresh) setOpenOrder(fresh);
+    }
+  }, [orders]);
+
+  const updateOrderField = async (order, key, value) => {
+    setOrders(prev => prev.map(o => (o.row === order.row ? { ...o, [key]: value } : o)));
+    await apiPost({ action: "updateOrderField", row: order.row, key, value });
+  };
+  const updateHardwareField = async (order, key, value) => {
+    setHardwareMap(prev => ({ ...prev, [order.order_no]: { ...(prev[order.order_no] || {}), [key]: value } }));
+    await apiPost({ action: "updateHardwareField", order_no: order.order_no, key, value });
+  };
+
+  if (!role) return <Login onLogin={setRole} />;
+
+  const filtered = orders.filter(o => {
+    if (!search.trim()) return true;
+    const s = search.toLowerCase();
+    return ["order_no", "project_name", "salesperson", "location", "developer_name"].some(k => (o[k] || "").toString().toLowerCase().includes(s));
+  });
+
+  const canCreate = ROLES[role].group === "sales" || ROLES[role].group === "admin";
+
+  return (
+    <div
+      className="app"
+      onFocusCapture={() => (editingRef.current = true)}
+      onBlurCapture={() => (editingRef.current = false)}
+    >
+      <div className="topbar">
+        <div className="topbar-brand">
+          <div className="mark"></div>
+          <div>
+            <h1>GWPL Order Tracker</h1>
+            <div className="sub">Geetanjali Woodcraft · Digital Operations</div>
+          </div>
+        </div>
+        <div className="topbar-right">
+          <div className="sync-pill"><span className={"sync-dot" + (connected ? "" : " off")}></span>{connected ? "Synced to Google Sheet" : "Reconnecting..."}</div>
+          <div className="role-chip"><span className="rt-dot" style={{ background: ROLES[role].color }}></span>{ROLES[role].label}</div>
+          <button className="ghost-btn" onClick={() => { localStorage.removeItem("gwpl_ort_role"); setRole(null); }}>Switch</button>
+        </div>
+      </div>
+
+      <div className="toolbar">
+        <input className="search-in" placeholder="Search order no., project, salesperson, location..." value={search} onChange={e => setSearch(e.target.value)} />
+        <div className="toolbar-actions">
+          <span className="count-note">{filtered.length} order{filtered.length === 1 ? "" : "s"}</span>
+          {canCreate && <button className="ghost-btn" onClick={() => setShowSalesMgr(true)}>Salespersons</button>}
+          {canCreate && <button className="primary-btn" onClick={() => setShowNew(true)}>+ New Order</button>}
+        </div>
+      </div>
+
+      <div className="list-wrap">
+        {loading ? (
+          <div className="empty-state">Loading orders…</div>
+        ) : filtered.length === 0 ? (
+          <div className="empty-state">
+            <h3>No orders yet</h3>
+            <p>{canCreate ? "Start by adding the first order." : "Once Sales adds an order, it'll show up here."}</p>
+          </div>
+        ) : (
+          filtered.map(o => (
+            <OrderCard key={o.row} order={o} hardware={hardwareMap[o.order_no] || {}} onOpen={() => setOpenOrder(o)} />
+          ))
+        )}
+      </div>
+
+      {openOrder && (
+        <OrderDetail
+          order={openOrder}
+          hardware={hardwareMap[openOrder.order_no] || {}}
+          role={role}
+          onClose={() => setOpenOrder(null)}
+          onUpdateOrder={(k, v) => updateOrderField(openOrder, k, v)}
+          onUpdateHardware={(k, v) => updateHardwareField(openOrder, k, v)}
+        />
+      )}
+      {showNew && (
+        <NewOrderModal
+          salespersons={salespersons}
+          onClose={() => setShowNew(false)}
+          onCreated={() => { setShowNew(false); fetchAll(); }}
+        />
+      )}
+      {showSalesMgr && (
+        <SalespersonManager
+          salespersons={salespersons}
+          onClose={() => setShowSalesMgr(false)}
+          onChanged={fetchAll}
+        />
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
