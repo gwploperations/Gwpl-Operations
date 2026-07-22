@@ -58,14 +58,6 @@
     flex:0 0 40%;display:flex;flex-direction:column;justify-content:center;padding:60px;
     border-right:1px solid var(--line);position:relative;
   }
-  .login-brand::before{
-    content:"";position:absolute;inset:0;
-    background:
-      linear-gradient(180deg, transparent 0%, transparent 8%, var(--line) 8%, var(--line) calc(8% + 1px), transparent calc(8% + 1px)),
-      linear-gradient(180deg, transparent 46%, var(--line) 46%, var(--line) calc(46% + 1px), transparent calc(46% + 1px)),
-      linear-gradient(180deg, transparent 92%, var(--line) 92%, var(--line) calc(92% + 1px), transparent calc(92% + 1px));
-    pointer-events:none;
-  }
   .brand-eyebrow{color:var(--brass);font-size:11px;letter-spacing:3px;font-weight:600;text-transform:uppercase;margin-bottom:14px;}
   .login-brand h1{font-size:44px;font-weight:600;line-height:1.08;margin:0 0 18px;color:var(--text);}
   .login-brand h1 em{color:var(--brass-light);font-style:normal;}
@@ -77,32 +69,23 @@
   }
 
   .login-panel{flex:1;display:flex;align-items:center;justify-content:center;padding:40px;}
-  .login-card{width:100%;max-width:420px;}
+  .login-card{width:100%;max-width:400px;}
   .login-card h2{font-size:15px;color:var(--muted);font-weight:600;margin:0 0 22px;text-transform:uppercase;letter-spacing:1.5px;}
-  .role-list{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;}
-  .role-tag{
-    display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);
-    border-left:4px solid var(--role-color, var(--brass));border-radius:4px;padding:13px 16px;cursor:pointer;
-    transition:.15s;text-align:left;
+  .login-field{margin-bottom:14px;}
+  .login-field label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:6px;}
+  .login-select, .login-input{
+    width:100%;background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:12px 14px;
+    font-size:14px;color:var(--text);
   }
-  .role-tag:hover{background:var(--panel-2);}
-  .role-tag.active{background:var(--panel-2);border-color:var(--role-color);box-shadow:0 0 0 1px var(--role-color);}
-  .role-tag .rt-dot{width:9px;height:9px;border-radius:50%;background:var(--role-color, var(--brass));flex-shrink:0;}
-  .role-tag .rt-name{font-weight:600;font-size:14.5px;color:var(--text);}
-  .role-tag .rt-sub{font-size:11.5px;color:var(--muted);margin-top:1px;}
-  .pin-row{display:flex;gap:10px;}
-  .pin-row input{
-    flex:1;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:12px 14px;
-    font-size:18px;letter-spacing:6px;text-align:center;color:var(--text);
-  }
-  .pin-row input:focus{outline:none;border-color:var(--brass);}
+  .login-select:focus, .login-input:focus{outline:none;border-color:var(--brass);}
   .enter-btn{
-    background:var(--brass);color:#14171B;border:none;border-radius:4px;padding:0 22px;font-weight:700;
-    font-size:14px;cursor:pointer;
+    width:100%;background:var(--brass);color:#14171B;border:none;border-radius:5px;padding:13px;font-weight:700;
+    font-size:14px;cursor:pointer;margin-top:6px;
   }
   .enter-btn:hover{background:var(--brass-light);}
   .enter-btn:disabled{background:var(--muted-2);cursor:not-allowed;}
   .login-err{color:var(--bad);font-size:12.5px;margin-top:10px;}
+  .login-hint{color:var(--muted-2);font-size:11.5px;margin-top:14px;line-height:1.6;}
 
   /* ============ APP SHELL ============ */
   .app{display:flex;flex-direction:column;height:100vh;}
@@ -278,15 +261,14 @@ async function apiPost(payload) {
   return res.json();
 }
 
-// Role PINs are a UI convenience for internal use, not real security. Change before sharing.
 const ROLES = {
-  ankit:   { label: "Ankit",         sub: "Full access — everything",       pin: "4321", group: "admin",   color: "var(--role-admin)" },
-  vidhi:   { label: "Vidhi Shinde",  sub: "Sales — order intake",           pin: "1111", group: "sales",   color: "var(--role-sales)" },
-  bajrang: { label: "Bajrang",       sub: "Sizing",                         pin: "2222", group: "sizing",  color: "var(--role-sizing)" },
-  madhav:  { label: "Madhav",        sub: "Sizing",                         pin: "2233", group: "sizing",  color: "var(--role-sizing)" },
-  piyush:  { label: "Piyush",        sub: "Laminate & edgeband",            pin: "3333", group: "piyush",  color: "var(--role-piyush)" },
-  khushal: { label: "Khushal",       sub: "Production date",                pin: "4444", group: "khushal", color: "var(--role-khushal)" },
-  milan:   { label: "Milan",         sub: "Installation, QC & site status", pin: "5555", group: "milan",   color: "var(--role-milan)" },
+  ankit:   { label: "Ankit",        group: "admin",   color: "var(--role-admin)" },
+  vidhi:   { label: "Vidhi Shinde", group: "sales",   color: "var(--role-sales)" },
+  bajrang: { label: "Bajrang",      group: "sizing",  color: "var(--role-sizing)" },
+  madhav:  { label: "Madhav",       group: "sizing",  color: "var(--role-sizing)" },
+  piyush:  { label: "Piyush",       group: "piyush",  color: "var(--role-piyush)" },
+  khushal: { label: "Khushal",      group: "khushal", color: "var(--role-khushal)" },
+  milan:   { label: "Milan",        group: "milan",   color: "var(--role-milan)" },
 };
 
 function canEditGroup(role, fieldGroup) {
@@ -326,17 +308,22 @@ function stageStatus(order, hw) {
 
 // ---------------- Login ----------------
 function Login({ onLogin }) {
-  const [role, setRole] = useState(null);
-  const [pin, setPin] = useState("");
+  const [role, setRole] = useState("ankit");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [checking, setChecking] = useState(false);
 
-  const submit = () => {
-    if (!role) return;
-    if (pin === ROLES[role].pin) {
+  const submit = async () => {
+    if (!password) { setError("Enter your password."); return; }
+    setChecking(true);
+    setError("");
+    const result = await apiPost({ action: "login", role, password });
+    setChecking(false);
+    if (result && result.ok) {
       localStorage.setItem("gwpl_ort_role", role);
       onLogin(role);
     } else {
-      setError("That PIN doesn't match. Try again.");
+      setError("Incorrect password. Try again.");
     }
   };
 
@@ -359,32 +346,120 @@ function Login({ onLogin }) {
       <div className="login-panel">
         <div className="login-card">
           <h2>Sign in to continue</h2>
-          <div className="role-list">
-            {Object.entries(ROLES).map(([key, r]) => (
-              <button
-                key={key}
-                className={"role-tag" + (role === key ? " active" : "")}
-                style={{ "--role-color": r.color }}
-                onClick={() => { setRole(key); setError(""); }}
-              >
-                <span className="rt-dot"></span>
-                <span>
-                  <span className="rt-name">{r.label}</span>
-                  <span className="rt-sub" style={{display:"block"}}>{r.sub}</span>
-                </span>
-              </button>
-            ))}
+          <div className="login-field">
+            <label>Name</label>
+            <select className="login-select" value={role} onChange={e => { setRole(e.target.value); setError(""); }}>
+              {Object.entries(ROLES).map(([key, r]) => <option key={key} value={key}>{r.label}</option>)}
+            </select>
           </div>
-          <div className="pin-row">
+          <div className="login-field">
+            <label>Password</label>
             <input
-              type="password" inputMode="numeric" maxLength="4" placeholder="PIN"
-              value={pin}
-              onChange={e => setPin(e.target.value.replace(/\D/g, ""))}
+              type="password" className="login-input" placeholder="Password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
               onKeyDown={e => e.key === "Enter" && submit()}
             />
-            <button className="enter-btn" onClick={submit} disabled={!role}>Enter</button>
           </div>
+          <button className="enter-btn" onClick={submit} disabled={checking}>{checking ? "Checking..." : "Enter"}</button>
           {error && <div className="login-err">{error}</div>}
+          <div className="login-hint">First time signing in? Your default password is your name followed by @2026 — e.g. Vidhi@2026. You can change it once you're in.</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Change password modal ----------------
+function ChangePasswordModal({ role, onClose }) {
+  const [oldPw, setOldPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [msg, setMsg] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const submit = async () => {
+    if (!oldPw || !newPw) { setMsg({ type: "err", text: "Fill in both fields." }); return; }
+    if (newPw !== confirmPw) { setMsg({ type: "err", text: "New passwords don't match." }); return; }
+    setSaving(true);
+    const result = await apiPost({ action: "changePassword", role, oldPassword: oldPw, newPassword: newPw });
+    setSaving(false);
+    if (result && result.ok) {
+      setMsg({ type: "ok", text: "Password updated. Ankit has been notified by email." });
+      setOldPw(""); setNewPw(""); setConfirmPw("");
+    } else {
+      setMsg({ type: "err", text: result.error || "Current password is incorrect." });
+    }
+  };
+
+  return (
+    <div className="modal-veil" onClick={onClose}>
+      <div className="modal-box narrow" onClick={e => e.stopPropagation()}>
+        <div className="modal-head"><h2>Change Password</h2><button className="close-x" onClick={onClose}>✕</button></div>
+        <div className="modal-body">
+          <div className="form-field" style={{ marginBottom: 12 }}>
+            <label>Current Password</label>
+            <input type="password" value={oldPw} onChange={e => setOldPw(e.target.value)} />
+          </div>
+          <div className="form-field" style={{ marginBottom: 12 }}>
+            <label>New Password</label>
+            <input type="password" value={newPw} onChange={e => setNewPw(e.target.value)} />
+          </div>
+          <div className="form-field" style={{ marginBottom: 4 }}>
+            <label>Confirm New Password</label>
+            <input type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} />
+          </div>
+          {msg && <div className={msg.type === "ok" ? "login-hint" : "login-err"} style={{ marginTop: 10 }}>{msg.text}</div>}
+        </div>
+        <div className="modal-foot">
+          <button className="ghost-btn" onClick={onClose}>Close</button>
+          <button className="primary-btn" onClick={submit} disabled={saving}>{saving ? "Saving..." : "Update Password"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Admin: reset anyone's password ----------------
+function ResetPasswordModal({ onClose }) {
+  const [targetRole, setTargetRole] = useState("vidhi");
+  const [newPw, setNewPw] = useState("");
+  const [msg, setMsg] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const submit = async () => {
+    if (!newPw) { setMsg({ type: "err", text: "Enter a new password." }); return; }
+    setSaving(true);
+    const result = await apiPost({ action: "resetPassword", role: targetRole, newPassword: newPw });
+    setSaving(false);
+    if (result && result.ok) {
+      setMsg({ type: "ok", text: ROLES[targetRole].label + "'s password has been reset. They (and Ankit) were notified by email." });
+      setNewPw("");
+    } else {
+      setMsg({ type: "err", text: "Something went wrong." });
+    }
+  };
+
+  return (
+    <div className="modal-veil" onClick={onClose}>
+      <div className="modal-box narrow" onClick={e => e.stopPropagation()}>
+        <div className="modal-head"><h2>Reset Someone's Password</h2><button className="close-x" onClick={onClose}>✕</button></div>
+        <div className="modal-body">
+          <div className="form-field" style={{ marginBottom: 12 }}>
+            <label>Team Member</label>
+            <select value={targetRole} onChange={e => setTargetRole(e.target.value)}>
+              {Object.entries(ROLES).filter(([k]) => k !== "ankit").map(([key, r]) => <option key={key} value={key}>{r.label}</option>)}
+            </select>
+          </div>
+          <div className="form-field">
+            <label>New Password</label>
+            <input type="text" value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="e.g. Vidhi@2026" />
+          </div>
+          {msg && <div className={msg.type === "ok" ? "login-hint" : "login-err"} style={{ marginTop: 10 }}>{msg.text}</div>}
+        </div>
+        <div className="modal-foot">
+          <button className="ghost-btn" onClick={onClose}>Close</button>
+          <button className="primary-btn" onClick={submit} disabled={saving}>{saving ? "Saving..." : "Reset Password"}</button>
         </div>
       </div>
     </div>
@@ -771,6 +846,8 @@ function App() {
   const [openOrder, setOpenOrder] = useState(null);
   const [showNew, setShowNew] = useState(false);
   const [showSalesMgr, setShowSalesMgr] = useState(false);
+  const [showChangePw, setShowChangePw] = useState(false);
+  const [showResetPw, setShowResetPw] = useState(false);
   const editingRef = useRef(false);
   const pollRef = useRef(null);
 
@@ -841,6 +918,8 @@ function App() {
         <div className="topbar-right">
           <div className="sync-pill"><span className={"sync-dot" + (connected ? "" : " off")}></span>{connected ? "Synced to Google Sheet" : "Reconnecting..."}</div>
           <div className="role-chip"><span className="rt-dot" style={{ background: ROLES[role].color }}></span>{ROLES[role].label}</div>
+          <button className="ghost-btn" onClick={() => setShowChangePw(true)}>Change Password</button>
+          {ROLES[role].group === "admin" && <button className="ghost-btn" onClick={() => setShowResetPw(true)}>Reset Someone's Password</button>}
           <button className="ghost-btn" onClick={() => { localStorage.removeItem("gwpl_ort_role"); setRole(null); }}>Switch</button>
         </div>
       </div>
@@ -893,6 +972,8 @@ function App() {
           onChanged={fetchAll}
         />
       )}
+      {showChangePw && <ChangePasswordModal role={role} onClose={() => setShowChangePw(false)} />}
+      {showResetPw && <ResetPasswordModal onClose={() => setShowResetPw(false)} />}
     </div>
   );
 }
