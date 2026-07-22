@@ -245,7 +245,7 @@
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 // ============ CONFIGURATION ============
-const APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7mB0YPlWBRslyzdVtTtGJblAp6HFBtpaMRVl2BXt64tIMW8Jg_E0f2LnEtsjg9fkr2A/exec";
 const POLL_MS = 5000;
 
 async function apiGet() {
@@ -363,7 +363,6 @@ function Login({ onLogin }) {
           </div>
           <button className="enter-btn" onClick={submit} disabled={checking}>{checking ? "Checking..." : "Enter"}</button>
           {error && <div className="login-err">{error}</div>}
-          <div className="login-hint">First time signing in? Your default password is your name followed by @2026 — e.g. Vidhi@2026. You can change it once you're in.</div>
         </div>
       </div>
     </div>
